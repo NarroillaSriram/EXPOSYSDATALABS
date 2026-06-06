@@ -1,0 +1,284 @@
+{% extends "student/base_student.html" %}
+{% block title %}Payment - Exposys Data Labs{% endblock %}
+{% block page_title %}Payment{% endblock %}
+
+{% block content %}
+<style>
+  .pay-card {
+    background:#fff; border-radius:20px;
+    border:1px solid rgba(10,36,99,0.08);
+    overflow:hidden; box-shadow:0 10px 40px rgba(10,36,99,0.10);
+    max-width:700px; margin:0 auto;
+  }
+  .pay-header {
+    background:linear-gradient(135deg,var(--primary) 0%,#1a3a8f 100%);
+    padding:28px 32px; color:#fff;
+  }
+  .pay-body { padding:32px; }
+  .feature-row {
+    display:flex; align-items:center; gap:12px;
+    padding:12px 0; border-bottom:1px solid rgba(10,36,99,0.05);
+    font-size:0.875rem;
+  }
+  .feature-row:last-child { border-bottom:none; }
+  .feature-icon {
+    width:36px; height:36px; border-radius:10px; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    background:linear-gradient(135deg,var(--primary),#1a3a8f);
+  }
+  .feature-icon i { color:#fff; font-size:0.9rem; }
+  .amount-display {
+    background:linear-gradient(135deg,rgba(10,36,99,0.05),rgba(232,69,69,0.05));
+    border-radius:14px; padding:20px 24px;
+    border:1px solid rgba(10,36,99,0.1);
+    margin-bottom:24px;
+  }
+  .rzp-btn {
+    background:linear-gradient(135deg,#0a2463,#1a3a8f);
+    color:#fff; border:none; border-radius:12px;
+    padding:15px 28px; font-size:1.05rem; font-weight:700;
+    width:100%; cursor:pointer; transition:all 0.3s ease;
+    display:flex; align-items:center; justify-content:center; gap:10px;
+  }
+  .rzp-btn:hover { transform:translateY(-2px); box-shadow:0 10px 30px rgba(10,36,99,0.3); }
+  .rzp-btn:disabled { opacity:0.6; cursor:not-allowed; transform:none; }
+  .secure-badge {
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    font-size:0.78rem; color:var(--text-muted); margin-top:12px;
+  }
+  .status-card {
+    border-radius:16px; padding:32px; text-align:center;
+    max-width:480px; margin:0 auto;
+  }
+  .spinner { display:none; }
+  .spinner.active { display:inline-block; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  .spin-icon { animation:spin 1s linear infinite; }
+</style>
+
+{% if existing and existing.status == 'verified' %}
+<!-- ===== ALREADY VERIFIED ===== -->
+<div class="pay-card">
+  <div class="status-card">
+    <div style="width:90px;height:90px;background:#d1fae5;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
+      <i class="fas fa-check-circle" style="font-size:3rem;color:#10b981;"></i>
+    </div>
+    <h4 style="font-weight:800;color:#065f46;margin-bottom:8px;">Payment Verified!</h4>
+    <p style="color:var(--text-muted);margin-bottom:6px;">Your internship is confirmed.</p>
+    <div style="background:#f0fdf4;border-radius:10px;padding:14px;margin:16px 0;font-size:0.85rem;text-align:left;">
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+        <span style="color:var(--text-muted);">Transaction ID</span>
+        <strong style="font-family:monospace;">{{ existing.transaction_id }}</strong>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+        <span style="color:var(--text-muted);">Amount Paid</span>
+        <strong>₹{{ existing.amount | int }}</strong>
+      </div>
+      <div style="display:flex;justify-content:space-between;">
+        <span style="color:var(--text-muted);">Date</span>
+        <strong>{{ existing.created_at.strftime('%d %b %Y') }}</strong>
+      </div>
+    </div>
+    <a href="{{ url_for('student.dashboard') }}" class="btn btn-success w-100" style="border-radius:10px;font-weight:700;padding:12px;">
+      <i class="fas fa-tachometer-alt me-2"></i>Go to Dashboard
+    </a>
+  </div>
+</div>
+
+{% else %}
+<!-- ===== PAYMENT FORM ===== -->
+<div class="pay-card">
+  <div class="pay-header">
+    <div style="display:flex;align-items:center;gap:14px;">
+      <div style="width:52px;height:52px;background:rgba(255,255,255,0.15);border-radius:14px;display:flex;align-items:center;justify-content:center;">
+        <i class="fas fa-credit-card" style="font-size:1.4rem;color:var(--accent);"></i>
+      </div>
+      <div>
+        <h4 style="font-weight:800;margin:0 0 4px;">Complete Your Payment</h4>
+        <p style="margin:0;color:rgba(255,255,255,0.75);font-size:0.88rem;">
+          Secure payment powered by Razorpay &nbsp;·&nbsp; UPI · Cards · Net Banking
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="pay-body">
+    <!-- Amount Display -->
+    <div class="amount-display">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+        <div>
+          <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:4px;">Internship Registration Fee</div>
+          <div style="font-size:2.2rem;font-weight:800;color:var(--primary);">₹{{ amount }}</div>
+          <div style="font-size:0.78rem;color:var(--text-muted);">One-time payment · All taxes included</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:6px;">Domain</div>
+          <div style="background:var(--primary);color:#fff;border-radius:20px;padding:4px 14px;font-size:0.8rem;font-weight:700;">
+            {{ current_user.internship_domain }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- What you get -->
+    <div style="margin-bottom:24px;">
+      <div style="font-weight:700;color:var(--primary);font-size:0.85rem;margin-bottom:12px;">What's included:</div>
+      {% for icon, text in [
+        ('fa-certificate', 'Industry-recognized Internship Certificate'),
+        ('fa-file-alt', 'Letter of Recommendation (LOR)'),
+        ('fa-user-tie', 'Expert Mentorship Sessions'),
+        ('fa-project-diagram', 'Live Project Experience'),
+        ('fa-headset', '24/7 Support Access'),
+      ] %}
+      <div class="feature-row">
+        <div class="feature-icon"><i class="fas {{ icon }}"></i></div>
+        <span style="color:#374151;">{{ text }}</span>
+        <i class="fas fa-check-circle ms-auto" style="color:#10b981;"></i>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Pay Button -->
+    <div id="paymentSection">
+      <button id="payBtn" class="rzp-btn" onclick="startPayment()">
+        <i class="fas fa-lock me-1"></i>
+        Pay ₹{{ amount }} Securely
+      </button>
+      <div class="secure-badge">
+        <img src="https://razorpay.com/favicon.ico" width="14" height="14" alt="Razorpay">
+        Secured by Razorpay &nbsp;·&nbsp;
+        <i class="fas fa-shield-alt" style="color:#10b981;"></i>
+        256-bit SSL Encryption
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div id="loadingSection" style="display:none;text-align:center;padding:20px 0;">
+      <i class="fas fa-circle-notch fa-spin" style="font-size:2rem;color:var(--primary);"></i>
+      <p style="color:var(--text-muted);margin-top:12px;">Processing payment...</p>
+    </div>
+
+    <!-- Success State (shown after payment) -->
+    <div id="successSection" style="display:none;text-align:center;padding:10px 0;">
+      <i class="fas fa-check-circle" style="font-size:3rem;color:#10b981;"></i>
+      <h5 style="font-weight:800;color:#065f46;margin:12px 0 6px;">Payment Successful!</h5>
+      <p style="color:var(--text-muted);font-size:0.88rem;">Redirecting to your dashboard...</p>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+  const RAZORPAY_KEY = "{{ razorpay_key }}";
+
+  async function startPayment() {
+    const btn = document.getElementById('payBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-circle-notch fa-spin me-2"></i>Creating order...';
+
+    try {
+      // Step 1: Create order on server
+      const res = await fetch("{{ url_for('student.create_order') }}", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': getCookie('csrf_token')
+        },
+        body: JSON.stringify({})
+      });
+      const order = await res.json();
+
+      if (order.error) {
+        showError(order.error);
+        resetBtn();
+        return;
+      }
+
+      // Step 2: Open Razorpay checkout popup
+      const options = {
+        key: RAZORPAY_KEY,
+        amount: order.amount,
+        currency: order.currency,
+        name: 'Exposys Data Labs',
+        description: 'Internship Registration Fee',
+        image: '/static/images/logo.png',
+        order_id: order.order_id,
+        prefill: {
+          name: order.name,
+          email: order.email,
+        },
+        theme: { color: '#0a2463' },
+        modal: {
+          ondismiss: function() {
+            resetBtn();
+          }
+        },
+        handler: async function(response) {
+          // Step 3: Verify payment on server
+          document.getElementById('paymentSection').style.display = 'none';
+          document.getElementById('loadingSection').style.display = 'block';
+
+          const verifyRes = await fetch("{{ url_for('student.verify_payment') }}", {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+            })
+          });
+          const result = await verifyRes.json();
+
+          if (result.success) {
+            document.getElementById('loadingSection').style.display = 'none';
+            document.getElementById('successSection').style.display = 'block';
+            setTimeout(() => { window.location.href = result.redirect; }, 1500);
+          } else {
+            showError(result.error || 'Payment verification failed. Please contact support.');
+            document.getElementById('loadingSection').style.display = 'none';
+            document.getElementById('paymentSection').style.display = 'block';
+            resetBtn();
+          }
+        }
+      };
+
+      const rzp = new Razorpay(options);
+      rzp.on('payment.failed', function(response) {
+        showError('Payment failed: ' + response.error.description);
+        resetBtn();
+      });
+      rzp.open();
+
+    } catch (err) {
+      showError('Something went wrong. Please try again.');
+      resetBtn();
+    }
+  }
+
+  function resetBtn() {
+    const btn = document.getElementById('payBtn');
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-lock me-1"></i> Pay ₹{{ amount }} Securely';
+  }
+
+  function showError(msg) {
+    // Remove old alerts
+    document.querySelectorAll('.rzp-error').forEach(e => e.remove());
+    const div = document.createElement('div');
+    div.className = 'alert alert-danger rzp-error mt-3';
+    div.innerHTML = '<i class="fas fa-exclamation-circle me-2"></i>' + msg;
+    document.getElementById('paymentSection').after(div);
+  }
+
+  function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+    return '';
+  }
+</script>
+{% endblock %}

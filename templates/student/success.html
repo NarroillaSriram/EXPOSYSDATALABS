@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block title %}Registration Successful - Exposys Data Labs{% endblock %}
+
+{% block content %}
+<div style="min-height:100vh;background:var(--gradient);display:flex;align-items:center;justify-content:center;padding:100px 20px 60px;">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-7">
+
+        <!-- Success Card -->
+        <div style="background:#fff;border-radius:24px;padding:50px 40px;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,0.3);">
+
+          <!-- Animated Checkmark -->
+          <div style="width:100px;height:100px;background:linear-gradient(135deg,#27ae60,#2ecc71);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 25px;box-shadow:0 10px 30px rgba(39,174,96,0.4);animation:popIn 0.6s ease;">
+            <i class="fas fa-check" style="font-size:2.8rem;color:#fff;"></i>
+          </div>
+
+          <h2 style="font-size:2rem;font-weight:900;color:var(--primary);margin-bottom:8px;">
+            Registration Successful! 🎉
+          </h2>
+          <p style="color:var(--text-muted);font-size:1rem;margin-bottom:30px;">
+            Congratulations <strong style="color:var(--secondary);">{{ student.name }}</strong>! Your internship registration and payment have been submitted successfully.
+          </p>
+
+          <!-- Details Card -->
+          <div style="background:var(--light);border-radius:16px;padding:25px;text-align:left;margin-bottom:30px;">
+            <h6 style="font-weight:800;color:var(--primary);margin-bottom:18px;text-align:center;">
+              <i class="fas fa-id-card me-2" style="color:var(--secondary);"></i>Registration Summary
+            </h6>
+            <div class="row g-3">
+              {% for label, value in [
+                ('Name', student.name),
+                ('Email', student.email),
+                ('Domain', student.internship_domain),
+                ('Duration', student.duration),
+                ('College', student.college),
+                ('Transaction ID', payment.transaction_id if payment else 'N/A'),
+              ] %}
+              <div class="col-sm-6">
+                <div style="background:#fff;border-radius:10px;padding:12px 15px;border-left:3px solid var(--secondary);">
+                  <div style="font-size:0.72rem;color:var(--text-muted);text-transform:uppercase;font-weight:700;letter-spacing:0.5px;">{{ label }}</div>
+                  <div style="font-weight:700;color:var(--primary);font-size:0.9rem;margin-top:3px;word-break:break-all;">{{ value }}</div>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+
+          <!-- Payment Status Banner -->
+          <div style="background:linear-gradient(135deg,#fff3cd,#ffeaa7);border:2px solid #f39c12;border-radius:12px;padding:15px 20px;margin-bottom:30px;display:flex;align-items:center;gap:12px;">
+            <i class="fas fa-clock" style="font-size:1.5rem;color:#f39c12;"></i>
+            <div style="text-align:left;">
+              <div style="font-weight:700;color:#856404;">Payment Verification Pending</div>
+              <div style="font-size:0.85rem;color:#856404;">Your payment will be verified within <strong>24 hours</strong>. You'll receive a confirmation on your registered email.</div>
+            </div>
+          </div>
+
+          <!-- What's Next -->
+          <div style="background:linear-gradient(135deg,rgba(10,36,99,0.05),rgba(30,58,138,0.08));border-radius:12px;padding:20px;margin-bottom:30px;text-align:left;">
+            <h6 style="font-weight:800;color:var(--primary);margin-bottom:15px;">
+              <i class="fas fa-list-check me-2" style="color:var(--secondary);"></i>What Happens Next?
+            </h6>
+            {% for step, text in [
+              ('1', 'Our team will verify your payment within 24 hours'),
+              ('2', 'You will receive a confirmation email with joining details'),
+              ('3', 'Your internship mentor will be assigned to you'),
+              ('4', 'You can start working on live projects immediately'),
+            ] %}
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
+              <div style="width:28px;height:28px;min-width:28px;background:var(--secondary);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:0.75rem;font-weight:800;">{{ step }}</div>
+              <span style="font-size:0.88rem;color:#444;">{{ text }}</span>
+            </div>
+            {% endfor %}
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="d-flex gap-3 justify-content-center flex-wrap">
+            <a href="{{ url_for('student.dashboard') }}" class="btn-primary-custom">
+              <i class="fas fa-tachometer-alt me-2"></i>Go to Dashboard
+            </a>
+            <a href="{{ url_for('main.index') }}" class="btn-secondary-custom">
+              <i class="fas fa-home me-2"></i>Back to Home
+            </a>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+@keyframes popIn {
+  0% { transform: scale(0); opacity: 0; }
+  70% { transform: scale(1.15); }
+  100% { transform: scale(1); opacity: 1; }
+}
+</style>
+{% endblock %}

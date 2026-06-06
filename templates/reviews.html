@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Student Endorsements - Exposys Data Labs{% endblock %}
+
+{% block content %}
+<div style="padding-top:80px;background:var(--gradient);padding-bottom:60px;">
+  <div class="container text-center text-white py-5" data-aos="zoom-in" data-aos-duration="1000">
+    <h1 style="font-size:2.5rem;font-weight:800;"><i class="fas fa-star me-3" style="color:var(--accent);"></i>Student <span style="color:var(--accent);">Endorsements</span></h1>
+    <p style="color:rgba(255,255,255,0.8);">Read inspiring stories from our successful alumni</p>
+  </div>
+</div>
+
+<section style="background:var(--light);">
+  <div class="container">
+    <div class="text-center mb-5" data-aos="fade-up" data-aos-duration="800">
+      <h2 class="section-title">What Our <span>Students Say</span></h2>
+      <div class="title-line"></div>
+      <p class="section-subtitle">Real experiences and feedback from students who transformed their careers with Exposys</p>
+    </div>
+    
+    <div class="row g-4">
+      {% for name, role, college, text, initial in [
+        ('Priya Sharma', 'Web Development Intern', 'IIT Delhi', 'The internship at Exposys was a game-changer for me. I learned React and Flask through real projects. Got placed at a top MNC within 2 months of completing!', 'P'),
+        ('Rahul Kumar', 'Data Science Intern', 'NIT Trichy', 'Excellent mentorship and structured curriculum. The live project experience helped me crack my campus placement. Highly recommend to all CS students!', 'R'),
+        ('Ananya Singh', 'ML Intern', 'VIT Vellore', 'The certificate from Exposys is recognized everywhere. My mentor was incredibly helpful. The 3-month ML program completely transformed my understanding.', 'A'),
+        ('Karthik Reddy', 'Android Dev Intern', 'BITS Pilani', 'Best investment I made for my career. The hands-on approach and real-world projects gave me confidence to build my own apps. 5 stars!', 'K'),
+        ('Sneha Patel', 'Cloud Computing Intern', 'Pune University', 'Got AWS certified after this internship. The curriculum is up-to-date with industry standards. The LOR helped me get into my dream company.', 'S'),
+        ('Arjun Nair', 'Cybersecurity Intern', 'Kerala University', 'Learned ethical hacking from scratch. The practical labs and CTF challenges were amazing. Now working as a security analyst!', 'A'),
+      ] %}
+      <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="{{ loop.index * 150 }}">
+        <div class="testimonial-card" style="background: var(--gradient); border: 1px solid rgba(10,36,99,0.1); border-radius: 16px; padding: 30px; color: #fff; height: 100%; box-shadow: var(--card-shadow); transition: var(--transition);">
+          <div class="stars" style="color: var(--accent); margin-bottom: 15px; font-size: 0.9rem;">
+            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+            <i class="fas fa-star"></i><i class="fas fa-star"></i>
+          </div>
+          <p class="testimonial-text" style="font-size: 0.95rem; line-height: 1.7; margin-bottom: 20px; font-style: italic;">"{{ text }}"</p>
+          <div class="testimonial-author" style="display: flex; align-items: center; gap: 12px; margin-top: auto;">
+            <div class="author-avatar" style="width: 50px; height: 50px; border-radius: 50%; background: var(--secondary); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.2rem; color: #fff;">{{ initial }}</div>
+            <div>
+              <div class="author-name" style="font-weight: 700; color: #fff;">{{ name }}</div>
+              <div class="author-role" style="font-size: 0.8rem; color: rgba(255,255,255,0.7);">{{ role }} | {{ college }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

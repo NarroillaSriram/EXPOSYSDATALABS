@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Research - Exposys Data Labs{% endblock %}
+{% block content %}
+<div style="padding-top:80px;background:var(--gradient);padding-bottom:60px;">
+  <div class="container text-center text-white py-5" data-aos="zoom-in" data-aos-duration="1000">
+    <h1 style="font-size:2.5rem;font-weight:800;"><i class="fas fa-flask me-3" style="color:var(--accent);"></i>Research</h1>
+    <p style="color:rgba(255,255,255,0.8);">Cutting-edge research in technology and data science</p>
+  </div>
+</div>
+<section style="background:var(--light);">
+  <div class="container">
+    <div class="row g-4">
+      {% for icon, title, desc in [
+        ('fa-brain','AI & Machine Learning Research','Exploring advanced AI algorithms, deep learning models, and neural network architectures for real-world applications.'),
+        ('fa-database','Data Analytics Research','Research in big data processing, data visualization techniques, and predictive analytics methodologies.'),
+        ('fa-shield-alt','Cybersecurity Research','Investigating emerging threats, vulnerability assessments, and developing robust security frameworks.'),
+        ('fa-cloud','Cloud Technology Research','Research on cloud-native architectures, serverless computing, and distributed systems optimization.'),
+        ('fa-mobile-alt','Mobile Technology Research','Exploring cross-platform development, mobile UX patterns, and performance optimization techniques.'),
+        ('fa-chart-line','Business Intelligence Research','Research in market trends, business analytics, and data-driven decision making frameworks.'),
+      ] %}
+      <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="{{ loop.index * 150 }}">
+        <div style="background:#fff;border-radius:16px;padding:30px;box-shadow:var(--card-shadow);height:100%;transition:all 0.3s;" onmouseover="this.style.transform='translateY(-6px)'" onmouseout="this.style.transform='translateY(0)'">
+          <div style="width:60px;height:60px;background:var(--gradient);border-radius:14px;display:flex;align-items:center;justify-content:center;margin-bottom:20px;">
+            <i class="fas {{ icon }}" style="color:#fff;font-size:1.4rem;"></i>
+          </div>
+          <h5 style="font-weight:800;color:var(--primary);margin-bottom:10px;">{{ title }}</h5>
+          <p style="color:var(--text-muted);font-size:0.88rem;line-height:1.7;">{{ desc }}</p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    <div style="background:var(--gradient);border-radius:20px;padding:40px;text-align:center;margin-top:40px;" data-aos="zoom-in" data-aos-duration="1000">
+      <h4 style="color:#fff;font-weight:800;margin-bottom:10px;">Interested in Research Collaboration?</h4>
+      <p style="color:rgba(255,255,255,0.8);margin-bottom:20px;">Join our research team and work on cutting-edge projects</p>
+      <a href="{{ url_for('main.contact') }}" class="btn-primary-custom" style="background:#fff;color:var(--primary);">
+        <i class="fas fa-envelope me-2"></i>Get in Touch
+      </a>
+    </div>
+  </div>
+</section>
+{% endblock %}

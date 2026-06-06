@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Design - Exposys Data Labs{% endblock %}
+{% block content %}
+<div style="padding-top:80px;background:var(--gradient);padding-bottom:60px;">
+  <div class="container text-center text-white py-5" data-aos="zoom-in" data-aos-duration="1000">
+    <h1 style="font-size:2.5rem;font-weight:800;"><i class="fas fa-paint-brush me-3" style="color:var(--accent);"></i>Design</h1>
+    <p style="color:rgba(255,255,255,0.8);">Creative design services and UI/UX training programs</p>
+  </div>
+</div>
+<section style="background:var(--light);">
+  <div class="container">
+    <div class="text-center mb-5" data-aos="fade-up" data-aos-duration="800">
+      <h2 class="section-title">Our Design <span>Services</span></h2>
+      <div class="title-line"></div>
+      <p class="section-subtitle">From concept to creation — we bring ideas to life</p>
+    </div>
+    <div class="row g-4 mb-5">
+      {% for icon, title, desc, tools in [
+        ('fa-desktop','UI/UX Design','Create intuitive and beautiful user interfaces with a focus on user experience and accessibility.','Figma, Adobe XD, Sketch'),
+        ('fa-paint-brush','Graphic Design','Professional graphic design for branding, marketing materials, and digital content creation.','Photoshop, Illustrator, Canva'),
+        ('fa-film','Motion Graphics','Engaging animations and motion graphics for social media, ads, and promotional videos.','After Effects, Premiere Pro'),
+        ('fa-mobile-alt','App UI Design','Mobile-first design for Android and iOS applications with modern design principles.','Figma, Flutter UI, Material Design'),
+        ('fa-globe','Web Design','Responsive and modern web designs that look great on all devices and screen sizes.','HTML, CSS, Bootstrap, Tailwind'),
+        ('fa-photo-video','Content Design','Visual content creation for social media, blogs, and digital marketing campaigns.','Canva, Photoshop, Lightroom'),
+      ] %}
+      <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="{{ loop.index * 150 }}">
+        <div style="background:#fff;border-radius:16px;padding:30px;box-shadow:var(--card-shadow);height:100%;transition:all 0.3s;" onmouseover="this.style.transform='translateY(-6px)'" onmouseout="this.style.transform='translateY(0)'">
+          <div style="width:60px;height:60px;background:linear-gradient(135deg,var(--secondary),#c0392b);border-radius:14px;display:flex;align-items:center;justify-content:center;margin-bottom:20px;">
+            <i class="fas {{ icon }}" style="color:#fff;font-size:1.4rem;"></i>
+          </div>
+          <h5 style="font-weight:800;color:var(--primary);margin-bottom:8px;">{{ title }}</h5>
+          <p style="color:var(--text-muted);font-size:0.88rem;line-height:1.7;margin-bottom:12px;">{{ desc }}</p>
+          <div style="background:var(--light);border-radius:8px;padding:8px 12px;font-size:0.78rem;color:var(--primary);font-weight:600;">
+            <i class="fas fa-tools me-1" style="color:var(--secondary);"></i>{{ tools }}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    <div style="background:var(--gradient);border-radius:20px;padding:40px;text-align:center;" data-aos="zoom-in" data-aos-duration="1000">
+      <h4 style="color:#fff;font-weight:800;margin-bottom:10px;">Want to Learn Design?</h4>
+      <p style="color:rgba(255,255,255,0.8);margin-bottom:20px;">Enroll in our UI/UX Designer internship program and master design tools</p>
+      <a href="{{ url_for('auth.register') }}" class="btn-primary-custom" style="background:#fff;color:var(--primary);">
+        <i class="fas fa-rocket me-2"></i>Enroll Now
+      </a>
+    </div>
+  </div>
+</section>
+{% endblock %}

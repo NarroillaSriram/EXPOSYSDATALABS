@@ -1,0 +1,252 @@
+{% extends "base.html" %}
+{% block title %}About Us - Exposys Data Labs{% endblock %}
+
+{% block content %}
+<div style="padding-top:80px;background:var(--gradient);padding-bottom:60px;">
+  <div class="container text-center text-white py-5" data-aos="zoom-in" data-aos-duration="1000">
+    <h1 style="font-size:2.5rem;font-weight:800;">About <span style="color:var(--accent);">Exposys Data Labs</span></h1>
+    <p style="color:rgba(255,255,255,0.8);">Empowering students since 2018</p>
+  </div>
+</div>
+
+<section style="background:#fff;">
+  <div class="container">
+    <div class="row g-5 align-items-center">
+      <div class="col-lg-6" data-aos="fade-right" data-aos-duration="800">
+        <h2 class="section-title">Our <span>Mission</span></h2>
+        <div class="title-line" style="margin:10px 0 20px;"></div>
+        <p style="color:var(--text-muted);line-height:1.8;">
+          Exposys Data Labs was founded with a singular mission: to bridge the gap between academic education and industry requirements. We believe every student deserves access to quality internship opportunities that prepare them for the real world.
+        </p>
+        <p style="color:var(--text-muted);line-height:1.8;margin-top:15px;">
+          Our programs are designed by industry experts and updated regularly to match current market demands. We provide not just training, but a complete career development ecosystem.
+        </p>
+        <h2 class="section-title" style="margin-top: 30px;">Our <span>Vision</span></h2>
+        <div class="title-line" style="margin:10px 0 20px;"></div>
+        <p style="color:var(--text-muted);line-height:1.8;">
+          Our vision is to empower individuals globally with hands-on experience and prepare them to excel in the ever-evolving tech ecosystem, making quality, practical education accessible to all.
+        </p>
+        <div class="row g-3 mt-3">
+          {% for num, label in [('50,000+','Students Trained'),('27+','Domains'),('500+','Hiring Partners'),('98%','Satisfaction Rate')] %}
+          <div class="col-6">
+            <div style="background:var(--light);border-radius:12px;padding:20px;text-align:center;">
+              <div style="font-size:1.8rem;font-weight:800;color:var(--secondary);">{{ num }}</div>
+              <div style="font-size:0.85rem;color:var(--text-muted);">{{ label }}</div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="col-lg-6" data-aos="fade-left" data-aos-duration="800" data-aos-delay="200">
+        <div style="background:var(--gradient);border-radius:20px;padding:40px;color:#fff;">
+          <h4 style="font-weight:800;margin-bottom:25px;">What We Offer</h4>
+          {% for icon, title, desc in [
+            ('fa-certificate','Industry Certificates','Recognized by top companies across India and abroad'),
+            ('fa-file-alt','Letter of Recommendation','Personalized LOR from our expert mentors'),
+            ('fa-project-diagram','Live Projects','Work on real client projects for your portfolio'),
+            ('fa-chalkboard-teacher','Expert Mentorship','Learn from professionals with 10+ years experience'),
+            ('fa-briefcase','Placement Support','Connect with 500+ hiring partners'),
+          ] %}
+          <div style="display:flex;align-items:flex-start;gap:15px;margin-bottom:20px;">
+            <div style="width:40px;height:40px;min-width:40px;background:rgba(255,255,255,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;">
+              <i class="fas {{ icon }}" style="color:var(--accent);"></i>
+            </div>
+            <div>
+              <h6 style="font-weight:700;margin-bottom:3px;">{{ title }}</h6>
+              <p style="color:rgba(255,255,255,0.7);font-size:0.85rem;margin:0;">{{ desc }}</p>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== OUR TEAM SECTION ===== -->
+<section style="background:var(--light); padding: 80px 0;">
+  <style>
+    .team-card {
+      transition: all 0.3s ease;
+      background: #fff;
+    }
+    .team-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 15px 35px rgba(0,36,99,0.1) !important;
+    }
+    .team-card .avatar {
+      transition: all 0.3s ease;
+      overflow: hidden;
+    }
+    .team-card:hover .avatar {
+      transform: scale(1.05);
+    }
+  </style>
+  <div class="container">
+    <div class="text-center mb-5" data-aos="fade-up" data-aos-duration="800">
+      <h2 class="section-title">Meet Our <span>Team</span></h2>
+      <div class="title-line"></div>
+      <p class="section-subtitle">The people driving Exposys Data Labs forward</p>
+    </div>
+
+    <!-- Team Members -->
+    <div class="row g-4 mb-5">
+      {% for name, role, linkedin, image, img_pos in [
+        ('Vishnuvardhan Y', 'Chief Product Officer', 'https://www.linkedin.com/in/vishnu27/', 'vishnu.jpg', 'center 10%'),
+        ('Dr. Akkem Yaganteeswarudu', 'Data Scientist', 'https://www.linkedin.com/in/dr-akkem-yaganteeswarudu-nit-silchar-202910372/?skipRedirect=true', 'akkem.jpg', 'center'),
+        ('Rahul Chandra', 'Product Engineer', 'https://www.linkedin.com/in/rahul-chandra-b1a768211/', 'rahul.jpg', 'center'),
+        ('Dr. Senthamarai Kannan Subramanian', 'Chief Technology Officer', 'https://www.linkedin.com/in/dr-senthamarai-kannan-subramanian-2a235517/', 'senthamarai.png', 'center'),
+        ('Srikanth Vaindam', 'Chief Scientist', 'https://www.linkedin.com/in/srikanth-vaindam-75ba4950/', 'srikanth.jpg', 'center'),
+        ('Sindhu Reecha', 'Human Resource', 'https://www.linkedin.com/in/sindhu-reecha-901099209/', 'sindhu.png', 'center'),
+        ('Aravind Kumar', 'Angel Investor', 'https://www.linkedin.com/in/aravind-kumar-9431601b/', None, 'center'),
+        ('Mothukuri Karthik', 'Operation Manager', 'https://www.linkedin.com/in/mothukuri-karthik-8b10bb2b8/', 'karthik.jpg', 'center 15%')
+      ] %}
+      <div class="col-md-6 col-lg-3" data-aos="zoom-in" data-aos-delay="{{ (loop.index0 % 4) * 100 }}">
+        <div class="team-card large-card text-center" style="border-radius:15px; padding:40px 20px; box-shadow:0 10px 30px rgba(0,0,0,0.05);">
+          <div class="avatar mb-4" style="width:140px; height:140px; border-radius:50%; background:var(--gradient); margin:0 auto; display:flex; align-items:center; justify-content:center; color:#fff; font-size:3.5rem; overflow:hidden;">
+            {% if image %}
+              <img src="{{ url_for('static', filename='images/team/' ~ image) }}" alt="{{ name }}" style="width:100%; height:100%; object-fit:cover; object-position:{{ img_pos }};">
+            {% else %}
+              <i class="fas fa-user-tie"></i>
+            {% endif %}
+          </div>
+          <h4 style="font-weight:800; font-size:1.15rem; margin-bottom:5px; color:var(--secondary);">{{ name }}</h4>
+          <p style="color:var(--primary); font-weight:700; font-size:0.95rem; margin-bottom:15px;">{{ role }}</p>
+          <a href="{{ linkedin }}" target="_blank" style="color:#0077b5; font-size:1.5rem; transition: color 0.3s;" onmouseover="this.style.color='#005582'" onmouseout="this.style.color='#0077b5'">
+            <i class="fab fa-linkedin"></i>
+          </a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+
+
+    <!-- 4 Members -->
+    <div class="text-center mb-4" data-aos="fade-up">
+      <h3 style="font-weight:800; color:var(--secondary);">Our Members</h3>
+      <div class="title-line" style="width:60px; margin:10px auto;"></div>
+    </div>
+    <div class="row g-3 justify-content-center">
+      {% set members = [
+        ('Manda Kalyan', 'Frontend & Database Developer', 'Crafting beautiful UI and data models.', 'kalyan.jpg', 'center', 'https://www.linkedin.com/in/mandakalyan/'),
+        ('Narrolla Sriram', 'Backend Developer', 'Building robust APIs.', 'sriram.jpg', 'center 15%', 'https://www.linkedin.com/in/narrolla-sriram-8765302b8/'),
+        ('Munnanooru Pavani', 'Frontend Developer', 'Building responsive interfaces.', 'pavani.jpg', 'center', 'https://www.linkedin.com/in/munnanooru-pavani-1905272b8/'),
+        ('Panjala Saivani', 'UI/UX Designer', 'Designing engaging experiences.', 'saivani.jpg', 'center 15%', 'https://www.linkedin.com/in/saivani-panjala-6001012b8/?skipRedirect=true')
+      ] %}
+      {% for name, role, desc, image, img_pos, linkedin in members %}
+      <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="{{ (loop.index0 % 4) * 50 }}">
+        <div class="team-card text-center" style="border-radius:15px; padding:40px 20px; box-shadow:0 10px 30px rgba(0,0,0,0.05);">
+          <div class="avatar mb-4" style="width:140px; height:140px; border-radius:50%; background:#f8f9fa; border:2px solid #e9ecef; margin:0 auto; display:flex; align-items:center; justify-content:center; color:var(--text-muted); font-size:3.5rem; overflow:hidden;">
+            {% if image %}
+              <img src="{{ url_for('static', filename='images/team/' ~ image) }}" alt="{{ name }}" style="width:100%; height:100%; object-fit:cover; object-position:{{ img_pos }};">
+            {% else %}
+              <i class="fas fa-user"></i>
+            {% endif %}
+          </div>
+          <h4 style="font-weight:800; font-size:1.15rem; margin-bottom:5px; color:var(--secondary);">{{ name }}</h4>
+          <p style="color:var(--primary); font-weight:700; font-size:0.95rem; margin-bottom:15px;">{{ role }}</p>
+          <a href="{{ linkedin }}" target="_blank" style="color:#0077b5; font-size:1.5rem; transition: color 0.3s;" onmouseover="this.style.color='#005582'" onmouseout="this.style.color='#0077b5'">
+            <i class="fab fa-linkedin"></i>
+          </a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="text-center mt-5" data-aos="fade-up">
+      <a href="{{ url_for('auth.register') }}" class="btn-primary-custom" style="padding: 12px 35px; font-size: 1.1rem; border-radius: 50px; text-decoration: none;">
+        <i class="fas fa-paper-plane me-2"></i>Apply Now
+      </a>
+    </div>
+
+  </div>
+</section>
+
+<!-- ===== LINKEDIN LIFE SECTION ===== -->
+<section style="background:#fff; padding: 60px 0; overflow: hidden;">
+  <div class="container text-center mb-4" data-aos="fade-up" data-aos-duration="800">
+    <h2 class="section-title">Life at <span>Exposys</span></h2>
+    <div class="title-line"></div>
+    <p class="section-subtitle">Follow us on <a href="https://www.linkedin.com/company/upchat-technologies/" target="_blank" style="color:var(--primary);font-weight:700;text-decoration:none;"><i class="fab fa-linkedin" style="color:#0077b5;"></i> LinkedIn</a> to see more of our culture</p>
+  </div>
+  
+  <div class="marquee-container">
+    <div class="marquee-content">
+      <!-- Original Set -->
+      <div class="marquee-card">
+        <img src="{{ url_for('static', filename='images/real_img_1.jpg') }}" alt="Exposys Team">
+        <div class="marquee-card-body">
+          <h6>Collaborative Environment</h6>
+          <p>Our teams work closely to bring innovative ideas to life.</p>
+        </div>
+      </div>
+      <div class="marquee-card">
+        <img src="{{ url_for('static', filename='images/real_img_2.png') }}" alt="Exposys Event">
+        <div class="marquee-card-body">
+          <h6>Expert Sessions</h6>
+          <p>Regular knowledge sharing and industry expert interactions.</p>
+        </div>
+      </div>
+      <div class="marquee-card">
+        <img src="{{ url_for('static', filename='images/real_img_3.jpg') }}" alt="Exposys Group">
+        <div class="marquee-card-body">
+          <h6>Tech Excellence</h6>
+          <p>We nurture top-tier talent in modern development frameworks.</p>
+        </div>
+      </div>
+      <div class="marquee-card">
+        <img src="{{ url_for('static', filename='images/real_img_4.jpg') }}" alt="Exposys Office">
+        <div class="marquee-card-body">
+          <h6>Mentorship & Growth</h6>
+          <p>Guiding interns to become industry-ready professionals.</p>
+        </div>
+      </div>
+      <div class="marquee-card">
+        <img src="{{ url_for('static', filename='images/real_img_5.jpg') }}" alt="Exposys Seminar">
+        <div class="marquee-card-body">
+          <h6>Dynamic Workshops</h6>
+          <p>Hands-on training and real-world project development.</p>
+        </div>
+      </div>
+      
+      <!-- Duplicate Set for infinite scroll illusion -->
+      <div class="marquee-card">
+        <img src="{{ url_for('static', filename='images/real_img_1.jpg') }}" alt="Exposys Team">
+        <div class="marquee-card-body">
+          <h6>Collaborative Environment</h6>
+          <p>Our teams work closely to bring innovative ideas to life.</p>
+        </div>
+      </div>
+      <div class="marquee-card">
+        <img src="{{ url_for('static', filename='images/real_img_2.png') }}" alt="Exposys Event">
+        <div class="marquee-card-body">
+          <h6>Expert Sessions</h6>
+          <p>Regular knowledge sharing and industry expert interactions.</p>
+        </div>
+      </div>
+      <div class="marquee-card">
+        <img src="{{ url_for('static', filename='images/real_img_3.jpg') }}" alt="Exposys Group">
+        <div class="marquee-card-body">
+          <h6>Tech Excellence</h6>
+          <p>We nurture top-tier talent in modern development frameworks.</p>
+        </div>
+      </div>
+      <div class="marquee-card">
+        <img src="{{ url_for('static', filename='images/real_img_4.jpg') }}" alt="Exposys Office">
+        <div class="marquee-card-body">
+          <h6>Mentorship & Growth</h6>
+          <p>Guiding interns to become industry-ready professionals.</p>
+        </div>
+      </div>
+      <div class="marquee-card">
+        <img src="{{ url_for('static', filename='images/real_img_5.jpg') }}" alt="Exposys Seminar">
+        <div class="marquee-card-body">
+          <h6>Dynamic Workshops</h6>
+          <p>Hands-on training and real-world project development.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

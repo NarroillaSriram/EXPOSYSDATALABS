@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}Cookie Policy - Exposys Data Labs{% endblock %}
+
+{% block content %}
+<div style="padding-top:80px;background:var(--gradient);padding-bottom:60px;">
+  <div class="container text-center text-white py-5">
+    <h1 style="font-size:2.5rem;font-weight:800;">Cookie <span style="color:var(--accent);">Policy</span></h1>
+    <p style="color:rgba(255,255,255,0.8);">Last updated: January 2024</p>
+  </div>
+</div>
+
+<section style="background:var(--light);">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-9">
+        <div style="background:#fff;border-radius:20px;padding:45px;box-shadow:var(--card-shadow);">
+
+          <p style="color:#555;line-height:1.8;margin-bottom:30px;">
+            This Cookie Policy explains how Exposys Data Labs uses cookies and similar technologies when you visit our platform. By using our website, you consent to the use of cookies as described in this policy.
+          </p>
+
+          <!-- What are cookies -->
+          <div style="margin-bottom:30px;">
+            <h5 style="font-weight:800;color:var(--primary);margin-bottom:10px;">
+              <i class="fas fa-chevron-right me-2" style="color:var(--secondary);font-size:0.8rem;"></i>1. What Are Cookies?
+            </h5>
+            <p style="color:#555;line-height:1.8;margin:0;padding-left:20px;">
+              Cookies are small text files that are stored on your device when you visit a website. They help websites remember your preferences, keep you logged in, and improve your overall experience.
+            </p>
+          </div>
+
+          <!-- Types of cookies -->
+          <div style="margin-bottom:30px;">
+            <h5 style="font-weight:800;color:var(--primary);margin-bottom:15px;">
+              <i class="fas fa-chevron-right me-2" style="color:var(--secondary);font-size:0.8rem;"></i>2. Types of Cookies We Use
+            </h5>
+            <div class="row g-3" style="padding-left:20px;">
+              {% for icon, type, color, desc in [
+                ('fa-lock', 'Essential Cookies', '#0a2463', 'These cookies are necessary for the website to function. They enable core features like login sessions, form submissions, and security (CSRF protection). You cannot opt out of these cookies.'),
+                ('fa-chart-line', 'Functional Cookies', '#27ae60', 'These cookies remember your preferences such as your login state (Remember Me) and improve your experience on our platform.'),
+                ('fa-shield-alt', 'Security Cookies', '#e84545', 'These cookies help protect your account and our platform from unauthorized access and cross-site request forgery (CSRF) attacks.'),
+              ] %}
+              <div class="col-12">
+                <div style="background:var(--light);border-radius:12px;padding:18px;border-left:4px solid {{ color }};">
+                  <h6 style="font-weight:700;color:{{ color }};margin-bottom:6px;">
+                    <i class="fas {{ icon }} me-2"></i>{{ type }}
+                  </h6>
+                  <p style="color:#555;font-size:0.88rem;margin:0;line-height:1.7;">{{ desc }}</p>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+
+          {% for title, content in [
+            ('3. Specific Cookies We Use', 'session — Maintains your login state while you browse the platform. Expires when you close the browser or logout. remember_token — If you select "Remember Me" during login, this cookie keeps you logged in for 30 days. csrf_token — Protects forms from cross-site request forgery attacks. This is a security essential cookie.'),
+            ('4. Third-Party Cookies', 'We use Bootstrap CDN and Font Awesome CDN to deliver styling and icons. These third-party services may set their own cookies. We do not control these cookies and recommend reviewing their respective privacy policies.'),
+            ('5. How to Control Cookies', 'You can control and manage cookies through your browser settings. Most browsers allow you to refuse cookies, delete existing cookies, or be notified when a new cookie is set. Please note that disabling essential cookies may affect the functionality of our platform.'),
+            ('6. Cookie Duration', 'Session cookies are temporary and are deleted when you close your browser. Persistent cookies (like Remember Me) remain on your device for a set period or until you delete them manually.'),
+            ('7. Updates to This Policy', 'We may update this Cookie Policy from time to time to reflect changes in technology or legal requirements. We encourage you to review this page periodically.'),
+            ('8. Contact Us', 'If you have any questions about our use of cookies, please contact us at hr@exposysdata.com or call +917892053145.'),
+          ] %}
+          <div style="margin-bottom:30px;">
+            <h5 style="font-weight:800;color:var(--primary);margin-bottom:10px;">
+              <i class="fas fa-chevron-right me-2" style="color:var(--secondary);font-size:0.8rem;"></i>{{ title }}
+            </h5>
+            <p style="color:#555;line-height:1.8;margin:0;padding-left:20px;">{{ content }}</p>
+          </div>
+          {% endfor %}
+
+          <div style="background:var(--gradient);border-radius:12px;padding:20px;text-align:center;margin-top:20px;">
+            <p style="color:#fff;margin:0;font-size:0.9rem;">
+              By continuing to use Exposys Data Labs, you agree to our use of cookies as described in this policy.
+            </p>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,290 @@
+{% extends "base.html" %}
+{% block title %}Exposys Data Labs - Internship & Training Programs{% endblock %}
+
+{% block content %}
+
+<!-- ===== HERO SECTION ===== -->
+
+<section class="hero-section" id="home">
+  <div class="container">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-6 hero-content" data-aos="fade-right" data-aos-duration="1000">
+        <h1 class="hero-title">
+          Launch Your <span>Tech Career</span><br>With Real Experience
+        </h1>
+        <p class="hero-subtitle">
+          Join 50,000+ students who have transformed their careers through our industry-aligned internship and training programs. Get certified, get hired.
+        </p>
+        <div class="d-flex flex-wrap gap-3">
+          <a href="{{ url_for('auth.register') }}" class="btn-primary-custom">
+            <i class="fas fa-rocket me-2"></i>Apply for Internship
+          </a>
+          <a href="{{ url_for('main.internships') }}" class="btn-secondary-custom" style="color:#fff;border-color:rgba(255,255,255,0.5)">
+            <i class="fas fa-compass me-2"></i>Explore Domains
+          </a>
+        </div>
+        <div class="hero-stats">
+          <div class="stat-item">
+            <span class="stat-number" data-target="50000" data-suffix="+">0</span>
+            <span class="stat-label">Students</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number" data-target="27" data-suffix="+">0</span>
+            <span class="stat-label">Domains</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number" data-target="500" data-suffix="+">0</span>
+            <span class="stat-label">Companies</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number" data-target="98" data-suffix="%">0</span>
+            <span class="stat-label">Satisfaction</span>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-6" data-aos="fade-left" data-aos-duration="1000" data-aos-delay="200">
+        <div class="hero-image-wrapper">
+          <div class="hero-card" style="padding:25px;">
+            <i class="fas fa-laptop-code" style="font-size:2.5rem;"></i>
+            <h3 style="font-size:1.1rem;">Start Your Internship Today</h3>
+            <p class="mb-3" style="font-size:0.85rem;">Work on real projects, earn certificates, and build your portfolio</p>
+            <div class="row g-2 text-start">
+              <div class="col-6">
+                <div style="background:rgba(255,255,255,0.1);border-radius:8px;padding:8px;">
+                  <i class="fas fa-certificate text-warning me-2" style="font-size:0.85rem;"></i>
+                  <small style="font-size:0.78rem;">Industry Certificate</small>
+                </div>
+              </div>
+              <div class="col-6">
+                <div style="background:rgba(255,255,255,0.1);border-radius:8px;padding:8px;">
+                  <i class="fas fa-file-alt text-warning me-2" style="font-size:0.85rem;"></i>
+                  <small style="font-size:0.78rem;">Letter of Recommendation</small>
+                </div>
+              </div>
+              <div class="col-6">
+                <div style="background:rgba(255,255,255,0.1);border-radius:8px;padding:8px;">
+                  <i class="fas fa-project-diagram text-warning me-2" style="font-size:0.85rem;"></i>
+                  <small style="font-size:0.78rem;">Live Projects</small>
+                </div>
+              </div>
+              <div class="col-6">
+                <div style="background:rgba(255,255,255,0.1);border-radius:8px;padding:8px;">
+                  <i class="fas fa-chalkboard-teacher text-warning me-2" style="font-size:0.85rem;"></i>
+                  <small style="font-size:0.78rem;">Expert Mentors</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+<div>
+<!-- ===== ABOUT SECTION ===== -->
+<section class="about-section" id="about">
+  <div class="container">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-5" data-aos="fade-up" data-aos-duration="800">
+        <div class="about-img-wrapper">
+          <div style="background:var(--gradient);border-radius:20px;padding:60px 40px;text-align:center;color:#fff;">
+            <i class="fas fa-building" style="font-size:5rem;color:rgba(255,255,255,0.3);"></i>
+            <h3 style="font-size:2rem;font-weight:800;margin-top:20px;">Exposys Data Labs</h3>
+            <p style="color:rgba(255,255,255,0.7);">Bangalore, Karnataka, India</p>
+            <div class="row g-3 mt-3">
+              <div class="col-6">
+                <div style="background:rgba(255,255,255,0.1);border-radius:10px;padding:15px;">
+                  <div style="font-size:1.8rem;font-weight:800;color:var(--accent);">2018</div>
+                  <div style="font-size:0.8rem;color:rgba(255,255,255,0.7);">Founded</div>
+                </div>
+              </div>
+              <div class="col-6">
+                <div style="background:rgba(255,255,255,0.1);border-radius:10px;padding:15px;">
+                  <div style="font-size:1.8rem;font-weight:800;color:var(--accent);">50K+</div>
+                  <div style="font-size:0.8rem;color:rgba(255,255,255,0.7);">Students</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-7" data-aos="fade-left" data-aos-duration="800" data-aos-delay="200">
+        <div class="hero-badge" style="background:rgba(10,36,99,0.08);border-color:var(--primary);color:var(--primary);">About Us</div>
+        <h2 class="section-title mt-3">Why Choose <span>Exposys?</span></h2>
+        <div class="title-line" style="margin:10px 0 20px;"></div>
+        <p style="color:var(--text-muted);line-height:1.8;margin-bottom:30px;">
+          Exposys Data Labs is a premier internship and training organization dedicated to bridging the gap between academic learning and industry requirements. We provide hands-on experience through real-world projects.
+        </p>
+        <div class="feature-item">
+          <div class="feature-icon"><i class="fas fa-certificate"></i></div>
+          <div class="feature-text">
+            <h6>Industry-Recognized Certificates</h6>
+            <p>Get certificates recognized by top companies and institutions across India.</p>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon"><i class="fas fa-users"></i></div>
+          <div class="feature-text">
+            <h6>Expert Mentorship</h6>
+            <p>Learn from industry professionals with 10+ years of experience.</p>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon"><i class="fas fa-project-diagram"></i></div>
+          <div class="feature-text">
+            <h6>Live Project Experience</h6>
+            <p>Work on real client projects and build an impressive portfolio.</p>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon"><i class="fas fa-handshake"></i></div>
+          <div class="feature-text">
+            <h6>Placement Assistance</h6>
+            <p>Get connected with 500+ hiring partners for job opportunities.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== DOMAINS SECTION ===== -->
+<section style="background:var(--light);" id="domains">
+  <div class="container">
+    <div class="text-center mb-5" data-aos="fade-up">
+      <h2 class="section-title">Our Internship <span>Domains</span></h2>
+      <div class="title-line"></div>
+      <p class="section-subtitle">Choose from a variety of cutting-edge domains to kickstart your career</p>
+    </div>
+    
+    <div class="row g-4 justify-content-center">
+      <!-- Domain 1 -->
+      <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
+        <div class="domain-card">
+          <img src="{{ url_for('static', filename='images/domain_frontend.png') }}" class="domain-img" alt="Frontend">
+          <h5>Frontend Developer</h5>
+          <p>Master HTML, CSS, JavaScript and modern frameworks like React and Vue to build stunning UIs.</p>
+          <div class="domain-badge">1 Month / 3 Months</div>
+        </div>
+      </div>
+      
+      <!-- Domain 2 -->
+      <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
+        <div class="domain-card">
+          <img src="{{ url_for('static', filename='images/domain_backend.png') }}" class="domain-img" alt="Backend">
+          <h5>Backend Developer</h5>
+          <p>Learn Node.js, Python, or Java to design robust APIs, manage databases, and handle server logic.</p>
+          <div class="domain-badge">1 Month / 3 Months</div>
+        </div>
+      </div>
+      
+      <!-- Domain 3 -->
+      <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="300">
+        <div class="domain-card">
+          <img src="{{ url_for('static', filename='images/domain_fullstack.png') }}" class="domain-img" alt="Full Stack">
+          <h5>Full Stack Developer</h5>
+          <p>Become an end-to-end developer by mastering both frontend aesthetics and backend architectures.</p>
+          <div class="domain-badge">1 Month / 3 Months</div>
+        </div>
+      </div>
+      
+      <!-- Domain 4 -->
+      <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="400">
+        <div class="domain-card">
+          <img src="{{ url_for('static', filename='images/domain_datascience.png') }}" class="domain-img" alt="Data Science">
+          <h5>Data Science / ML / AI</h5>
+          <p>Dive into data analytics, machine learning algorithms, and build intelligent AI models using Python.</p>
+          <div class="domain-badge">1 Month / 3 Months</div>
+        </div>
+      </div>
+      
+      <!-- Domain 5 -->
+      <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="500">
+        <div class="domain-card">
+          <img src="{{ url_for('static', filename='images/domain_digitalmarketing.png') }}" class="domain-img" alt="Digital Marketing">
+          <h5>Digital Marketing</h5>
+          <p>Learn SEO, SEM, content marketing, and social media strategies to drive growth and engagement.</p>
+          <div class="domain-badge">1 Month / 3 Months</div>
+        </div>
+      </div>
+
+      <!-- Domain 6 -->
+      <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="600">
+        <div class="domain-card">
+          <img src="{{ url_for('static', filename='images/domain_uiux.png') }}" class="domain-img" alt="UI/UX Design">
+          <h5>UI/UX Design</h5>
+          <p>Design intuitive user experiences and beautiful interfaces using tools like Figma and Adobe XD.</p>
+          <div class="domain-badge">1 Month / 3 Months</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="text-center mt-5">
+      <a href="{{ url_for('main.internships') }}" class="btn-primary-custom">View All Internships</a>
+    </div>
+  </div>
+</section>
+
+
+
+<!-- ===== PROCESS SECTION ===== -->
+<section style="background:var(--gradient);">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="section-title" style="color:#fff;">How It <span style="color:var(--accent);">Works</span></h2>
+      <div class="title-line" style="background:linear-gradient(to right,var(--accent),var(--secondary));"></div>
+      <p style="color:rgba(255,255,255,0.7);">Simple 4-step process to start your internship</p>
+    </div>
+    <div class="row g-4 text-center">
+      {% for step, icon, title, desc in [
+        ('01', 'fa-user-plus', 'Register', 'Fill the registration form with your details and choose your domain'),
+        ('02', 'fa-envelope-open', 'Get Confirmation', 'Receive confirmation email with joining details and schedule'),
+        ('03', 'fa-laptop-code', 'Start Exploring', 'Begin your internship with live projects and expert guidance'),
+      ] %}
+      <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="{{ loop.index * 150 }}">
+        <div style="background:rgba(255,255,255,0.1);border-radius:16px;padding:30px;border:1px solid rgba(255,255,255,0.2);">
+          <div style="font-size:3rem;font-weight:900;color:var(--accent);opacity:0.5;">{{ step }}</div>
+          <div style="width:60px;height:60px;background:var(--secondary);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:10px auto;">
+            <i class="fas {{ icon }}" style="color:#fff;font-size:1.3rem;"></i>
+          </div>
+          <h5 style="color:#fff;font-weight:700;margin-top:15px;">{{ title }}</h5>
+          <p style="color:rgba(255,255,255,0.7);font-size:0.88rem;">{{ desc }}</p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+
+
+<!-- ===== CTA SECTION ===== -->
+<section style="background:#fff;padding:60px 0;">
+  <div class="container">
+    <div style="background:var(--gradient);border-radius:24px;padding:60px;text-align:center;" data-aos="zoom-in" data-aos-duration="1000">
+      <h2 style="color:#fff;font-size:2.2rem;font-weight:800;margin-bottom:15px;">
+        Ready to Start Your <span style="color:var(--accent);">Journey?</span>
+      </h2>
+      <p style="color:rgba(255,255,255,0.8);font-size:1.1rem;margin-bottom:35px;">
+        Join thousands of students who have already transformed their careers
+      </p>
+      <div class="d-flex justify-content-center gap-3 flex-wrap">
+        <a href="{{ url_for('auth.register') }}" class="btn-primary-custom" style="background:#fff;color:var(--primary);">
+          <i class="fas fa-rocket me-2"></i>Register Now — It's Easy!
+        </a>
+        <a href="{{ url_for('main.contact') }}" class="btn-secondary-custom" style="border-color:rgba(255,255,255,0.5);color:#fff;">
+          <i class="fas fa-phone me-2"></i>Talk to Us
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+</div> <!-- End Protected Content -->
+
+
+
+{% endblock %}

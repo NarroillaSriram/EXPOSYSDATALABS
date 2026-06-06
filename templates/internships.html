@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+{% block title %}Internship Programs - Exposys Data Labs{% endblock %}
+
+{% block content %}
+<div style="padding-top:80px;background:var(--gradient);padding-bottom:60px;">
+  <div class="container text-center text-white py-5" data-aos="zoom-in" data-aos-duration="1000">
+    <h1 style="font-size:2.5rem;font-weight:800;">Internship <span style="color:var(--accent);">Programs</span></h1>
+    <p style="color:rgba(255,255,255,0.8);">Choose your domain and start your career journey</p>
+  </div>
+</div>
+
+{% set active_titles = internships|map(attribute='title')|list %}
+{% if current_user.is_authenticated and current_user.__class__.__name__ == 'Student' %}
+  {% set student_domain = current_user.internship_domain | lower %}
+{% else %}
+  {% set student_domain = '' %}
+{% endif %}
+
+{# Macro to render one domain card #}
+{% macro domain_card(icon, title, desc, duration) %}
+  {% set title_lower = title | lower %}
+  {% set is_registered = current_user.is_authenticated and current_user.__class__.__name__ == 'Student' and student_domain == title_lower %}
+  {% set is_verified_addon = title in addon_domains_verified %}
+  {% set is_pending_addon  = title in addon_domains_pending %}
+  {% set is_logged_in_student = current_user.is_authenticated and current_user.__class__.__name__ == 'Student' and has_payment %}
+  {% set is_locked = is_logged_in_student and not is_registered and not is_verified_addon and not is_pending_addon %}
+
+  <div class="col-lg-3 col-md-4 col-sm-6" data-aos="fade-up">
+    <div class="domain-card" style="display:flex;flex-direction:column;justify-content:space-between;min-height:300px;position:relative;
+      {% if is_registered %}border:2px solid #27ae60;
+      {% elif is_verified_addon %}border:2px solid var(--secondary);
+      {% elif is_locked %}opacity:0.88;{% endif %}">
+
+      {# Badge top-right #}
+      {% if is_registered %}
+        <div style="position:absolute;top:10px;right:10px;background:#27ae60;color:#fff;font-size:0.68rem;font-weight:700;padding:3px 9px;border-radius:20px;letter-spacing:0.3px;">
+          YOUR DOMAIN
+        </div>
+      {% elif is_verified_addon %}
+        <div style="position:absolute;top:10px;right:10px;background:var(--secondary);color:#fff;font-size:0.68rem;font-weight:700;padding:3px 9px;border-radius:20px;">
+          UNLOCKED
+        </div>
+      {% elif is_pending_addon %}
+        <div style="position:absolute;top:10px;right:10px;background:#f39c12;color:#fff;font-size:0.68rem;font-weight:700;padding:3px 9px;border-radius:20px;">
+          PENDING
+        </div>
+      {% elif is_locked %}
+        <div style="position:absolute;top:10px;right:10px;background:rgba(71,85,105,0.85);color:#fff;font-size:0.68rem;font-weight:700;padding:3px 9px;border-radius:20px;display:flex;align-items:center;gap:4px;">
+          <i class="fas fa-lock" style="font-size:0.6rem;"></i> LOCKED
+        </div>
+      {% endif %}
+
+      <div>
+        <div class="domain-icon">
+          {% if is_locked %}<i class="fas {{ icon }}" style="opacity:0.6;"></i>{% else %}<i class="fas {{ icon }}"></i>{% endif %}
+        </div>
+        <h5 style="font-size:1.05rem;font-weight:700;margin-bottom:8px;">{{ title }}</h5>
+        <p style="font-size:0.82rem;line-height:1.5;color:var(--text-muted);margin-bottom:14px;">{{ desc }}</p>
+      </div>
+
+      <div>
+        <span class="domain-badge" style="display:inline-block;margin-bottom:14px;">
+          <i class="fas fa-clock me-1"></i>{{ duration }}
+        </span>
+
+        {% if is_logged_in_student %}
+          {% if is_registered or is_verified_addon %}
+            <a href="{{ url_for('student.domain_detail', domain=title) }}" class="btn-apply"
+               style="margin-top:0;padding:9px;font-size:0.82rem;border-radius:8px;background:#27ae60;display:block;text-align:center;">
+              <i class="fas fa-check-circle me-1"></i>Open Domain
+            </a>
+          {% elif is_pending_addon %}
+            <button disabled class="btn-apply"
+              style="margin-top:0;padding:9px;font-size:0.82rem;border-radius:8px;background:#f39c12;cursor:not-allowed;opacity:0.85;border:none;width:100%;">
+              <i class="fas fa-clock me-1"></i>Payment Pending
+            </button>
+          {% else %}
+            <a href="{{ url_for('student.addon_payment', domain=title) }}" class="btn-apply"
+               style="margin-top:0;padding:9px;font-size:0.82rem;border-radius:8px;background:var(--primary);display:block;text-align:center;">
+              <i class="fas fa-lock me-1"></i>Unlock — ₹1
+            </a>
+          {% endif %}
+        {% else %}
+          <a href="{{ url_for('auth.register') }}" class="btn-apply"
+             style="margin-top:0;padding:9px;font-size:0.82rem;border-radius:8px;display:block;text-align:center;">
+            Apply Now
+          </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+{% endmacro %}
+
+<!-- ===== SECTION 1: TECHNICAL INTERNSHIPS ===== -->
+<section style="background:var(--light);padding-bottom:50px;">
+  <div class="container">
+    <div class="text-center mb-5" data-aos="fade-up" data-aos-duration="800">
+      <div class="hero-badge" style="background:rgba(10,36,99,0.08);border-color:var(--primary);color:var(--primary);">Engineering &amp; Design</div>
+      <h2 class="section-title mt-3">Technical <span>Internships</span></h2>
+      <div class="title-line"></div>
+      <p class="section-subtitle">Hands-on practical training in cutting-edge software engineering and technology domains</p>
+    </div>
+    <div class="row g-4">
+      {{ domain_card('fa-code',        'Frontend Developer',          'HTML, CSS, JS, React, Angular',          '1-3 Months') }}
+      {{ domain_card('fa-server',      'Backend Developer',           'Node.js, Python, Java, APIs',            '1-3 Months') }}
+      {{ domain_card('fa-layer-group', 'MEAN Stack Developer',        'MongoDB, Express, Angular, Node',        '2-3 Months') }}
+      {{ domain_card('fa-laptop-code', 'Full Stack Developer',        'Frontend + Backend + Database',          '2-6 Months') }}
+      {{ domain_card('fa-shield-alt',  'Cyber Security',              'Ethical Hacking, Pen Testing',           '2-3 Months') }}
+      {{ domain_card('fa-brain',       'Data Science / ML / AI Intern','Python, TensorFlow, NLP, CV',           '2-6 Months') }}
+      {{ domain_card('fa-mobile-alt',  'App Developer',               'Android, iOS, Flutter, React Native',    '1-3 Months') }}
+      {{ domain_card('fa-globe',       'Web Developer',               'HTML, CSS, JS, Bootstrap, Flask',        '1-3 Months') }}
+      {{ domain_card('fa-paint-brush', 'UI/UX Designer',             'Figma, Adobe XD, Prototyping',           '1-2 Months') }}
+      {{ domain_card('fa-headset',     'Technical Support',           'IT Support, Troubleshooting',            '1-2 Months') }}
+    </div>
+  </div>
+</section>
+
+<!-- Divider -->
+<div style="background:#fff;padding:20px 0;">
+  <div class="container">
+    <hr style="border:0;border-top:1px solid rgba(10,36,99,0.1);margin:0;">
+  </div>
+</div>
+
+<!-- ===== SECTION 2: NON-TECHNICAL INTERNSHIPS ===== -->
+<section style="background:#fff;padding-top:50px;padding-bottom:80px;">
+  <div class="container">
+    <div class="text-center mb-5" data-aos="fade-up" data-aos-duration="800">
+      <div class="hero-badge" style="background:rgba(10,36,99,0.08);border-color:var(--primary);color:var(--primary);">Business &amp; Management</div>
+      <h2 class="section-title mt-3">Non-Technical <span>Internships</span></h2>
+      <div class="title-line"></div>
+      <p class="section-subtitle">Real-world training in corporate management, business growth, and creative strategy</p>
+    </div>
+    <div class="row g-4 justify-content-center">
+      {{ domain_card('fa-handshake',         'Business Development Associate', 'Sales, Client Relations, Growth',                 '1-3 Months') }}
+      {{ domain_card('fa-users',             'Human Resources (HR)',           'Recruitment, HR Operations',                      '1-2 Months') }}
+      {{ domain_card('fa-bullhorn',          'Marketing',                      'Strategy, Branding, Campaigns',                   '1-2 Months') }}
+      {{ domain_card('fa-photo-video',       'Digital Content Creator',        'Graphics, Videos, Media',                         '1-2 Months') }}
+      {{ domain_card('fa-share-alt',         'Social Media Promotion',         'Instagram, Facebook, Twitter, LinkedIn',           '1-2 Months') }}
+      {{ domain_card('fa-chart-line',        'Digital Marketing',              'SEO, SEM, Online Ads',                            '1-2 Months') }}
+      {{ domain_card('fa-envelope-open-text','SMS / Email Marketing',          'Campaigns, Newsletters, Automation',              '1-2 Months') }}
+      {{ domain_card('fa-tasks',             'Process Associate',              'Operations, Workflow Management',                  '1-2 Months') }}
+      {{ domain_card('fa-video',             'Short Film Maker / Ads Creator', 'Directing, Editing, Storytelling',                '1-2 Months') }}
+      {{ domain_card('fa-pen-nib',           'Content Writer',                 'Blogs, Articles, Copywriting',                    '1-2 Months') }}
+    </div>
+  </div>
+</section>
+{% endblock %}

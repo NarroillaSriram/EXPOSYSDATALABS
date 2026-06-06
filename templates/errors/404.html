@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}404 - Page Not Found{% endblock %}
+{% block content %}
+<div style="min-height:100vh;background:var(--gradient);display:flex;align-items:center;justify-content:center;text-align:center;padding:20px;">
+  <div>
+    <div style="font-size:8rem;font-weight:900;color:rgba(255,255,255,0.1);line-height:1;">404</div>
+    <i class="fas fa-search" style="font-size:4rem;color:var(--accent);margin-bottom:20px;"></i>
+    <h2 style="color:#fff;font-weight:800;font-size:2rem;">Page Not Found</h2>
+    <p style="color:rgba(255,255,255,0.7);margin-bottom:30px;">The page you're looking for doesn't exist or has been moved.</p>
+    <a href="{{ url_for('main.index') }}" class="btn-primary-custom" style="background:#fff;color:var(--primary);">
+      <i class="fas fa-home me-2"></i>Back to Home
+    </a>
+  </div>
+</div>
+{% endblock %}

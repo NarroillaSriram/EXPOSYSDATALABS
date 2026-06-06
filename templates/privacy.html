@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Privacy Policy - Exposys Data Labs{% endblock %}
+
+{% block content %}
+<div style="padding-top:80px;background:var(--gradient);padding-bottom:60px;">
+  <div class="container text-center text-white py-5">
+    <h1 style="font-size:2.5rem;font-weight:800;">Privacy <span style="color:var(--accent);">Policy</span></h1>
+    <p style="color:rgba(255,255,255,0.8);">Last updated: January 2024</p>
+  </div>
+</div>
+
+<section style="background:var(--light);">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-9">
+        <div style="background:#fff;border-radius:20px;padding:45px;box-shadow:var(--card-shadow);">
+
+          <p style="color:#555;line-height:1.8;margin-bottom:30px;">
+            At Exposys Data Labs, we are committed to protecting your personal information and your right to privacy. This Privacy Policy explains how we collect, use, and safeguard your information when you use our platform.
+          </p>
+
+          {% for title, content in [
+            ('1. Information We Collect', 'We collect information you provide directly to us during registration, including your name, email address, phone number, college name, branch, academic percentages, location, and internship preferences. We also collect payment transaction details when you submit payment.'),
+            ('2. How We Use Your Information', 'We use the information we collect to: process your internship registration, verify your payment, communicate with you about your internship, issue certificates and letters of recommendation, improve our services, and send important program updates.'),
+            ('3. Information Sharing', 'We do not sell, trade, or rent your personal information to third parties. We may share your information with trusted partners only as necessary to deliver our services, such as payment verification. All partners are bound by confidentiality agreements.'),
+            ('4. Data Storage & Security', 'Your data is stored securely in our MySQL database with encrypted passwords. We implement industry-standard security measures including password hashing (Werkzeug), HTTPS encryption, and secure session management to protect your information.'),
+            ('5. Payment Information', 'We collect transaction IDs and payment screenshots for verification purposes only. We do not store credit card or banking details. All payment verification is done manually by our team.'),
+            ('6. Cookies', 'We use session cookies to maintain your login state and improve your experience. These cookies are essential for the platform to function. Please refer to our Cookie Policy for more details.'),
+            ('7. Your Rights', 'You have the right to access, correct, or delete your personal information. You may request account deletion by contacting us at hr@exposysdata.com. We will process your request within 7 business days.'),
+            ('8. Data Retention', 'We retain your personal data for as long as your account is active or as needed to provide services. After program completion, basic records are retained for certificate verification purposes for up to 3 years.'),
+            ('9. Children\'s Privacy', 'Our services are not directed to individuals under 18 years of age. We do not knowingly collect personal information from minors.'),
+            ('10. Changes to This Policy', 'We may update this Privacy Policy from time to time. We will notify you of any significant changes via email or a prominent notice on our platform.'),
+            ('11. Contact Us', 'If you have any questions about this Privacy Policy or how we handle your data, please contact us at hr@exposysdata.com or call +917892053145.'),
+            ('12. Refund Policy', 'All payments made towards our programs are strictly non-refundable. Please ensure that you have reviewed the program details and schedule before proceeding with the payment.'),
+          ] %}
+          <div style="margin-bottom:30px;">
+            <h5 style="font-weight:800;color:var(--primary);margin-bottom:10px;">
+              <i class="fas fa-chevron-right me-2" style="color:var(--secondary);font-size:0.8rem;"></i>{{ title }}
+            </h5>
+            <p style="color:#555;line-height:1.8;margin:0;padding-left:20px;">{{ content }}</p>
+          </div>
+          {% endfor %}
+
+          <div style="background:var(--gradient);border-radius:12px;padding:20px;text-align:center;margin-top:20px;">
+            <p style="color:#fff;margin:0;font-size:0.9rem;">
+              Your privacy matters to us. We are committed to keeping your data safe and secure.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

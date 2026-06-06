@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block title %}Careers - Exposys Data Labs{% endblock %}
+{% block content %}
+<div style="padding-top:80px;background:var(--gradient);padding-bottom:60px;">
+  <div class="container text-center text-white py-5" data-aos="zoom-in" data-aos-duration="1000">
+    <h1 style="font-size:2.5rem;font-weight:800;"><i class="fas fa-briefcase me-3" style="color:var(--accent);"></i>Careers</h1>
+    <p style="color:rgba(255,255,255,0.8);">Join our growing team at Exposys Data Labs</p>
+  </div>
+</div>
+<section style="background:var(--light);">
+  <div class="container">
+
+    <!-- Why Join Us -->
+    <div class="text-center mb-5" data-aos="fade-up" data-aos-duration="800">
+      <h2 class="section-title">Why Join <span>Exposys?</span></h2>
+      <div class="title-line"></div>
+    </div>
+    <div class="row g-4 mb-5">
+      {% for icon, title, desc in [
+        ('fa-rocket','Fast Growth','Be part of a fast-growing EdTech company with opportunities to grow your career rapidly.'),
+        ('fa-users','Great Team','Work with a passionate team of educators, developers, and industry professionals.'),
+        ('fa-home','Flexible Work','We offer flexible working hours and remote work options for most positions.'),
+        ('fa-graduation-cap','Learning Culture','Continuous learning is at our core — access to all our training programs for free.'),
+      ] %}
+      <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="{{ loop.index * 150 }}">
+        <div style="background:#fff;border-radius:16px;padding:25px;box-shadow:var(--card-shadow);text-align:center;height:100%;">
+          <div style="width:55px;height:55px;background:var(--gradient);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 15px;">
+            <i class="fas {{ icon }}" style="color:#fff;font-size:1.2rem;"></i>
+          </div>
+          <h6 style="font-weight:800;color:var(--primary);margin-bottom:8px;">{{ title }}</h6>
+          <p style="color:var(--text-muted);font-size:0.85rem;line-height:1.6;margin:0;">{{ desc }}</p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Open Positions -->
+    <div class="text-center mb-4" data-aos="fade-up" data-aos-duration="800">
+      <h2 class="section-title">Open <span>Positions</span></h2>
+      <div class="title-line"></div>
+    </div>
+    <div class="row g-3 mb-5">
+      {% for title, type, location, dept in [
+        ('Python / Flask Developer','Full Time','Bengaluru / Remote','Engineering'),
+        ('Frontend Developer (React)','Full Time','Bengaluru / Remote','Engineering'),
+        ('UI/UX Designer','Full Time','Bengaluru','Design'),
+        ('Data Science Trainer','Part Time / Contract','Remote','Training'),
+        ('Business Development Executive','Full Time','Bengaluru','Sales'),
+        ('Social Media Manager','Full Time','Bengaluru / Remote','Marketing'),
+        ('Content Writer','Part Time','Remote','Content'),
+        ('HR Executive','Full Time','Bengaluru','Human Resources'),
+      ] %}
+      <div class="col-12" data-aos="fade-left" data-aos-delay="{{ loop.index * 100 }}">
+        <div style="background:#fff;border-radius:14px;padding:20px 25px;box-shadow:var(--card-shadow);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:15px;">
+          <div>
+            <h6 style="font-weight:800;color:var(--primary);margin-bottom:4px;">{{ title }}</h6>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+              <span style="background:rgba(10,36,99,0.08);color:var(--primary);padding:3px 10px;border-radius:10px;font-size:0.75rem;font-weight:600;">
+                <i class="fas fa-building me-1"></i>{{ dept }}
+              </span>
+              <span style="background:rgba(39,174,96,0.1);color:#27ae60;padding:3px 10px;border-radius:10px;font-size:0.75rem;font-weight:600;">
+                <i class="fas fa-clock me-1"></i>{{ type }}
+              </span>
+              <span style="background:rgba(232,69,69,0.1);color:var(--secondary);padding:3px 10px;border-radius:10px;font-size:0.75rem;font-weight:600;">
+                <i class="fas fa-map-marker-alt me-1"></i>{{ location }}
+              </span>
+            </div>
+          </div>
+          <a href="{{ url_for('auth.register') }}" class="btn-primary-custom" style="padding:8px 20px;font-size:0.88rem;">
+            <i class="fas fa-paper-plane me-2"></i>Apply Now
+          </a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Apply CTA -->
+    <div style="background:var(--gradient);border-radius:20px;padding:40px;text-align:center;" data-aos="zoom-in" data-aos-duration="1000">
+      <h4 style="color:#fff;font-weight:800;margin-bottom:10px;">Don't See Your Role?</h4>
+      <p style="color:rgba(255,255,255,0.8);margin-bottom:20px;">Send us your resume and we'll reach out when a suitable position opens up.</p>
+      <a href="mailto:hr@exposysdata.com?subject=General%20Application%20-%20Exposys%20Data%20Labs" class="btn-primary-custom" style="background:#fff;color:var(--primary);">
+        <i class="fas fa-envelope me-2"></i>Send Your Resume
+      </a>
+    </div>
+
+  </div>
+</section>
+{% endblock %}

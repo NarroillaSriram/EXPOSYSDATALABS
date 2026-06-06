@@ -1,0 +1,241 @@
+{% extends "student/base_student.html" %}
+{% block title %}{{ domain }} Internship - Exposys{% endblock %}
+{% block page_title %}{{ domain }}{% endblock %}
+
+{% block content %}
+<style>
+  .domain-hero {
+    background: linear-gradient(135deg, var(--primary) 0%, #1a3a8f 100%);
+    border-radius: 20px; padding: 36px 40px; color: #fff;
+    margin-bottom: 28px; position: relative; overflow: hidden;
+  }
+  .domain-hero::before {
+    content: ''; position: absolute; top: -50px; right: -50px;
+    width: 220px; height: 220px; background: rgba(255,255,255,0.05); border-radius: 50%;
+  }
+  .domain-hero::after {
+    content: ''; position: absolute; bottom: -60px; left: -30px;
+    width: 160px; height: 160px; background: rgba(255,255,255,0.04); border-radius: 50%;
+  }
+  .badge-access {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: #d1fae5; color: #065f46; border: 1px solid #10b981;
+    border-radius: 20px; padding: 4px 14px; font-size: 0.78rem; font-weight: 700;
+  }
+  .tech-pill {
+    display: inline-block; background: rgba(255,255,255,0.15);
+    color: #fff; border-radius: 20px; padding: 4px 14px;
+    font-size: 0.78rem; font-weight: 600; margin: 3px 3px 3px 0;
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+  .section-card {
+    background: #fff; border-radius: 16px; padding: 28px;
+    border: 1px solid rgba(10,36,99,0.08); height: 100%;
+  }
+  .section-card-title {
+    font-weight: 800; color: var(--primary); font-size: 1rem;
+    margin-bottom: 20px; display: flex; align-items: center; gap: 10px;
+  }
+  .section-card-title .title-icon {
+    width: 38px; height: 38px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .task-item {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 10px 0; border-bottom: 1px solid rgba(10,36,99,0.05);
+    font-size: 0.875rem; color: #374151;
+  }
+  .task-item:last-child { border-bottom: none; }
+  .task-bullet {
+    width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.7rem; font-weight: 800; color: #fff;
+    background: var(--primary); margin-top: 1px;
+  }
+  .outcome-card {
+    background: var(--light); border-radius: 12px; padding: 16px;
+    display: flex; align-items: flex-start; gap: 14px;
+    border: 1px solid rgba(10,36,99,0.06);
+    transition: all 0.25s ease;
+  }
+  .outcome-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(10,36,99,0.10); border-color: var(--secondary); }
+  .outcome-icon {
+    width: 42px; height: 42px; border-radius: 12px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, var(--primary), #1a3a8f);
+  }
+  .outcome-icon i { color: #fff; font-size: 1rem; }
+  .roadmap-step {
+    display: flex; align-items: flex-start; gap: 16px;
+    padding: 16px 0; border-bottom: 1px solid rgba(10,36,99,0.06);
+  }
+  .roadmap-step:last-child { border-bottom: none; }
+  .step-num {
+    width: 38px; height: 38px; border-radius: 50%; flex-shrink: 0;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: #fff; font-weight: 800; font-size: 0.85rem;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .info-highlight {
+    background: linear-gradient(135deg, rgba(10,36,99,0.04), rgba(26,58,143,0.04));
+    border-radius: 12px; padding: 20px;
+    border-left: 4px solid var(--secondary);
+    font-size: 0.85rem; color: var(--text-muted);
+  }
+</style>
+
+<!-- Hero Banner -->
+<div class="domain-hero">
+  <div style="position:relative;z-index:1;">
+    <span class="badge-access mb-3 d-inline-flex">
+      <i class="fas fa-check-circle"></i> Access Granted
+    </span>
+    <div class="d-flex align-items-center gap-3 mb-2 mt-2">
+      <div style="width:54px;height:54px;background:rgba(255,255,255,0.15);border-radius:14px;display:flex;align-items:center;justify-content:center;">
+        <i class="fas {{ content.icon }}" style="font-size:1.5rem;color:var(--accent);"></i>
+      </div>
+      <h2 style="font-size:1.8rem;font-weight:800;margin:0;">{{ domain }}</h2>
+    </div>
+    <p style="color:rgba(255,255,255,0.8);margin:0 0 16px;max-width:600px;">
+      Welcome, <strong>{{ student.name }}</strong>! You have full access to this internship program.
+      Work on real tasks, build your portfolio, and earn your certificate.
+    </p>
+    <div>
+      {% for tech in content.technologies %}
+        <span class="tech-pill">{{ tech }}</span>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<!-- Main Content Grid -->
+<div class="row g-4 mb-4">
+
+  <!-- Internship Tasks -->
+  <div class="col-lg-7">
+    <div class="section-card">
+      <div class="section-card-title">
+        <div class="title-icon" style="background:linear-gradient(135deg,var(--primary),#1a3a8f);">
+          <i class="fas fa-tasks" style="color:#fff;font-size:1rem;"></i>
+        </div>
+        Internship Tasks
+        <span style="margin-left:auto;background:rgba(10,36,99,0.08);color:var(--primary);font-size:0.72rem;padding:3px 10px;border-radius:20px;font-weight:700;">
+          {{ content.tasks | length }} Tasks
+        </span>
+      </div>
+      {% for task in content.tasks %}
+      <div class="task-item">
+        <div class="task-bullet">{{ loop.index }}</div>
+        <span>{{ task }}</span>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Right Column -->
+  <div class="col-lg-5">
+    <!-- Learning Outcomes -->
+    <div class="section-card mb-4">
+      <div class="section-card-title">
+        <div class="title-icon" style="background:linear-gradient(135deg,#10b981,#059669);">
+          <i class="fas fa-graduation-cap" style="color:#fff;font-size:1rem;"></i>
+        </div>
+        Learning Outcomes
+      </div>
+      <div class="d-flex flex-column gap-3">
+        {% for icon, title, desc in content.outcomes %}
+        <div class="outcome-card">
+          <div class="outcome-icon">
+            <i class="fas {{ icon }}"></i>
+          </div>
+          <div>
+            <div style="font-weight:700;font-size:0.88rem;color:var(--primary);">{{ title }}</div>
+            <div style="font-size:0.79rem;color:var(--text-muted);margin-top:2px;">{{ desc }}</div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Quick Info -->
+    <div class="section-card">
+      <div class="section-card-title">
+        <div class="title-icon" style="background:linear-gradient(135deg,#f59e0b,#d97706);">
+          <i class="fas fa-info-circle" style="color:#fff;font-size:1rem;"></i>
+        </div>
+        Program Benefits
+      </div>
+      {% for icon, label, value in [
+        ('fa-certificate', 'Certificate', 'Industry-recognized on completion'),
+        ('fa-file-alt', 'Letter of Recommendation', 'From Exposys Data Labs'),
+        ('fa-user-tie', 'Expert Mentorship', 'Guided by industry professionals'),
+        ('fa-project-diagram', 'Live Project', 'Real-world project experience'),
+        ('fa-envelope', 'Resources via Email', 'Delivered within 24 hrs of verification'),
+      ] %}
+      <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(10,36,99,0.05);">
+        <i class="fas {{ icon }}" style="color:var(--secondary);width:18px;text-align:center;"></i>
+        <div>
+          <div style="font-weight:700;font-size:0.83rem;color:var(--primary);">{{ label }}</div>
+          <div style="font-size:0.78rem;color:var(--text-muted);">{{ value }}</div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<!-- Learning Roadmap -->
+<div class="section-card mb-4">
+  <div class="section-card-title">
+    <div class="title-icon" style="background:linear-gradient(135deg,#6366f1,#4f46e5);">
+      <i class="fas fa-road" style="color:#fff;font-size:1rem;"></i>
+    </div>
+    Your Learning Roadmap
+  </div>
+  <div class="row g-0">
+    {% for num, title, desc in [
+      ('1', 'Orientation & Onboarding', 'Receive your joining kit, mentor introduction, program schedule, and study materials via email.'),
+      ('2', 'Core Learning Phase', 'Study domain-specific materials, attend mentorship sessions, and complete learning modules.'),
+      ('3', 'Live Project Development', 'Work on a real-world project under expert guidance. Apply your skills to solve actual problems.'),
+      ('4', 'Submission & Review', 'Submit your project, receive detailed feedback from mentors, and incorporate improvements.'),
+      ('5', 'Certification & Completion', 'Receive your industry-recognized certificate and Letter of Recommendation from Exposys Data Labs.'),
+    ] %}
+    <div class="col-12">
+      <div class="roadmap-step">
+        <div class="step-num">{{ num }}</div>
+        <div>
+          <div style="font-weight:700;font-size:0.9rem;color:var(--primary);">{{ title }}</div>
+          <div style="font-size:0.82rem;color:var(--text-muted);margin-top:3px;">{{ desc }}</div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- Info + Support CTA -->
+<div class="row g-4">
+  <div class="col-md-6">
+    <div class="info-highlight">
+      <div style="font-weight:700;color:var(--primary);margin-bottom:6px;">
+        <i class="fas fa-envelope me-2" style="color:var(--secondary);"></i>What happens next?
+      </div>
+      Our team will send you the complete study materials, project brief, and mentor details
+      to your registered email (<strong>{{ student.email }}</strong>) within 24 hours of payment verification.
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div style="background:#fff;border-radius:12px;padding:20px;border:1px solid rgba(10,36,99,0.08);display:flex;align-items:center;gap:16px;flex-wrap:wrap;height:100%;">
+      <div style="flex:1;min-width:150px;">
+        <div style="font-weight:700;color:var(--primary);margin-bottom:4px;">Need Help?</div>
+        <div style="font-size:0.82rem;color:var(--text-muted);">
+          Reach out for queries about your <strong>{{ domain }}</strong> program.
+        </div>
+      </div>
+      <a href="{{ url_for('main.contact') }}" class="btn btn-primary" style="border-radius:10px;font-weight:700;padding:10px 20px;white-space:nowrap;">
+        <i class="fas fa-envelope me-2"></i>Contact Support
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

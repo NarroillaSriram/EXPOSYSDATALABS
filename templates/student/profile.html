@@ -1,0 +1,84 @@
+{% extends "student/base_student.html" %}
+{% block title %}My Profile - Exposys{% endblock %}
+{% block page_title %}My Profile{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+  <div class="col-lg-4">
+    <div class="data-table">
+      <div class="p-4 text-center">
+        <div style="width:100px;height:100px;background:var(--gradient);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 15px;font-size:2.5rem;font-weight:800;color:#fff;">
+          {{ student.name[0].upper() }}
+        </div>
+        <h5 style="font-weight:800;color:var(--primary);">{{ student.name }}</h5>
+        <p style="color:var(--secondary);font-weight:600;">{{ student.internship_domain }}</p>
+        <span class="badge-status badge-verified">Active Student</span>
+        <hr>
+        <div style="text-align:left;">
+          <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:8px;">
+            <i class="fas fa-envelope me-2" style="color:var(--primary);"></i>{{ student.email }}
+          </p>
+          <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:8px;">
+            <i class="fas fa-phone me-2" style="color:var(--primary);"></i>{{ student.phone }}
+          </p>
+          <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:0;">
+            <i class="fas fa-map-marker-alt me-2" style="color:var(--primary);"></i>{{ student.location }}
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-8">
+    <div class="data-table">
+      <div class="data-table-header">
+        <h5><i class="fas fa-id-card me-2" style="color:var(--secondary);"></i>Complete Profile</h5>
+      </div>
+      <div class="p-4">
+        <h6 style="font-weight:700;color:var(--primary);margin-bottom:15px;">Personal Details</h6>
+        <div class="row g-3 mb-4">
+          {% for label, value in [
+            ('Full Name', student.name), ('Email', student.email),
+            ('Phone', student.phone), ('Location', student.location),
+          ] %}
+          <div class="col-md-6">
+            <div style="background:var(--light);border-radius:10px;padding:12px;">
+              <div style="font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;font-weight:600;">{{ label }}</div>
+              <div style="font-weight:700;color:var(--primary);margin-top:3px;">{{ value }}</div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        <h6 style="font-weight:700;color:var(--primary);margin-bottom:15px;">Academic Details</h6>
+        <div class="row g-3 mb-4">
+          {% for label, value in [
+            ('College', student.college), ('Branch', student.branch),
+            ('10th %', student.tenth_percentage), ('12th %', student.twelfth_percentage),
+            ('UG', student.ug or 'N/A'), ('PG', student.pg or 'N/A'),
+          ] %}
+          <div class="col-md-6">
+            <div style="background:var(--light);border-radius:10px;padding:12px;">
+              <div style="font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;font-weight:600;">{{ label }}</div>
+              <div style="font-weight:700;color:var(--primary);margin-top:3px;">{{ value }}</div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        <h6 style="font-weight:700;color:var(--primary);margin-bottom:15px;">Internship Details</h6>
+        <div class="row g-3">
+          {% for label, value in [
+            ('Domain', student.internship_domain), ('Duration', student.duration),
+            ('Registered On', student.created_at.strftime('%d %B %Y')),
+          ] %}
+          <div class="col-md-6">
+            <div style="background:var(--light);border-radius:10px;padding:12px;">
+              <div style="font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;font-weight:600;">{{ label }}</div>
+              <div style="font-weight:700;color:var(--primary);margin-top:3px;">{{ value }}</div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

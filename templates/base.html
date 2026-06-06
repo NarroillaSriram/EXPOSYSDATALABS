@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Exposys Data Labs - Internship & Training{% endblock %}</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700;800&display=swap" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=1.5" />
+  {% block extra_css %}{% endblock %}
+  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css">
+</head>
+
+<body>
+  <div id="progressBar"></div>
+
+  <!-- Preloader -->
+  <div id="preloader">
+    <div class="loader-ring"></div>
+  </div>
+
+  <!-- Flash Messages -->
+  <div class="flash-container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}
+    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+      <i
+        class="fas fa-{% if category == 'success' %}check-circle{% elif category == 'danger' %}exclamation-circle{% elif category == 'warning' %}exclamation-triangle{% else %}info-circle{% endif %} me-2"></i>
+      {{ message }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}
+    {% endwith %}
+  </div>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg fixed-top">
+    <div class="container">
+      <a class="navbar-brand" href="{{ url_for('main.index') }}">
+        <span class="brand-main">EXPOSYS</span>
+        <span class="brand-sub">Data Labs</span>
+      </a>
+      <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navMenu">
+        <ul class="navbar-nav mx-auto">
+          <li class="nav-item"><a class="nav-link {% if request.endpoint == 'main.index' %}active{% endif %}" href="{{ url_for('main.index') }}">Home</a></li>
+          <li class="nav-item"><a class="nav-link {% if request.endpoint == 'main.about' %}active{% endif %}" href="{{ url_for('main.about') }}">About</a></li>
+          <li class="nav-item"><a class="nav-link {% if request.endpoint == 'main.internships' %}active{% endif %}" href="{{ url_for('main.internships') }}">Internships</a></li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle {% if request.endpoint in ['main.research', 'main.promotions', 'main.design'] %}active{% endif %}" href="#" role="button" data-bs-toggle="dropdown">Services</a>
+            <ul class="dropdown-menu"
+              style="background:#0a2463;border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:8px;min-width:200px;">
+              <li><a class="dropdown-item" href="{{ url_for('main.research') }}"
+                  style="color:rgba(255,255,255,0.85);border-radius:8px;padding:8px 15px;"><i class="fas fa-flask me-2"
+                    style="color:var(--accent);"></i>Research</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('main.promotions') }}"
+                  style="color:rgba(255,255,255,0.85);border-radius:8px;padding:8px 15px;"><i
+                    class="fas fa-bullhorn me-2" style="color:var(--accent);"></i>Promotions</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('main.design') }}"
+                  style="color:rgba(255,255,255,0.85);border-radius:8px;padding:8px 15px;"><i
+                    class="fas fa-paint-brush me-2" style="color:var(--accent);"></i>Design</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('main.careers') }}"
+                  style="color:rgba(255,255,255,0.85);border-radius:8px;padding:8px 15px;"><i
+                    class="fas fa-briefcase me-2" style="color:var(--accent);"></i>Careers</a></li>
+            </ul>
+          </li>
+          <li class="nav-item"><a class="nav-link {% if request.endpoint == 'main.careers' %}active{% endif %}" href="{{ url_for('main.careers') }}">Careers</a></li>
+          <li class="nav-item"><a class="nav-link {% if request.endpoint == 'main.reviews' %}active{% endif %}" href="{{ url_for('main.reviews') }}">Endorsement</a></li>
+          <li class="nav-item"><a class="nav-link {% if request.endpoint == 'main.contact' %}active{% endif %}" href="{{ url_for('main.contact') }}">Contact</a></li>
+        </ul>
+        <div class="d-flex gap-2 align-items-center">
+          {% if current_user.is_authenticated %}
+          {% if current_user.__class__.__name__ == 'Student' %}
+            {% if has_payment %}
+            <a href="{{ url_for('student.dashboard') }}" class="btn-nav-login nav-link">
+              <i class="fas fa-tachometer-alt me-1"></i>Dashboard
+            </a>
+            {% else %}
+            <a href="{{ url_for('student.payment') }}" class="btn-nav-login nav-link" style="background:var(--secondary);">
+              <i class="fas fa-credit-card me-1"></i>Complete Payment
+            </a>
+            {% endif %}
+          {% else %}
+          <a href="{{ url_for('admin.dashboard') }}" class="btn-nav-login nav-link">
+            <i class="fas fa-tachometer-alt me-1"></i>Dashboard
+          </a>
+          {% endif %}
+          <a href="{{ url_for('auth.logout') }}" class="btn-nav-register nav-link">
+            <i class="fas fa-sign-out-alt me-1"></i>Logout
+          </a>
+          {% else %}
+          <a href="{{ url_for('auth.login') }}" class="btn-nav-login nav-link">Login</a>
+          <a href="{{ url_for('auth.register') }}" class="btn-nav-register nav-link">Register</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  {% block content %}{% endblock %}
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="row g-4">
+        <div class="col-lg-4">
+          <div class="footer-brand">Exposys <span>Data</span> Labs</div>
+          <p class="footer-desc">Empowering students with industry-relevant internships and training programs. Build
+            your career with us.</p>
+          <div class="footer-social">
+            <a href="https://www.facebook.com/share/17LaBwfMkF/" target="_blank" class="social-btn"><i
+                class="fab fa-facebook-f"></i></a>
+            <a href="https://x.com/ExposysDataLabs" target="_blank" class="social-btn"><i
+                class="fab fa-twitter"></i></a>
+            <a href="https://www.linkedin.com/company/upchat-technologies/" target="_blank" class="social-btn"><i
+                class="fab fa-linkedin-in"></i></a>
+            <a href="https://www.instagram.com/exposysdatalabs?igsh=M3YwN3dwMm8xNG1s" target="_blank"
+              class="social-btn"><i class="fab fa-instagram"></i></a>
+            <a href="https://youtube.com/@exposysdatalabs4156?si=uMDS8_tzNH32xUF7" target="_blank" class="social-btn"><i
+                class="fab fa-youtube"></i></a>
+          </div>
+        </div>
+        <div class="col-lg-2 col-md-4">
+          <h6>Quick Links</h6>
+          <ul class="footer-links">
+            <li><a href="{{ url_for('main.index') }}">Home</a></li>
+            <li><a href="{{ url_for('main.about') }}">About Us</a></li>
+            <li><a href="{{ url_for('main.internships') }}">Internships</a></li>
+            <li><a href="{{ url_for('auth.register') }}">Register</a></li>
+            <li><a href="{{ url_for('main.contact') }}">Contact</a></li>
+          </ul>
+        </div>
+        <div class="col-lg-3 col-md-4">
+          <h6>Internship Domains</h6>
+          <ul class="footer-links">
+            <li><a href="{{ url_for('main.internships') }}">Frontend Developer</a></li>
+            <li><a href="{{ url_for('main.internships') }}">Backend Developer</a></li>
+            <li><a href="{{ url_for('main.internships') }}">Full Stack Developer</a></li>
+            <li><a href="{{ url_for('main.internships') }}">Data Science / ML / AI</a></li>
+            <li><a href="{{ url_for('main.internships') }}">Digital Marketing</a></li>
+          </ul>
+        </div>
+        <div class="col-lg-3 col-md-4">
+          <h6>Contact Info</h6>
+          <ul class="footer-links">
+            <li><i class="fas fa-envelope me-2" style="color:var(--secondary)"></i><a
+                href="mailto:hr@exposysdata.com?subject=Enquiry%20-%20Exposys%20Data%20Labs"
+                style="color:rgba(255,255,255,0.6);transition:color 0.3s;"
+                onmouseover="this.style.color='var(--secondary)'"
+                onmouseout="this.style.color='rgba(255,255,255,0.6)'">hr@exposysdata.com</a></li>
+            <li><i class="fas fa-phone me-2" style="color:var(--secondary)"></i>+917892053145</li>
+            <li><i class="fas fa-map-marker-alt me-2" style="color:var(--secondary)"></i><a
+                href="https://www.google.com/maps/dir/?api=1&destination=4th%20Floor,%20YVR%20Cave,%2056,%20Kakolu%20Rd,%20Yelahanka,%20Rajanukunte,%20Bengaluru,%20Karnataka%20560064"
+                target="_blank" style="color:rgba(255,255,255,0.6);transition:color 0.3s;"
+                onmouseover="this.style.color='var(--secondary)'"
+                onmouseout="this.style.color='rgba(255,255,255,0.6)'">4th Floor, YVR Cave, 56, Kakolu Rd, Yelahanka,
+                Rajanukunte, Bengaluru, Karnataka 560064</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="container">
+        <p class="mb-2">&copy; 2026 Explore and Evolve Pvt.Ltd. All rights reserved.</p>
+        <div class="d-flex justify-content-center gap-3 flex-wrap">
+          <a href="{{ url_for('main.terms') }}"
+            style="color:rgba(255,255,255,0.5);font-size:0.82rem;transition:color 0.3s;"
+            onmouseover="this.style.color='#e84545'" onmouseout="this.style.color='rgba(255,255,255,0.5)'">Terms of
+            Service</a>
+          <span style="color:rgba(255,255,255,0.2);">|</span>
+          <a href="{{ url_for('main.privacy') }}"
+            style="color:rgba(255,255,255,0.5);font-size:0.82rem;transition:color 0.3s;"
+            onmouseover="this.style.color='#e84545'" onmouseout="this.style.color='rgba(255,255,255,0.5)'">Privacy
+            Policy</a>
+          <span style="color:rgba(255,255,255,0.2);">|</span>
+          <a href="{{ url_for('main.cookies') }}"
+            style="color:rgba(255,255,255,0.5);font-size:0.82rem;transition:color 0.3s;"
+            onmouseover="this.style.color='#e84545'" onmouseout="this.style.color='rgba(255,255,255,0.5)'">Cookie
+            Policy</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="{{ url_for('static', filename='js/main.js') }}?v=1.3"></script>
+  {% block extra_js %}{% endblock %}
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+
+  <script>
+    AOS.init({
+      duration: 1000,
+      once: true,
+      offset: 100
+    });
+  </script>
+</body>
+
+</html>

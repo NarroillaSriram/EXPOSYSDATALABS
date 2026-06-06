@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}500 - Server Error{% endblock %}
+{% block content %}
+<div style="min-height:100vh;background:var(--gradient);display:flex;align-items:center;justify-content:center;text-align:center;padding:20px;">
+  <div>
+    <div style="font-size:8rem;font-weight:900;color:rgba(255,255,255,0.1);line-height:1;">500</div>
+    <i class="fas fa-exclamation-triangle" style="font-size:4rem;color:var(--secondary);margin-bottom:20px;"></i>
+    <h2 style="color:#fff;font-weight:800;font-size:2rem;">Internal Server Error</h2>
+    <p style="color:rgba(255,255,255,0.7);margin-bottom:30px;">Something went wrong on our end. Please try again later.</p>
+    <a href="{{ url_for('main.index') }}" class="btn-primary-custom" style="background:#fff;color:var(--primary);">
+      <i class="fas fa-home me-2"></i>Back to Home
+    </a>
+  </div>
+</div>
+{% endblock %}

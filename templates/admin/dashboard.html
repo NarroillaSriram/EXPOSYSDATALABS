@@ -1,0 +1,136 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Admin Dashboard - Exposys{% endblock %}
+{% block page_title %}Dashboard Overview{% endblock %}
+
+{% block content %}
+<!-- Stats -->
+<div class="row g-4 mb-4">
+  <div class="col-lg-3 col-md-6">
+    <div class="stat-card">
+      <div class="stat-card-icon blue"><i class="fas fa-users"></i></div>
+      <div class="stat-card-info">
+        <h3>{{ total_students }}</h3>
+        <p>Total Students</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-3 col-md-6">
+    <div class="stat-card">
+      <div class="stat-card-icon green"><i class="fas fa-check-circle"></i></div>
+      <div class="stat-card-info">
+        <h3>{{ verified_payments }}</h3>
+        <p>Verified Payments</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-3 col-md-6">
+    <div class="stat-card">
+      <div class="stat-card-icon orange"><i class="fas fa-clock"></i></div>
+      <div class="stat-card-info">
+        <h3>{{ pending_payments }}</h3>
+        <p>Pending Payments</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-3 col-md-6">
+    <div class="stat-card">
+      <div class="stat-card-icon red"><i class="fas fa-envelope"></i></div>
+      <div class="stat-card-info">
+        <h3>{{ unread_contacts }}</h3>
+        <p>Unread Messages</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4">
+  <!-- Domain Analytics -->
+  <div class="col-lg-5">
+    <div class="data-table">
+      <div class="data-table-header">
+        <h5><i class="fas fa-chart-pie me-2" style="color:var(--secondary);"></i>Domain Analytics</h5>
+      </div>
+      <div class="p-3">
+        {% if domain_stats %}
+          {% for domain, count in domain_stats %}
+          <div style="margin-bottom:12px;">
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+              <span style="font-size:0.85rem;font-weight:600;color:var(--primary);">{{ domain }}</span>
+              <span style="font-size:0.85rem;color:var(--text-muted);">{{ count }}</span>
+            </div>
+            <div style="background:#f0f0f0;border-radius:4px;height:8px;">
+              <div style="background:var(--gradient);border-radius:4px;height:8px;width:{{ [(count / total_students * 100)|int, 100]|min if total_students > 0 else 0 }}%;transition:width 1s ease;"></div>
+            </div>
+          </div>
+          {% endfor %}
+        {% else %}
+          <p style="color:var(--text-muted);text-align:center;padding:20px;">No data yet.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Students -->
+  <div class="col-lg-7">
+    <div class="data-table">
+      <div class="data-table-header">
+        <h5><i class="fas fa-user-plus me-2" style="color:var(--secondary);"></i>Recent Registrations</h5>
+        <a href="{{ url_for('admin.students') }}" style="color:var(--primary);font-size:0.85rem;">View All</a>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Domain</th>
+              <th>College</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for s in recent_students %}
+            <tr>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <div style="width:32px;height:32px;background:var(--gradient);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:0.85rem;">
+                    {{ s.name[0].upper() }}
+                  </div>
+                  <span style="font-weight:600;font-size:0.88rem;">{{ s.name }}</span>
+                </div>
+              </td>
+              <td><span style="font-size:0.82rem;">{{ s.internship_domain }}</span></td>
+              <td><span style="font-size:0.82rem;">{{ s.college[:20] }}...</span></td>
+              <td><span style="font-size:0.82rem;">{{ s.created_at.strftime('%d %b') }}</span></td>
+            </tr>
+            {% else %}
+            <tr><td colspan="4" class="text-center text-muted py-4">No students yet.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row g-4 mt-1">
+  {% for icon, label, url, color in [
+    ('fa-users', 'Manage Students', url_for('admin.students'), 'blue'),
+    ('fa-credit-card', 'Review Payments', url_for('admin.payments'), 'green'),
+    ('fa-envelope', 'View Messages', url_for('admin.contacts'), 'red'),
+    ('fa-file-csv', 'Export Data', url_for('admin.export_students'), 'orange'),
+  ] %}
+  <div class="col-lg-3 col-md-6">
+    <a href="{{ url }}" style="text-decoration:none;">
+      <div class="stat-card" style="cursor:pointer;">
+        <div class="stat-card-icon {{ color }}"><i class="fas {{ icon }}"></i></div>
+        <div class="stat-card-info">
+          <h3 style="font-size:1rem;">{{ label }}</h3>
+          <p>Quick Action</p>
+        </div>
+      </div>
+    </a>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

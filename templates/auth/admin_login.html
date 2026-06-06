@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Admin Login - Exposys Data Labs{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper" style="background:linear-gradient(135deg,#060e1f,#0a2463);">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <div style="width:60px;height:60px;background:var(--gradient);border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 15px;">
+        <i class="fas fa-shield-alt" style="font-size:1.5rem;color:#fff;"></i>
+      </div>
+      <h2>Admin <span>Portal</span></h2>
+      <p>Exposys Data Labs Administration</p>
+    </div>
+
+    <form method="POST" action="{{ url_for('auth.admin_login') }}">
+      {{ form.hidden_tag() }}
+      <div class="mb-3">
+        <label class="form-label">{{ form.email.label.text }}</label>
+        {{ form.email(class="form-control", placeholder="admin@exposys.com") }}
+        {% for e in form.email.errors %}<div class="text-danger small mt-1">{{ e }}</div>{% endfor %}
+      </div>
+      <div class="mb-4">
+        <label class="form-label">{{ form.password.label.text }}</label>
+        <div class="password-field-container">
+          {{ form.password(class="form-control", placeholder="Admin password", id="password") }}
+          <button type="button" class="password-toggle-btn" data-pw-target="#password" aria-label="Toggle Password Visibility">
+              <i class="fas fa-eye-slash"></i>
+            </button>
+        </div>
+        {% for e in form.password.errors %}<div class="text-danger small mt-1">{{ e }}</div>{% endfor %}
+      </div>
+      <button type="submit" class="btn-primary-custom w-100">
+        <i class="fas fa-lock-open me-2"></i>Admin Login
+      </button>
+    </form>
+
+    <div class="text-center mt-4">
+      <a href="{{ url_for('main.index') }}" style="color:var(--text-muted);font-size:0.88rem;">
+        <i class="fas fa-arrow-left me-1"></i>Back to Website
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

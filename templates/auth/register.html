@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+{% block title %}Register - Exposys Data Labs{% endblock %}
+
+{% block content %}
+<div style="padding-top:80px;background:var(--gradient);min-height:100vh;padding-bottom:60px;">
+  <div class="container py-5">
+    <div class="row justify-content-center">
+      <div class="col-lg-9">
+        <div style="background:#fff;border-radius:20px;padding:45px;box-shadow:0 30px 60px rgba(0,0,0,0.2);" data-aos="zoom-in" data-aos-duration="1000">
+          <div class="text-center mb-4">
+            <h2 style="font-size:1.8rem;font-weight:800;color:var(--primary);">Exposys <span
+                style="color:var(--secondary);">Data</span> Labs</h2>
+            <h4 style="font-weight:700;color:var(--primary);margin-top:10px;">Internship Registration</h4>
+            <p style="color:var(--text-muted);font-size:0.9rem;">Fill in your details to apply for an internship</p>
+          </div>
+
+          <form method="POST" action="{{ url_for('auth.register') }}" id="registrationForm" novalidate>
+            {{ form.hidden_tag() }}
+
+            {% if form.errors %}
+            <div class="alert alert-danger" style="border-radius:10px;">
+              <i class="fas fa-exclamation-circle me-2"></i>
+              <strong>Please fix the following errors:</strong>
+              <ul class="mb-0 mt-2">
+                {% for field, errors in form.errors.items() %}
+                {% for error in errors %}
+                <li>{{ form[field].label.text }}: {{ error }}</li>
+                {% endfor %}
+                {% endfor %}
+              </ul>
+            </div>
+            {% endif %}
+
+            <!-- Personal Info -->
+            <div style="background:var(--light);border-radius:12px;padding:20px;margin-bottom:25px;">
+              <h6 style="font-weight:700;color:var(--primary);margin-bottom:20px;">
+                <i class="fas fa-user me-2" style="color:var(--secondary);"></i>Personal Information
+              </h6>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label">{{ form.name.label.text }} <span class="text-danger">*</span></label>
+                  {{ form.name(class="form-control", placeholder="Enter your full name") }}
+                  {% for e in form.name.errors %}<div class="text-danger small mt-1">{{ e }}</div>{% endfor %}
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">{{ form.email.label.text }} <span class="text-danger">*</span></label>
+                  {{ form.email(class="form-control", placeholder="your@email.com") }}
+                  {% for e in form.email.errors %}<div class="text-danger small mt-1">{{ e }}</div>{% endfor %}
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">{{ form.phone.label.text }} <span class="text-danger">*</span></label>
+                  {{ form.phone(class="form-control", placeholder="10-digit mobile number") }}
+                  {% for e in form.phone.errors %}<div class="text-danger small mt-1">{{ e }}</div>{% endfor %}
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">{{ form.location.label.text }} <span class="text-danger">*</span></label>
+                  {{ form.location(class="form-control", placeholder="City, State") }}
+                  {% for e in form.location.errors %}<div class="text-danger small mt-1">{{ e }}</div>{% endfor %}
+                </div>
+              </div>
+            </div>
+
+            <!-- Academic Info -->
+            <div style="background:var(--light);border-radius:12px;padding:20px;margin-bottom:25px;">
+              <h6 style="font-weight:700;color:var(--primary);margin-bottom:20px;">
+                <i class="fas fa-graduation-cap me-2" style="color:var(--secondary);"></i>Academic Information
+              </h6>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label">{{ form.college.label.text }} <span class="text-danger">*</span></label>
+                  {{ form.college(class="form-control", placeholder="Your college/university name") }}
+                  {% for e in form.college.errors %}<div class="text-danger small mt-1">{{ e }}</div>{% endfor %}
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">{{ form.branch.label.text }} <span class="text-danger">*</span></label>
+                  {{ form.branch(class="form-select") }}
+                  {% for e in form.branch.errors %}<div class="text-danger small mt-1">{{ e }}</div>{% endfor %}
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">{{ form.tenth_percentage.label.text }} <span
+                      class="text-danger">*</span></label>
+                  {{ form.tenth_percentage(class="form-control", placeholder="e.g. 85.5", type="number", step="any",
+                  min="0", max="100") }}
+                  {% for e in form.tenth_percentage.errors %}<div class="text-danger small mt-1">{{ e }}</div>{% endfor
+                  %}
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">{{ form.twelfth_percentage.label.text }} <span
+                      class="text-danger">*</span></label>
+                  {{ form.twelfth_percentage(class="form-control", placeholder="e.g. 78.0", type="number", step="any",
+                  min="0", max="100") }}
+                  {% for e in form.twelfth_percentage.errors %}<div class="text-danger small mt-1">{{ e }}</div>{%
+                  endfor %}
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">{{ form.ug.label.text }}</label>
+                  {{ form.ug(class="form-control", placeholder="e.g. B.Tech CSE (Optional)") }}
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">{{ form.pg.label.text }}</label>
+                  {{ form.pg(class="form-control", placeholder="e.g. M.Tech (Optional)") }}
+                </div>
+              </div>
+            </div>
+
+            <!-- Internship Info -->
+            <div style="background:var(--light);border-radius:12px;padding:20px;margin-bottom:25px;">
+              <h6 style="font-weight:700;color:var(--primary);margin-bottom:20px;">
+                <i class="fas fa-briefcase me-2" style="color:var(--secondary);"></i>Internship Preferences
+              </h6>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label">{{ form.internship_domain.label.text }} <span
+                      class="text-danger">*</span></label>
+                  {{ form.internship_domain(class="form-select") }}
+                  {% for e in form.internship_domain.errors %}<div class="text-danger small mt-1">{{ e }}</div>{% endfor
+                  %}
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">{{ form.duration.label.text }} <span class="text-danger">*</span></label>
+                  {{ form.duration(class="form-select") }}
+                  {% for e in form.duration.errors %}<div class="text-danger small mt-1">{{ e }}</div>{% endfor %}
+                </div>
+              </div>
+            </div>
+
+            <!-- Password -->
+            <div style="background:var(--light);border-radius:12px;padding:20px;margin-bottom:25px;">
+              <h6 style="font-weight:700;color:var(--primary);margin-bottom:20px;">
+                <i class="fas fa-lock me-2" style="color:var(--secondary);"></i>Account Security
+              </h6>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label">{{ form.password.label.text }} <span class="text-danger">*</span></label>
+                  <div class="password-field-container">
+                    {{ form.password(class="form-control", placeholder="Min 6 characters", id="password") }}
+                    <button type="button" class="password-toggle-btn" data-pw-target="#password"
+                      aria-label="Toggle Password Visibility">
+                      <i class="fas fa-eye-slash"></i>
+                    </button>
+                  </div>
+                  {% for e in form.password.errors %}<div class="text-danger small mt-1">{{ e }}</div>{% endfor %}
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">{{ form.confirm_password.label.text }} <span
+                      class="text-danger">*</span></label>
+                  <div class="password-field-container">
+                    {{ form.confirm_password(class="form-control", placeholder="Repeat password", id="confirm_password")
+                    }}
+                    <button type="button" class="password-toggle-btn" data-pw-target="#confirm_password"
+                      aria-label="Toggle Confirm Password Visibility">
+                      <i class="fas fa-eye-slash"></i>
+                    </button>
+                  </div>
+                  {% for e in form.confirm_password.errors %}<div class="text-danger small mt-1">{{ e }}</div>{% endfor
+                  %}
+                </div>
+              </div>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+              <p style="color:var(--text-muted);font-size:0.88rem;margin:0;">
+                Already registered? <a href="{{ url_for('auth.login') }}"
+                  style="color:var(--secondary);font-weight:600;">Login here</a>
+              </p>
+              <div class="d-flex gap-2 flex-wrap">
+                <button type="submit" class="btn-primary-custom">
+                  <i class="fas fa-paper-plane me-2"></i>Submit Registration
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const lettersOnlyFields = ['#name', '#college', '#ug', '#pg'];
+
+    lettersOnlyFields.forEach(selector => {
+      const input = document.querySelector(selector);
+      if (input) {
+        input.addEventListener('keypress', function (e) {
+          if (/[0-9]/.test(e.key)) {
+            e.preventDefault();
+          }
+          if (e.key === ' ') {
+            if (input.value.length === 0 || input.value.endsWith(' ')) {
+              e.preventDefault();
+            }
+          }
+        });
+        input.addEventListener('input', function (e) {
+          let val = input.value.replace(/[0-9]/g, '');
+          val = val.replace(/^\s+/, '');
+          val = val.replace(/\s{2,}/g, ' ');
+          input.value = val;
+        });
+      }
+    });
+  });
+</script>
+{% endblock %}

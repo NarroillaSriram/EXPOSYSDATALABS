@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+{% block title %}Contact Us - Exposys Data Labs{% endblock %}
+
+{% block content %}
+<div style="padding-top:80px;background:var(--gradient);padding-bottom:60px;">
+  <div class="container text-center text-white py-5" data-aos="zoom-in" data-aos-duration="1000">
+    <h1 style="font-size:2.5rem;font-weight:800;">Contact <span style="color:var(--accent);">Us</span></h1>
+    <p style="color:rgba(255,255,255,0.8);">We'd love to hear from you. Send us a message!</p>
+  </div>
+</div>
+
+<section style="background:var(--light);">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-lg-4" data-aos="fade-right" data-aos-duration="800">
+        <div class="contact-info-card">
+          <h4 style="font-weight:800;margin-bottom:30px;">Get In Touch</h4>
+          <div class="contact-info-item">
+            <div class="contact-info-icon"><i class="fas fa-map-marker-alt"></i></div>
+            <div>
+              <h6 style="font-weight:700;margin-bottom:3px;">Address</h6>
+              <p style="color:rgba(255,255,255,0.7);font-size:0.88rem;margin:0;"><a href="https://www.google.com/maps/dir/?api=1&destination=4th%20Floor,%20YVR%20Cave,%2056,%20Kakolu%20Rd,%20Yelahanka,%20Rajanukunte,%20Bengaluru,%20Karnataka%20560064" target="_blank" style="color:rgba(255,255,255,0.7);text-decoration:none;transition:color 0.3s;" onmouseover="this.style.color='#ffd700'" onmouseout="this.style.color='rgba(255,255,255,0.7)'">4th Floor, YVR Cave, 56, Kakolu Rd, Yelahanka, Rajanukunte, Bengaluru, Karnataka 560064</a></p>
+            </div>
+          </div>
+          <div class="contact-info-item">
+            <div class="contact-info-icon"><i class="fas fa-phone"></i></div>
+            <div>
+              <h6 style="font-weight:700;margin-bottom:3px;">Phone</h6>
+              <p style="color:rgba(255,255,255,0.7);font-size:0.88rem;margin:0;">+917892053145</p>
+            </div>
+          </div>
+          <div class="contact-info-item">
+            <div class="contact-info-icon"><i class="fas fa-envelope"></i></div>
+            <div>
+              <h6 style="font-weight:700;margin-bottom:3px;">Email</h6>
+              <p style="color:rgba(255,255,255,0.7);font-size:0.88rem;margin:0;"><a href="mailto:hr@exposysdata.com?subject=Enquiry%20-%20Exposys%20Data%20Labs" style="color:rgba(255,255,255,0.7);text-decoration:underline;transition:color 0.3s;" onmouseover="this.style.color='#ffd700'" onmouseout="this.style.color='rgba(255,255,255,0.7)'">hr@exposysdata.com</a></p>
+            </div>
+          </div>
+          <div class="contact-info-item">
+            <div class="contact-info-icon"><i class="fas fa-clock"></i></div>
+            <div>
+              <h6 style="font-weight:700;margin-bottom:3px;">Working Hours</h6>
+              <p style="color:rgba(255,255,255,0.7);font-size:0.88rem;margin:0;">Mon - Sat: 9:00 AM - 6:00 PM</p>
+            </div>
+          </div>
+          <div class="footer-social mt-4">
+            <a href="https://www.facebook.com/share/17LaBwfMkF/" target="_blank" class="social-btn"><i class="fab fa-facebook-f"></i></a>
+            <a href="https://x.com/ExposysDataLabs" target="_blank" class="social-btn"><i class="fab fa-twitter"></i></a>
+            <a href="https://www.linkedin.com/company/upchat-technologies/" target="_blank" class="social-btn"><i class="fab fa-linkedin-in"></i></a>
+            <a href="https://www.instagram.com/exposysdatalabs?igsh=M3YwN3dwMm8xNG1s" target="_blank" class="social-btn"><i class="fab fa-instagram"></i></a>
+            <a href="https://youtube.com/@exposysdatalabs4156?si=uMDS8_tzNH32xUF7" target="_blank" class="social-btn"><i class="fab fa-youtube"></i></a>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-8" data-aos="fade-left" data-aos-duration="800" data-aos-delay="200">
+        <div class="contact-form-card">
+          <h4 style="font-weight:800;color:var(--primary);margin-bottom:25px;">Send a Message</h4>
+          <form method="POST" action="{{ url_for('main.contact') }}">
+            {{ form.hidden_tag() }}
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">{{ form.name.label.text }}</label>
+                {{ form.name(class="form-control", placeholder="Your full name") }}
+                {% for error in form.name.errors %}
+                  <div class="text-danger small mt-1">{{ error }}</div>
+                {% endfor %}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">{{ form.email.label.text }}</label>
+                {{ form.email(class="form-control", placeholder="your@email.com") }}
+                {% for error in form.email.errors %}
+                  <div class="text-danger small mt-1">{{ error }}</div>
+                {% endfor %}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">{{ form.phone.label.text }}</label>
+                {{ form.phone(class="form-control", placeholder="10-digit phone number", type="tel", maxlength="10") }}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">{{ form.subject.label.text }}</label>
+                {{ form.subject(class="form-control", placeholder="Subject") }}
+                {% for error in form.subject.errors %}
+                  <div class="text-danger small mt-1">{{ error }}</div>
+                {% endfor %}
+              </div>
+              <div class="col-12">
+                <label class="form-label">{{ form.message.label.text }}</label>
+                {{ form.message(class="form-control", rows=5, placeholder="Write your message here...") }}
+                {% for error in form.message.errors %}
+                  <div class="text-danger small mt-1">{{ error }}</div>
+                {% endfor %}
+              </div>
+              <div class="col-12">
+                <button type="submit" class="btn-primary-custom">
+                  <i class="fas fa-paper-plane me-2"></i>Send Message
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const nameInput = document.querySelector('#name');
+  const phoneInput = document.querySelector('#phone');
+
+  // 1. Name Input: Only accept alphabets and spaces, blocking leading/consecutive spaces
+  if (nameInput) {
+    nameInput.addEventListener('keypress', function(e) {
+      if (/[0-9]/.test(e.key)) {
+        e.preventDefault();
+      }
+      if (e.key === ' ') {
+        // Block if field is empty (leading space) or if the last character typed was already a space
+        if (nameInput.value.length === 0 || nameInput.value.endsWith(' ')) {
+          e.preventDefault();
+        }
+      }
+    });
+    nameInput.addEventListener('input', function(e) {
+      let val = nameInput.value.replace(/[0-9]/g, '');
+      val = val.replace(/^\s+/, '');       // Strip leading space
+      val = val.replace(/\s{2,}/g, ' ');   // Collapse multiple spaces into one
+      nameInput.value = val;
+    });
+  }
+
+  // 2. Phone Input: Only accept digits (0-9)
+  if (phoneInput) {
+    phoneInput.addEventListener('keypress', function(e) {
+      if (!/[0-9]/.test(e.key)) {
+        e.preventDefault();
+      }
+    });
+    phoneInput.addEventListener('input', function(e) {
+      phoneInput.value = phoneInput.value.replace(/[^0-9]/g, '');
+    });
+  }
+});
+</script>
+{% endblock %}
