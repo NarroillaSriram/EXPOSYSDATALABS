@@ -92,7 +92,7 @@ DB_PASSWORD=your_mysql_password
 DB_HOST=localhost
 DB_PORT=3306
 DB_NAME=exposys_db
-ADMIN_EMAIL=1111111111
+ADMIN_EMAIL=111111111
 ADMIN_PASSWORD=111111111
 ```
 
@@ -107,8 +107,8 @@ Visit: **http://localhost:5000**
 
 ### Admin Login
 - URL: http://localhost:5000/admin/login
-- Email: 1111111111111111
-- Password: 11111111111111
+- Email: `111111111111`
+- Password: `1111111111`
 
 ### Student
 - Register at: http://localhost:5000/register
