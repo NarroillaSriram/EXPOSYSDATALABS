@@ -22,6 +22,21 @@ body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   color: #333;
   overflow-x: hidden;
+  position: relative;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -100;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300'%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial, sans-serif' font-size='36' font-weight='bold' fill='rgba(10,36,99,0.06)' transform='rotate(-30 200 150)'%3EEXPOSYS DATA LABS%3C/text%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 400px 300px;
 }
 
 a {
@@ -867,6 +882,7 @@ section {
   flex: 1;
   background: #f0f2f5;
   min-height: 100vh;
+  min-width: 0;
 }
 
 .topbar {
@@ -1440,4 +1456,56 @@ section {
 
 .domain-card:hover .domain-img {
   transform: translateY(-8px) scale(1.08) rotate(3deg);
+}
+
+/* ===== INPUT VALIDATION STYLES ===== */
+.form-control.is-invalid, 
+.form-select.is-invalid {
+  border-color: #e84545 !important;
+  background-image: none !important;
+  padding-right: 12px !important;
+}
+
+.form-control.is-invalid:focus, 
+.form-select.is-invalid:focus {
+  border-color: #e84545 !important;
+  box-shadow: 0 0 0 4px rgba(232, 69, 69, 0.18) !important;
+  background-color: rgba(232, 69, 69, 0.01) !important;
+}
+
+.input-group-custom input:focus {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 4px rgba(10, 36, 99, 0.12) !important;
+}
+
+.input-group-custom input:focus + i,
+.input-group-custom i:focus-within {
+  color: var(--primary) !important;
+}
+
+/* For dark admin inputs */
+.auth-wrapper input.form-control.is-invalid {
+  background: rgba(232, 69, 69, 0.08) !important;
+}
+
+.auth-wrapper input.form-control.is-invalid:focus {
+  box-shadow: 0 0 0 4px rgba(232, 69, 69, 0.25) !important;
+}
+
+/* Customize hover effect on login forms */
+.auth-card input:hover {
+  border-color: #cbd5e0;
+}
+.auth-card input.is-invalid:hover {
+  border-color: #e84545;
+}
+
+.password-field-container input:focus {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 4px rgba(10, 36, 99, 0.12) !important;
+}
+
+.auth-wrapper[style*="background: radial-gradient"] input:focus {
+  border-color: #00f5ff !important;
+  box-shadow: 0 0 0 4px rgba(0, 245, 255, 0.2) !important;
 }

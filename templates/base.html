@@ -22,6 +22,7 @@
   </div>
 
   <!-- Flash Messages -->
+  {% if request.endpoint not in ['auth.login', 'auth.admin_login', 'auth.register'] %}
   <div class="flash-container">
     {% with messages = get_flashed_messages(with_categories=true) %}
     {% for category, message in messages %}
@@ -34,6 +35,7 @@
     {% endfor %}
     {% endwith %}
   </div>
+  {% endif %}
 
   <!-- Navbar -->
   <nav class="navbar navbar-expand-lg fixed-top">
@@ -63,9 +65,6 @@
               <li><a class="dropdown-item" href="{{ url_for('main.design') }}"
                   style="color:rgba(255,255,255,0.85);border-radius:8px;padding:8px 15px;"><i
                     class="fas fa-paint-brush me-2" style="color:var(--accent);"></i>Design</a></li>
-              <li><a class="dropdown-item" href="{{ url_for('main.careers') }}"
-                  style="color:rgba(255,255,255,0.85);border-radius:8px;padding:8px 15px;"><i
-                    class="fas fa-briefcase me-2" style="color:var(--accent);"></i>Careers</a></li>
             </ul>
           </li>
           <li class="nav-item"><a class="nav-link {% if request.endpoint == 'main.careers' %}active{% endif %}" href="{{ url_for('main.careers') }}">Careers</a></li>
@@ -80,7 +79,7 @@
               <i class="fas fa-tachometer-alt me-1"></i>Dashboard
             </a>
             {% else %}
-            <a href="{{ url_for('student.payment') }}" class="btn-nav-login nav-link" style="background:var(--secondary);">
+            <a href="{{ url_for('student.payment') }}" class="btn-nav-register nav-link">
               <i class="fas fa-credit-card me-1"></i>Complete Payment
             </a>
             {% endif %}
@@ -152,7 +151,7 @@
                 style="color:rgba(255,255,255,0.6);transition:color 0.3s;"
                 onmouseover="this.style.color='var(--secondary)'"
                 onmouseout="this.style.color='rgba(255,255,255,0.6)'">hr@exposysdata.com</a></li>
-            <li><i class="fas fa-phone me-2" style="color:var(--secondary)"></i>+917892053145</li>
+            <li><i class="fas fa-phone me-2" style="color:var(--secondary)"></i><a href="tel:+917892053145" style="color:rgba(255,255,255,0.6);transition:color 0.3s;" onmouseover="this.style.color='var(--secondary)'" onmouseout="this.style.color='rgba(255,255,255,0.6)'">+917892053145</a></li>
             <li><i class="fas fa-map-marker-alt me-2" style="color:var(--secondary)"></i><a
                 href="https://www.google.com/maps/dir/?api=1&destination=4th%20Floor,%20YVR%20Cave,%2056,%20Kakolu%20Rd,%20Yelahanka,%20Rajanukunte,%20Bengaluru,%20Karnataka%20560064"
                 target="_blank" style="color:rgba(255,255,255,0.6);transition:color 0.3s;"

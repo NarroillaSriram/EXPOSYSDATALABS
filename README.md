@@ -1,5 +1,5 @@
 # Exposys Data Labs - Internship & Training Management System
-
+First Change
 A full-stack web application built with Python Flask and MySQL, inspired by Exposys Data Labs.
 
 ## Tech Stack
@@ -92,8 +92,8 @@ DB_PASSWORD=your_mysql_password
 DB_HOST=localhost
 DB_PORT=3306
 DB_NAME=exposys_db
-ADMIN_EMAIL=admin@exposys.com
-ADMIN_PASSWORD=Admin@123
+ADMIN_EMAIL=1111111111
+ADMIN_PASSWORD=111111111
 ```
 
 ### Step 7: Run the Application
@@ -107,8 +107,8 @@ Visit: **http://localhost:5000**
 
 ### Admin Login
 - URL: http://localhost:5000/admin/login
-- Email: `admin@exposys.com`
-- Password: `Admin@123`
+- Email: 1111111111111111
+- Password: 11111111111111
 
 ### Student
 - Register at: http://localhost:5000/register

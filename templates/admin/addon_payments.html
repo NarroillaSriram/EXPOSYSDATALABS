@@ -20,7 +20,7 @@
     <table class="table table-hover mb-0">
       <thead>
         <tr>
-          <th>#</th>
+          <th>S.No</th>
           <th>Student</th>
           <th>Domain</th>
           <th>Amount</th>
@@ -34,7 +34,7 @@
       <tbody>
         {% for p in addon_payments %}
         <tr>
-          <td style="font-size:0.85rem;color:var(--text-muted);">{{ p.id }}</td>
+          <td style="font-size:0.85rem;color:var(--text-muted);">{{ loop.index }}</td>
           <td>
             <div style="font-weight:700;font-size:0.88rem;">{{ p.student.name }}</div>
             <div style="font-size:0.78rem;color:var(--text-muted);">{{ p.student.email }}</div>
@@ -48,7 +48,7 @@
           <td style="font-size:0.82rem;font-family:monospace;">{{ p.transaction_id }}</td>
           <td>
             {% if p.screenshot_filename %}
-              <a href="{{ url_for('static', filename='../uploads/' + p.screenshot_filename) }}"
+              <a href="{{ url_for('admin.serve_upload', filename=p.screenshot_filename) }}"
                  target="_blank" class="btn btn-sm btn-outline-primary">
                 <i class="fas fa-image me-1"></i>View
               </a>
@@ -61,24 +61,66 @@
           </td>
           <td style="font-size:0.82rem;">{{ p.created_at.strftime('%d %b %Y') }}</td>
           <td>
-            <form method="POST" action="{{ url_for('admin.update_addon_payment', addon_id=p.id) }}" class="d-flex gap-1">
-              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-              {% if p.status != 'verified' %}
-              <button type="submit" name="status" value="verified" class="btn btn-sm btn-success" title="Verify">
-                <i class="fas fa-check"></i>
+            {% if p.status == 'pending' %}
+            <div class="d-flex gap-1">
+              <button type="button" class="btn btn-sm btn-success" title="Accept" style="font-weight:600; font-size:0.78rem; padding: 4px 10px;" data-bs-toggle="modal" data-bs-target="#addonAcceptModal{{ p.id }}">
+                Accept
               </button>
-              {% endif %}
-              {% if p.status != 'rejected' %}
-              <button type="submit" name="status" value="rejected" class="btn btn-sm btn-danger" title="Reject">
-                <i class="fas fa-times"></i>
+              <button type="button" class="btn btn-sm btn-danger" title="Reject" style="font-weight:600; font-size:0.78rem; padding: 4px 10px;" data-bs-toggle="modal" data-bs-target="#addonRejectModal{{ p.id }}">
+                Reject
               </button>
-              {% endif %}
-              {% if p.status != 'pending' %}
-              <button type="submit" name="status" value="pending" class="btn btn-sm btn-warning" title="Reset">
-                <i class="fas fa-undo"></i>
-              </button>
-              {% endif %}
-            </form>
+            </div>
+            
+            <!-- Accept Modal -->
+            <div class="modal fade" id="addonAcceptModal{{ p.id }}" tabindex="-1" aria-hidden="true">
+              <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content" style="white-space: normal;">
+                  <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title text-success" style="font-weight:700;"><i class="fas fa-check-circle me-2"></i>Confirm Acceptance</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body text-start">
+                    <p class="mb-1" style="font-size: 0.95rem;">Are you sure you want to <strong>accept</strong> the add-on payment of ₹{{ p.amount | int }} for <strong>{{ p.domain }}</strong> from <strong>{{ p.student.name }}</strong>?</p>
+                    <p class="text-muted small mb-0">This action cannot be undone.</p>
+                  </div>
+                  <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <form method="POST" action="{{ url_for('admin.update_addon_payment', addon_id=p.id) }}">
+                      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                      <button type="submit" name="status" value="verified" class="btn btn-sm btn-success">Yes, Accept</button>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Reject Modal -->
+            <div class="modal fade" id="addonRejectModal{{ p.id }}" tabindex="-1" aria-hidden="true">
+              <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content" style="white-space: normal;">
+                  <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title text-danger" style="font-weight:700;"><i class="fas fa-times-circle me-2"></i>Confirm Rejection</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body text-start">
+                    <p class="mb-1" style="font-size: 0.95rem;">Are you sure you want to <strong>reject</strong> the add-on payment of ₹{{ p.amount | int }} for <strong>{{ p.domain }}</strong> from <strong>{{ p.student.name }}</strong>?</p>
+                    <p class="text-muted small mb-0">This action cannot be undone.</p>
+                  </div>
+                  <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <form method="POST" action="{{ url_for('admin.update_addon_payment', addon_id=p.id) }}">
+                      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                      <button type="submit" name="status" value="rejected" class="btn btn-sm btn-danger">Yes, Reject</button>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {% elif p.status == 'verified' %}
+              <span class="text-success" style="font-weight:700;font-size:0.82rem;"><i class="fas fa-check-circle me-1"></i>Accepted</span>
+            {% elif p.status == 'rejected' %}
+              <span class="text-danger" style="font-weight:700;font-size:0.82rem;"><i class="fas fa-times-circle me-1"></i>Rejected</span>
+            {% endif %}
           </td>
         </tr>
         {% else %}

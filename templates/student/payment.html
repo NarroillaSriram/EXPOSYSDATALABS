@@ -4,6 +4,7 @@
 
 {% block content %}
 <style>
+  /* ── Card Shell ─────────────────────────────────────── */
   .pay-card {
     background:#fff; border-radius:20px;
     border:1px solid rgba(10,36,99,0.08);
@@ -15,6 +16,8 @@
     padding:28px 32px; color:#fff;
   }
   .pay-body { padding:32px; }
+
+  /* ── Feature List ───────────────────────────────────── */
   .feature-row {
     display:flex; align-items:center; gap:12px;
     padding:12px 0; border-bottom:1px solid rgba(10,36,99,0.05);
@@ -27,12 +30,16 @@
     background:linear-gradient(135deg,var(--primary),#1a3a8f);
   }
   .feature-icon i { color:#fff; font-size:0.9rem; }
+
+  /* ── Amount Display ─────────────────────────────────── */
   .amount-display {
     background:linear-gradient(135deg,rgba(10,36,99,0.05),rgba(232,69,69,0.05));
     border-radius:14px; padding:20px 24px;
     border:1px solid rgba(10,36,99,0.1);
     margin-bottom:24px;
   }
+
+  /* ── Razorpay Button ────────────────────────────────── */
   .rzp-btn {
     background:linear-gradient(135deg,#0a2463,#1a3a8f);
     color:#fff; border:none; border-radius:12px;
@@ -42,49 +49,349 @@
   }
   .rzp-btn:hover { transform:translateY(-2px); box-shadow:0 10px 30px rgba(10,36,99,0.3); }
   .rzp-btn:disabled { opacity:0.6; cursor:not-allowed; transform:none; }
+
   .secure-badge {
     display:flex; align-items:center; justify-content:center; gap:8px;
     font-size:0.78rem; color:var(--text-muted); margin-top:12px;
   }
+
+  /* ── Success/Verified card ──────────────────────────── */
   .status-card {
     border-radius:16px; padding:32px; text-align:center;
     max-width:480px; margin:0 auto;
   }
-  .spinner { display:none; }
-  .spinner.active { display:inline-block; }
   @keyframes spin { to { transform:rotate(360deg); } }
-  .spin-icon { animation:spin 1s linear infinite; }
+
+  /* ── Payment Tabs ───────────────────────────────────── */
+  .pay-tabs {
+    display:flex; gap:0; margin-bottom:24px;
+    border-radius:14px; overflow:hidden;
+    border:1.5px solid rgba(10,36,99,0.12);
+  }
+  .pay-tab {
+    flex:1; padding:13px 10px; text-align:center;
+    font-size:0.9rem; font-weight:600; cursor:pointer;
+    border:none; background:#f8f9ff; color:#6b7280;
+    transition:all 0.25s ease; display:flex;
+    align-items:center; justify-content:center; gap:8px;
+  }
+  .pay-tab:first-child { border-right:1.5px solid rgba(10,36,99,0.12); }
+  .pay-tab.active {
+    background:linear-gradient(135deg,#0a2463,#1a3a8f);
+    color:#fff;
+  }
+  .pay-tab-pane { display:none; }
+  .pay-tab-pane.active { display:block; }
+
+  /* ═══════════════════════════════════════════════════
+     REAL PHONEPE QR SECTION
+  ════════════════════════════════════════════════════ */
+  .qr-outer-wrap {
+    display:flex; flex-direction:column; align-items:center; gap:20px;
+  }
+
+  /* Dark branded card containing the QR */
+  .phonepe-card {
+    background: #0a0a0a;
+    border-radius: 24px;
+    padding: 24px 28px 20px;
+    width: 100%; max-width: 360px;
+    box-shadow: 0 20px 60px rgba(108,63,197,0.25), 0 0 0 1px rgba(108,63,197,0.2);
+    display: flex; flex-direction: column; align-items: center; gap: 14px;
+    position: relative; overflow: hidden;
+  }
+  /* Purple glow behind card */
+  .phonepe-card::before {
+    content:''; position:absolute; top:-60px; left:50%; transform:translateX(-50%);
+    width:200px; height:200px;
+    background:radial-gradient(circle, rgba(108,63,197,0.3) 0%, transparent 70%);
+    pointer-events:none;
+  }
+
+  /* PhonePe logo row */
+  .pe-logo-row {
+    display:flex; align-items:center; gap:10px; z-index:1;
+  }
+  .pe-logo-circle {
+    width:44px; height:44px; border-radius:50%;
+    background: linear-gradient(135deg, #6c3fc5, #8b5cf6);
+    display:flex; align-items:center; justify-content:center;
+    font-weight:900; color:#fff; font-size:1.1rem;
+    box-shadow: 0 4px 15px rgba(108,63,197,0.5);
+    flex-shrink:0;
+  }
+  .pe-brand-name { color:#fff; font-size:1.3rem; font-weight:800; letter-spacing:0.3px; }
+
+  /* "ACCEPTED HERE" badge */
+  .pe-accepted-badge {
+    background: linear-gradient(135deg, #6c3fc5, #8b5cf6);
+    color:#fff; font-size:0.72rem; font-weight:800;
+    letter-spacing:2px; padding:4px 14px; border-radius:20px;
+    text-transform:uppercase; z-index:1;
+  }
+
+  /* QR image frame */
+  .qr-frame {
+    background: #fff;
+    border-radius: 16px;
+    padding: 10px;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 0 3px rgba(108,63,197,0.3), 0 8px 30px rgba(0,0,0,0.4);
+    z-index:1; position:relative;
+  }
+  .qr-frame img {
+    width: 280px;
+    height: auto;
+    display: block;
+    border-radius: 6px;
+    image-rendering: crisp-edges;
+  }
+
+  /* Scan animation border */
+  @keyframes qr-pulse {
+    0%,100% { box-shadow: 0 0 0 3px rgba(108,63,197,0.3), 0 8px 30px rgba(0,0,0,0.4); }
+    50%      { box-shadow: 0 0 0 6px rgba(108,63,197,0.5), 0 8px 30px rgba(0,0,0,0.4); }
+  }
+  .qr-frame { animation: qr-pulse 2s ease-in-out infinite; }
+
+  /* Name tag below QR */
+  .pe-name-tag {
+    color:#d4b8ff; font-weight:800; font-size:0.85rem;
+    letter-spacing:2px; text-transform:uppercase; z-index:1;
+  }
+
+  /* Scan instruction strip */
+  .scan-strip {
+    background: rgba(108,63,197,0.08);
+    border: 1px solid rgba(108,63,197,0.2);
+    border-radius: 10px; padding: 10px 16px;
+    display:flex; align-items:center; gap:10px;
+    font-size:0.8rem; color:#6c3fc5; font-weight:600;
+    width:100%; max-width:360px; z-index:1;
+  }
+  .scan-strip i { font-size:1rem; flex-shrink:0; }
+
+  /* UPI ID Copy Box */
+  .upi-copy-box {
+    display:flex; align-items:center; gap:10px;
+    background:#f0f4ff; border-radius:12px; padding:12px 16px;
+    border:1.5px solid rgba(10,36,99,0.12);
+    width:100%; max-width:360px;
+  }
+  .upi-copy-box .upi-id-text {
+    flex:1; font-family:monospace; font-weight:700;
+    color:#0a2463; font-size:0.9rem; word-break:break-all;
+  }
+  .copy-upi-btn {
+    background:linear-gradient(135deg,#6c3fc5,#8b5cf6);
+    color:#fff; border:none; border-radius:8px;
+    padding:7px 16px; font-size:0.8rem; font-weight:700;
+    cursor:pointer; transition:all 0.2s; white-space:nowrap; flex-shrink:0;
+  }
+  .copy-upi-btn:hover { transform:scale(1.04); opacity:0.9; }
+  .copy-upi-btn.copied {
+    background:linear-gradient(135deg,#059669,#10b981);
+  }
+
+  /* ── "I've Paid" submission form ───────────────────── */
+  .paid-form-wrap {
+    background: #f8f9ff;
+    border-radius: 16px;
+    border: 1.5px dashed rgba(108,63,197,0.3);
+    padding: 22px;
+    width: 100%; max-width: 360px;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .paid-form-title {
+    font-weight:800; color:#374151; font-size:0.95rem;
+    display:flex; align-items:center; gap:8px;
+  }
+  .paid-form-title .paid-badge {
+    background:linear-gradient(135deg,#6c3fc5,#8b5cf6);
+    color:#fff; font-size:0.65rem; padding:2px 8px;
+    border-radius:20px; font-weight:700; letter-spacing:0.5px;
+  }
+
+  .paid-input {
+    width:100%; border:1.5px solid rgba(10,36,99,0.15);
+    border-radius:10px; padding:10px 14px; font-size:0.88rem;
+    color:#374151; background:#fff; outline:none; transition:border 0.2s;
+    box-sizing:border-box;
+  }
+  .paid-input:focus { border-color:#6c3fc5; box-shadow:0 0 0 3px rgba(108,63,197,0.1); }
+  .paid-input::placeholder { color:#9ca3af; }
+
+  /* File upload styled */
+  .file-upload-label {
+    display:flex; flex-direction:column; align-items:center; gap:6px;
+    border:1.5px dashed rgba(108,63,197,0.4); border-radius:10px;
+    padding:16px; cursor:pointer; transition:all 0.2s; background:#fff;
+    text-align:center;
+  }
+  .file-upload-label:hover { border-color:#6c3fc5; background:rgba(108,63,197,0.04); }
+  .file-upload-label i { font-size:1.5rem; color:#8b5cf6; }
+  .file-upload-label span { font-size:0.8rem; color:#6b7280; font-weight:600; }
+  .file-upload-label .file-name { font-size:0.75rem; color:#6c3fc5; font-weight:700; display:none; }
+  input[type="file"]#paymentScreenshot { display:none; }
+
+  .submit-upi-btn {
+    background:linear-gradient(135deg,#6c3fc5,#8b5cf6);
+    color:#fff; border:none; border-radius:12px;
+    padding:13px; font-size:0.95rem; font-weight:700;
+    width:100%; cursor:pointer; transition:all 0.3s;
+    display:flex; align-items:center; justify-content:center; gap:8px;
+  }
+  .submit-upi-btn:hover { transform:translateY(-2px); box-shadow:0 8px 25px rgba(108,63,197,0.35); }
+  .submit-upi-btn:disabled { opacity:0.65; cursor:not-allowed; transform:none; }
+
+  /* ── Pending Status Banner ──────────────────────────── */
+  .pending-banner {
+    background:linear-gradient(135deg,rgba(245,158,11,0.08),rgba(251,191,36,0.05));
+    border:1.5px solid rgba(245,158,11,0.3);
+    border-radius:14px; padding:18px 20px; text-align:center;
+    display:flex; flex-direction:column; align-items:center; gap:8px;
+  }
+  .pending-banner i { color:#f59e0b; font-size:1.6rem; }
+  .pending-banner strong { color:#92400e; font-size:0.92rem; }
+  .pending-banner p { color:#78716c; font-size:0.8rem; margin:0; }
 </style>
 
 {% if existing and existing.status == 'verified' %}
-<!-- ===== ALREADY VERIFIED ===== -->
-<div class="pay-card">
-  <div class="status-card">
-    <div style="width:90px;height:90px;background:#d1fae5;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
-      <i class="fas fa-check-circle" style="font-size:3rem;color:#10b981;"></i>
+<!-- ===== ALREADY VERIFIED (Premium Successful Receipt Style) ===== -->
+<div style="max-width: 440px; margin: 0 auto; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.06); font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; overflow: hidden; text-align: left;">
+  <!-- Accent Top Bar -->
+  <div style="height: 6px; background: linear-gradient(90deg, #10b981, #059669);"></div>
+
+  <!-- Header Bar -->
+  <div style="background: #f8fafc; padding: 18px 24px; display: flex; align-items: center; gap: 14px; border-bottom: 1px solid #e2e8f0;">
+    <!-- Styled CDI Grid representation in SVG -->
+    <div style="width: 40px; height: 40px; background: #ffffff; border-radius: 8px; display: flex; align-items: center; justify-content: center; padding: 6px; flex-shrink: 0; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); border: 1px solid #e2e8f0;">
+      <svg width="100%" height="100%" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="4" y="4" width="8" height="32" rx="2" fill="#10b981"/>
+        <rect x="16" y="4" width="8" height="8" rx="2" fill="#109489"/>
+        <rect x="28" y="4" width="8" height="8" rx="2" fill="#109489"/>
+        <rect x="16" y="16" width="8" height="8" rx="2" fill="#109489"/>
+        <rect x="28" y="28" width="8" height="8" rx="2" fill="#10b981"/>
+        <rect x="16" y="28" width="8" height="8" rx="2" fill="#109489"/>
+      </svg>
     </div>
-    <h4 style="font-weight:800;color:#065f46;margin-bottom:8px;">Payment Verified!</h4>
-    <p style="color:var(--text-muted);margin-bottom:6px;">Your internship is confirmed.</p>
-    <div style="background:#f0fdf4;border-radius:10px;padding:14px;margin:16px 0;font-size:0.85rem;text-align:left;">
-      <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
-        <span style="color:var(--text-muted);">Transaction ID</span>
-        <strong style="font-family:monospace;">{{ existing.transaction_id }}</strong>
-      </div>
-      <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
-        <span style="color:var(--text-muted);">Amount Paid</span>
-        <strong>₹{{ existing.amount | int }}</strong>
-      </div>
-      <div style="display:flex;justify-content:space-between;">
-        <span style="color:var(--text-muted);">Date</span>
-        <strong>{{ existing.created_at.strftime('%d %b %Y') }}</strong>
+    <div>
+      <div style="color: #0f172a; font-size: 1.15rem; font-weight: 800; letter-spacing: -0.3px; line-height: 1.2;">Exposys Data Labs</div>
+      <div style="color: #64748b; font-size: 0.75rem; font-weight: 500; margin-top: 1px;">Official Payment Receipt</div>
+    </div>
+  </div>
+
+  <!-- Body -->
+  <div style="padding: 32px 24px;">
+    <!-- Green Checkmark Circle with ripple -->
+    <div style="text-align: center; margin-bottom: 16px;">
+      <div style="width: 80px; height: 80px; background: #d1fae5; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center;">
+        <div style="width: 60px; height: 60px; background: #10b981; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);">
+          <i class="fas fa-check" style="color: #ffffff; font-size: 1.8rem;"></i>
+        </div>
       </div>
     </div>
-    <a href="{{ url_for('student.dashboard') }}" class="btn btn-success w-100" style="border-radius:10px;font-weight:700;padding:12px;">
-      <i class="fas fa-tachometer-alt me-2"></i>Go to Dashboard
-    </a>
+    
+    <!-- Title -->
+    <div style="text-align: center; color: #065f46; font-size: 1.4rem; font-weight: 800; margin-bottom: 24px; letter-spacing: -0.3px;">
+      Payment Successful!
+    </div>
+
+    <!-- Receipt Details Container -->
+    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 14px; font-size: 0.9rem; color: #334155; margin-bottom: 24px; position: relative;">
+      <!-- Tear strip decorative dots on left and right -->
+      <div style="position: absolute; left: -6px; top: 50%; transform: translateY(-50%); width: 12px; height: 12px; background: #ffffff; border-radius: 50%; border-right: 1px solid #e2e8f0;"></div>
+      <div style="position: absolute; right: -6px; top: 50%; transform: translateY(-50%); width: 12px; height: 12px; background: #ffffff; border-radius: 50%; border-left: 1px solid #e2e8f0;"></div>
+
+      <div style="display: flex; justify-content: space-between; align-items: baseline;">
+        <span style="color: #64748b; font-weight: 600;">Payment ID</span>
+        <span style="font-family: monospace; font-weight: 700; font-size: 0.9rem; color: #0f172a; word-break: break-all; text-align: right; margin-left: 10px;">{{ existing.transaction_id }}</span>
+      </div>
+      
+      <hr style="border: 0; border-top: 1px dashed #e2e8f0; margin: 2px 0;">
+
+      <div style="display: flex; justify-content: space-between; align-items: baseline;">
+        <span style="color: #64748b; font-weight: 600;">Amount</span>
+        <span style="font-weight: 800; color: #0f172a; font-size: 1.15rem;">₹ {{ "%.2f"|format(existing.amount) }}</span>
+      </div>
+
+      <hr style="border: 0; border-top: 1px dashed #e2e8f0; margin: 2px 0;">
+
+      <div style="display: flex; justify-content: space-between; align-items: baseline;">
+        <span style="color: #64748b; font-weight: 600;">Paid to</span>
+        <span style="font-weight: 700; color: #0f172a;">Exposys Data Labs</span>
+      </div>
+
+      <hr style="border: 0; border-top: 1px dashed #e2e8f0; margin: 2px 0;">
+
+      <div style="display: flex; justify-content: space-between; align-items: baseline;">
+        <span style="color: #64748b; font-weight: 600;">Paid on</span>
+        <span style="font-weight: 600; color: #0f172a;">{{ existing.created_at.strftime('%B %d, %Y at %I:%M%p').replace(' 0', ' ').replace('AM', 'am').replace('PM', 'pm') }}</span>
+      </div>
+    </div>
+
+    <!-- Receipt Notification Alert Block -->
+    <div style="background: #f0f9ff; border: 1px solid #e0f2fe; border-radius: 12px; padding: 16px; display: flex; gap: 12px; align-items: flex-start; margin-bottom: 24px;">
+      <i class="fas fa-info-circle" style="color: #0284c7; font-size: 1.15rem; margin-top: 2px;"></i>
+      <div style="color: #0369a1; font-size: 0.85rem; line-height: 1.5;">
+        We've sent the receipt to <strong style="color: #0c4a6e;">{{ current_user.email }}</strong> & <strong style="color: #0c4a6e;">{{ current_user.phone or 'N/A' }}</strong>.<br>
+        For any problems, <a href="{{ url_for('main.contact') }}" style="color: #0284c7; text-decoration: underline; font-weight: 700;">create a case</a>.
+      </div>
+    </div>
+
   </div>
 </div>
 
+<div style="max-width: 440px; margin: 32px auto 0 auto; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.06); overflow: hidden; padding: 24px; text-align: left; font-family: 'Inter', sans-serif;">
+  <h6 style="font-weight: 800; color: var(--primary); margin-top: 0; margin-bottom: 18px; display: flex; align-items: center; gap: 8px;">
+    <i class="fas fa-receipt" style="color: var(--secondary);"></i> All Payments History
+  </h6>
+  <div class="table-responsive">
+    <table class="table table-hover mb-0" style="font-size: 0.8rem; text-align: left;">
+      <thead>
+        <tr>
+          <th>Type / Domain</th>
+          <th>Amount</th>
+          <th>Verify Time</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in all_payments %}
+        <tr>
+          <td style="vertical-align:middle; padding:8px 4px;">
+            <div style="font-weight: 700; color: var(--primary);">{{ p.type }}</div>
+            <div style="font-size: 0.72rem;">
+              {% if p.status == 'verified' %}
+                <a href="{{ url_for('student.view_receipt', payment_type=p.type_raw, payment_id=p.id) }}" style="color: #0369a1; text-decoration: underline; font-weight: 600;">{{ p.domain }}</a>
+              {% else %}
+                <span style="color: var(--text-muted);">{{ p.domain }}</span>
+              {% endif %}
+            </div>
+          </td>
+          <td style="font-weight: 700; vertical-align:middle; padding:8px 4px;">₹{{ p.amount | int }}</td>
+          <td style="vertical-align:middle; padding:8px 4px; font-size: 0.75rem;">
+            {% if p.status == 'verified' %}
+              {{ p.updated_at.strftime('%d %b %Y %I:%M %p') }}
+            {% else %}
+              —
+            {% endif %}
+          </td>
+          <td style="vertical-align:middle; padding:8px 4px;">
+            {% if p.status == 'verified' %}
+            <span class="badge bg-success" style="font-size: 0.65rem; padding:3px 6px; border-radius:8px;">Verified</span>
+            {% elif p.status == 'pending' %}
+            <span class="badge bg-warning text-dark" style="font-size: 0.65rem; padding:3px 6px; border-radius:8px;">Pending</span>
+            {% else %}
+            <span class="badge bg-danger" style="font-size: 0.65rem; padding:3px 6px; border-radius:8px;">Rejected</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
 {% else %}
 <!-- ===== PAYMENT FORM ===== -->
 <div class="pay-card">
@@ -96,7 +403,7 @@
       <div>
         <h4 style="font-weight:800;margin:0 0 4px;">Complete Your Payment</h4>
         <p style="margin:0;color:rgba(255,255,255,0.75);font-size:0.88rem;">
-          Secure payment powered by Razorpay &nbsp;·&nbsp; UPI · Cards · Net Banking
+          Secure payment · UPI · Cards · Net Banking
         </p>
       </div>
     </div>
@@ -138,27 +445,105 @@
       {% endfor %}
     </div>
 
-    <!-- Pay Button -->
-    <div id="paymentSection">
-      <button id="payBtn" class="rzp-btn" onclick="startPayment()">
-        <i class="fas fa-lock me-1"></i>
-        Pay ₹{{ amount }} Securely
+    <!-- Payment Method Tabs -->
+    <div class="pay-tabs" role="tablist">
+      <button id="tab-online" class="pay-tab active" onclick="switchTab('online')" role="tab" aria-selected="true">
+        <i class="fas fa-credit-card"></i> Pay Online
       </button>
-      <div class="secure-badge">
-        <img src="https://razorpay.com/favicon.ico" width="14" height="14" alt="Razorpay">
-        Secured by Razorpay &nbsp;·&nbsp;
-        <i class="fas fa-shield-alt" style="color:#10b981;"></i>
-        256-bit SSL Encryption
+      <button id="tab-qr" class="pay-tab" onclick="switchTab('qr')" role="tab" aria-selected="false">
+        <i class="fas fa-qrcode"></i> Scan &amp; Pay
+      </button>
+    </div>
+
+    <!-- ─────────────────────────────────────────────────
+         Tab: Razorpay Online
+    ──────────────────────────────────────────────────── -->
+    <div id="pane-online" class="pay-tab-pane active">
+      <div id="paymentSection">
+        <button id="payBtn" class="rzp-btn" onclick="startPayment()">
+          <i class="fas fa-lock me-1"></i>
+          Pay ₹{{ amount }} Securely
+        </button>
+        <div class="secure-badge">
+          <img src="https://razorpay.com/favicon.ico" width="14" height="14" alt="Razorpay">
+          Secured by Razorpay &nbsp;·&nbsp;
+          <i class="fas fa-shield-alt" style="color:#10b981;"></i>
+          256-bit SSL Encryption
+        </div>
       </div>
     </div>
 
-    <!-- Loading State -->
+    <!-- ─────────────────────────────────────────────────
+         Tab: Real PhonePe QR Scanner
+    ──────────────────────────────────────────────────── -->
+    <div id="pane-qr" class="pay-tab-pane">
+      <div class="qr-outer-wrap">
+
+        <!-- PhonePe branded dark card with real QR -->
+        <div class="phonepe-card">
+          <div class="pe-logo-row">
+            <div class="pe-logo-circle">पे</div>
+            <span class="pe-brand-name">PhonePe</span>
+          </div>
+          <div class="pe-accepted-badge">✦ Scan &amp; Pay ✦</div>
+          <div class="qr-frame">
+            <img src="{{ url_for('static', filename='images/phonepe_qr.png') }}"
+                 alt="PhonePe QR Code — Scan to Pay ₹{{ amount }}"
+                 id="realQrImg">
+          </div>
+          <div class="pe-name-tag">NARROLLA SRIRAM</div>
+        </div>
+
+        <!-- I've Paid — Submit Transaction -->
+        {% if existing and existing.status == 'pending' %}
+        <!-- Already submitted, pending verification -->
+        <div class="pending-banner" style="width:100%;max-width:360px;">
+          <i class="fas fa-clock"></i>
+          <strong>Payment under review</strong>
+          <p>Your payment screenshot was submitted (Txn: <strong>{{ existing.transaction_id }}</strong>).<br>
+          Admin will verify within 24 hours. Check back soon!</p>
+        </div>
+        {% else %}
+        <div class="paid-form-wrap" id="paidFormWrap">
+          <div class="paid-form-title">
+            <i class="fas fa-receipt" style="color:#6c3fc5;"></i>
+            Paid via UPI?
+            <span class="paid-badge">Submit Proof</span>
+          </div>
+          <p style="font-size:0.78rem;color:#6b7280;margin:0;line-height:1.5;">
+            After scanning &amp; paying, enter your UPI transaction ID and upload the payment screenshot for quick verification.
+          </p>
+
+          <input type="text" id="upiTxnId" class="paid-input"
+                 placeholder="UPI Transaction ID (e.g. 512345678901)"
+                 maxlength="30">
+
+          <label class="file-upload-label" for="paymentScreenshot" id="fileLabel">
+            <i class="fas fa-cloud-upload-alt"></i>
+            <span>Tap to upload payment screenshot</span>
+            <span class="file-name" id="fileNameDisplay"></span>
+          </label>
+          <input type="file" id="paymentScreenshot" accept="image/*">
+
+          <button class="submit-upi-btn" id="submitUpiBtn" onclick="submitUpiPayment()">
+            <i class="fas fa-paper-plane"></i> Submit for Verification
+          </button>
+          <p style="font-size:0.72rem;color:#9ca3af;text-align:center;margin:0;">
+            ⏱ Verification typically takes 2–24 hours. You'll get access once confirmed.
+          </p>
+        </div>
+        {% endif %}
+
+      </div><!-- /.qr-outer-wrap -->
+    </div>
+
+    <!-- Loading State (Razorpay only) -->
     <div id="loadingSection" style="display:none;text-align:center;padding:20px 0;">
       <i class="fas fa-circle-notch fa-spin" style="font-size:2rem;color:var(--primary);"></i>
       <p style="color:var(--text-muted);margin-top:12px;">Processing payment...</p>
     </div>
 
-    <!-- Success State (shown after payment) -->
+    <!-- Success State -->
     <div id="successSection" style="display:none;text-align:center;padding:10px 0;">
       <i class="fas fa-check-circle" style="font-size:3rem;color:#10b981;"></i>
       <h5 style="font-weight:800;color:#065f46;margin:12px 0 6px;">Payment Successful!</h5>
@@ -175,13 +560,13 @@
 <script>
   const RAZORPAY_KEY = "{{ razorpay_key }}";
 
+  /* ─────────────────────── Razorpay ─────────────────────── */
   async function startPayment() {
     const btn = document.getElementById('payBtn');
     btn.disabled = true;
     btn.innerHTML = '<i class="fas fa-circle-notch fa-spin me-2"></i>Creating order...';
 
     try {
-      // Step 1: Create order on server
       const res = await fetch("{{ url_for('student.create_order') }}", {
         method: 'POST',
         headers: {
@@ -192,13 +577,8 @@
       });
       const order = await res.json();
 
-      if (order.error) {
-        showError(order.error);
-        resetBtn();
-        return;
-      }
+      if (order.error) { showError(order.error); resetBtn(); return; }
 
-      // Step 2: Open Razorpay checkout popup
       const options = {
         key: RAZORPAY_KEY,
         amount: order.amount,
@@ -207,18 +587,10 @@
         description: 'Internship Registration Fee',
         image: '/static/images/logo.png',
         order_id: order.order_id,
-        prefill: {
-          name: order.name,
-          email: order.email,
-        },
+        prefill: { name: order.name, email: order.email },
         theme: { color: '#0a2463' },
-        modal: {
-          ondismiss: function() {
-            resetBtn();
-          }
-        },
+        modal: { ondismiss: function() { resetBtn(); } },
         handler: async function(response) {
-          // Step 3: Verify payment on server
           document.getElementById('paymentSection').style.display = 'none';
           document.getElementById('loadingSection').style.display = 'block';
 
@@ -226,7 +598,7 @@
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              razorpay_order_id: response.razorpay_order_id,
+              razorpay_order_id:  response.razorpay_order_id,
               razorpay_payment_id: response.razorpay_payment_id,
               razorpay_signature: response.razorpay_signature,
             })
@@ -252,7 +624,6 @@
         resetBtn();
       });
       rzp.open();
-
     } catch (err) {
       showError('Something went wrong. Please try again.');
       resetBtn();
@@ -261,17 +632,18 @@
 
   function resetBtn() {
     const btn = document.getElementById('payBtn');
+    if (!btn) return;
     btn.disabled = false;
     btn.innerHTML = '<i class="fas fa-lock me-1"></i> Pay ₹{{ amount }} Securely';
   }
 
   function showError(msg) {
-    // Remove old alerts
     document.querySelectorAll('.rzp-error').forEach(e => e.remove());
     const div = document.createElement('div');
     div.className = 'alert alert-danger rzp-error mt-3';
     div.innerHTML = '<i class="fas fa-exclamation-circle me-2"></i>' + msg;
-    document.getElementById('paymentSection').after(div);
+    const ps = document.getElementById('paymentSection');
+    if (ps) ps.after(div);
   }
 
   function getCookie(name) {
@@ -279,6 +651,118 @@
     const parts = value.split(`; ${name}=`);
     if (parts.length === 2) return parts.pop().split(';').shift();
     return '';
+  }
+
+  /* ─────────────────────── Tabs ─────────────────────────── */
+  function switchTab(tab) {
+    document.querySelectorAll('.pay-tab').forEach(btn => {
+      btn.classList.remove('active');
+      btn.setAttribute('aria-selected', 'false');
+    });
+    document.getElementById('tab-' + tab).classList.add('active');
+    document.getElementById('tab-' + tab).setAttribute('aria-selected', 'true');
+    document.querySelectorAll('.pay-tab-pane').forEach(pane => pane.classList.remove('active'));
+    document.getElementById('pane-' + tab).classList.add('active');
+  }
+
+  /* ─────────────────────── Copy UPI ─────────────────────── */
+  function copyUPI() {
+    const upi = document.getElementById('upiIdText').textContent.trim();
+    navigator.clipboard.writeText(upi).then(() => {
+      const btn = document.getElementById('copyUpiBtn');
+      btn.classList.add('copied');
+      btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        btn.innerHTML = '<i class="fas fa-copy"></i> Copy UPI';
+      }, 2500);
+    }).catch(() => {
+      const el = document.createElement('textarea');
+      el.value = upi;
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand('copy');
+      document.body.removeChild(el);
+    });
+  }
+
+  /* ─────────────────────── File picker label ─────────────── */
+  const fileInput = document.getElementById('paymentScreenshot');
+  if (fileInput) {
+    fileInput.addEventListener('change', function() {
+      const label  = document.getElementById('fileLabel');
+      const nameEl = document.getElementById('fileNameDisplay');
+      if (this.files && this.files[0]) {
+        nameEl.textContent = this.files[0].name;
+        nameEl.style.display = 'block';
+        label.style.borderColor = '#6c3fc5';
+        label.style.background  = 'rgba(108,63,197,0.06)';
+      }
+    });
+  }
+
+  /* ─────────────────────── Submit UPI payment ────────────── */
+  async function submitUpiPayment() {
+    const txnId    = document.getElementById('upiTxnId').value.trim();
+    const fileEl   = document.getElementById('paymentScreenshot');
+    const btn      = document.getElementById('submitUpiBtn');
+
+    if (!txnId) {
+      showUpiError('Please enter your UPI Transaction ID.');
+      return;
+    }
+    if (!fileEl || !fileEl.files || !fileEl.files[0]) {
+      showUpiError('Please upload your payment screenshot.');
+      return;
+    }
+
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Submitting...';
+
+    try {
+      const formData = new FormData();
+      formData.append('transaction_id', txnId);
+      formData.append('screenshot', fileEl.files[0]);
+
+      const res = await fetch("{{ url_for('student.submit_upi_payment') }}", {
+        method: 'POST',
+        body: formData
+      });
+      const result = await res.json();
+
+      if (result.success) {
+        // Replace form with success message
+        document.getElementById('paidFormWrap').innerHTML = `
+          <div style="text-align:center;padding:10px 0;">
+            <div style="width:60px;height:60px;background:#ede9fe;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">
+              <i class="fas fa-check" style="color:#6c3fc5;font-size:1.5rem;"></i>
+            </div>
+            <strong style="color:#374151;font-size:0.95rem;">Submitted Successfully!</strong>
+            <p style="color:#6b7280;font-size:0.8rem;margin:8px 0 0;line-height:1.5;">
+              Transaction ID: <strong style="font-family:monospace;color:#6c3fc5;">${txnId}</strong><br>
+              Admin will verify your payment within 24 hours.
+            </p>
+          </div>`;
+      } else {
+        showUpiError(result.error || 'Submission failed. Please try again.');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit for Verification';
+      }
+    } catch (err) {
+      showUpiError('Network error. Please try again.');
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit for Verification';
+    }
+  }
+
+  function showUpiError(msg) {
+    document.querySelectorAll('.upi-form-error').forEach(e => e.remove());
+    const div = document.createElement('div');
+    div.className = 'alert alert-danger upi-form-error';
+    div.style.cssText = 'font-size:0.82rem;padding:10px 14px;border-radius:10px;margin:0;';
+    div.innerHTML = '<i class="fas fa-exclamation-circle me-2"></i>' + msg;
+    const wrap = document.getElementById('paidFormWrap');
+    if (wrap) wrap.insertBefore(div, wrap.querySelector('.submit-upi-btn'));
   }
 </script>
 {% endblock %}

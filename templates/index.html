@@ -19,9 +19,6 @@
           <a href="{{ url_for('auth.register') }}" class="btn-primary-custom">
             <i class="fas fa-rocket me-2"></i>Apply for Internship
           </a>
-          <a href="{{ url_for('main.internships') }}" class="btn-secondary-custom" style="color:#fff;border-color:rgba(255,255,255,0.5)">
-            <i class="fas fa-compass me-2"></i>Explore Domains
-          </a>
         </div>
         <div class="hero-stats">
           <div class="stat-item">
@@ -163,62 +160,74 @@
     <div class="row g-4 justify-content-center">
       <!-- Domain 1 -->
       <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
-        <div class="domain-card">
-          <img src="{{ url_for('static', filename='images/domain_frontend.png') }}" class="domain-img" alt="Frontend">
-          <h5>Frontend Developer</h5>
-          <p>Master HTML, CSS, JavaScript and modern frameworks like React and Vue to build stunning UIs.</p>
-          <div class="domain-badge">1 Month / 3 Months</div>
-        </div>
+        <a href="{{ url_for('main.go_to_domain', domain_name='Frontend Developer') }}" class="d-block text-decoration-none text-dark h-100">
+          <div class="domain-card">
+            <img src="{{ url_for('static', filename='images/domain_frontend.png') }}" class="domain-img" alt="Frontend">
+            <h5>Frontend Developer</h5>
+            <p>Master HTML, CSS, JavaScript and modern frameworks like React and Vue to build stunning UIs.</p>
+            <div class="domain-badge">1 Month / 3 Months</div>
+          </div>
+        </a>
       </div>
       
       <!-- Domain 2 -->
       <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
-        <div class="domain-card">
-          <img src="{{ url_for('static', filename='images/domain_backend.png') }}" class="domain-img" alt="Backend">
-          <h5>Backend Developer</h5>
-          <p>Learn Node.js, Python, or Java to design robust APIs, manage databases, and handle server logic.</p>
-          <div class="domain-badge">1 Month / 3 Months</div>
-        </div>
+        <a href="{{ url_for('main.go_to_domain', domain_name='Backend Developer') }}" class="d-block text-decoration-none text-dark h-100">
+          <div class="domain-card">
+            <img src="{{ url_for('static', filename='images/domain_backend.png') }}" class="domain-img" alt="Backend">
+            <h5>Backend Developer</h5>
+            <p>Learn Node.js, Python, or Java to design robust APIs, manage databases, and handle server logic.</p>
+            <div class="domain-badge">1 Month / 3 Months</div>
+          </div>
+        </a>
       </div>
       
       <!-- Domain 3 -->
       <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="300">
-        <div class="domain-card">
-          <img src="{{ url_for('static', filename='images/domain_fullstack.png') }}" class="domain-img" alt="Full Stack">
-          <h5>Full Stack Developer</h5>
-          <p>Become an end-to-end developer by mastering both frontend aesthetics and backend architectures.</p>
-          <div class="domain-badge">1 Month / 3 Months</div>
-        </div>
+        <a href="{{ url_for('main.go_to_domain', domain_name='Full Stack Developer') }}" class="d-block text-decoration-none text-dark h-100">
+          <div class="domain-card">
+            <img src="{{ url_for('static', filename='images/domain_fullstack.png') }}" class="domain-img" alt="Full Stack">
+            <h5>Full Stack Developer</h5>
+            <p>Become an end-to-end developer by mastering both frontend aesthetics and backend architectures.</p>
+            <div class="domain-badge">1 Month / 3 Months</div>
+          </div>
+        </a>
       </div>
       
       <!-- Domain 4 -->
       <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="400">
-        <div class="domain-card">
-          <img src="{{ url_for('static', filename='images/domain_datascience.png') }}" class="domain-img" alt="Data Science">
-          <h5>Data Science / ML / AI</h5>
-          <p>Dive into data analytics, machine learning algorithms, and build intelligent AI models using Python.</p>
-          <div class="domain-badge">1 Month / 3 Months</div>
-        </div>
+        <a href="{{ url_for('main.go_to_domain', domain_name='Data Science / ML / AI') }}" class="d-block text-decoration-none text-dark h-100">
+          <div class="domain-card">
+            <img src="{{ url_for('static', filename='images/domain_datascience.png') }}" class="domain-img" alt="Data Science">
+            <h5>Data Science / ML / AI</h5>
+            <p>Dive into data analytics, machine learning algorithms, and build intelligent AI models using Python.</p>
+            <div class="domain-badge">1 Month / 3 Months</div>
+          </div>
+        </a>
       </div>
       
       <!-- Domain 5 -->
       <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="500">
-        <div class="domain-card">
-          <img src="{{ url_for('static', filename='images/domain_digitalmarketing.png') }}" class="domain-img" alt="Digital Marketing">
-          <h5>Digital Marketing</h5>
-          <p>Learn SEO, SEM, content marketing, and social media strategies to drive growth and engagement.</p>
-          <div class="domain-badge">1 Month / 3 Months</div>
-        </div>
+        <a href="{{ url_for('main.go_to_domain', domain_name='Digital Marketing') }}" class="d-block text-decoration-none text-dark h-100">
+          <div class="domain-card">
+            <img src="{{ url_for('static', filename='images/domain_digitalmarketing.png') }}" class="domain-img" alt="Digital Marketing">
+            <h5>Digital Marketing</h5>
+            <p>Learn SEO, SEM, content marketing, and social media strategies to drive growth and engagement.</p>
+            <div class="domain-badge">1 Month / 3 Months</div>
+          </div>
+        </a>
       </div>
 
       <!-- Domain 6 -->
       <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="600">
-        <div class="domain-card">
-          <img src="{{ url_for('static', filename='images/domain_uiux.png') }}" class="domain-img" alt="UI/UX Design">
-          <h5>UI/UX Design</h5>
-          <p>Design intuitive user experiences and beautiful interfaces using tools like Figma and Adobe XD.</p>
-          <div class="domain-badge">1 Month / 3 Months</div>
-        </div>
+        <a href="{{ url_for('main.go_to_domain', domain_name='UI/UX Design') }}" class="d-block text-decoration-none text-dark h-100">
+          <div class="domain-card">
+            <img src="{{ url_for('static', filename='images/domain_uiux.png') }}" class="domain-img" alt="UI/UX Design">
+            <h5>UI/UX Design</h5>
+            <p>Design intuitive user experiences and beautiful interfaces using tools like Figma and Adobe XD.</p>
+            <div class="domain-badge">1 Month / 3 Months</div>
+          </div>
+        </a>
       </div>
     </div>
     
@@ -242,7 +251,8 @@
       {% for step, icon, title, desc in [
         ('01', 'fa-user-plus', 'Register', 'Fill the registration form with your details and choose your domain'),
         ('02', 'fa-envelope-open', 'Get Confirmation', 'Receive confirmation email with joining details and schedule'),
-        ('03', 'fa-laptop-code', 'Start Exploring', 'Begin your internship with live projects and expert guidance'),
+        ('03', 'fa-credit-card', 'Complete Payment', 'Make a secure payment via UPI Scanner or Razorpay to unlock your domain'),
+        ('04', 'fa-rocket', 'Start Exploring', 'Begin your internship with live projects and expert guidance'),
       ] %}
       <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="{{ loop.index * 150 }}">
         <div style="background:rgba(255,255,255,0.1);border-radius:16px;padding:30px;border:1px solid rgba(255,255,255,0.2);">

@@ -23,7 +23,7 @@ class Student(UserMixin, db.Model):
     password = db.Column(db.String(256), nullable=False)
     is_active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    payments = db.relationship('Payment', backref='student', lazy=True)
+    payments = db.relationship('Payment', backref='student', lazy=True, cascade="all, delete-orphan")
 
     def set_password(self, password):
         self.password = generate_password_hash(password)
@@ -108,5 +108,28 @@ class AddonPayment(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    student = db.relationship('Student', backref=db.backref('addon_payments', lazy=True))
+    student = db.relationship('Student', backref=db.backref('addon_payments', lazy=True, cascade="all, delete-orphan"))
+
+
+class Certificate(db.Model):
+    __tablename__ = 'certificates'
+
+    id = db.Column(db.Integer, primary_key=True)
+    certificate_id = db.Column(db.String(100), unique=True, nullable=False)
+    student_id = db.Column(db.Integer, db.ForeignKey('students.id'), nullable=True)
+    student_name = db.Column(db.String(255), nullable=False)
+    domain_name = db.Column(db.String(255), nullable=False)
+    start_date = db.Column(db.Date, nullable=False)
+    end_date = db.Column(db.Date, nullable=False)
+    issue_date = db.Column(db.Date, nullable=False)
+    blockchain_hash = db.Column(db.String(100), nullable=True)
+    tx_hash = db.Column(db.String(100), nullable=True)
+    qr_code = db.Column(db.String(255), nullable=True)
+    status = db.Column(db.String(20), default='pending')
+    pdf_path = db.Column(db.String(255), nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    student = db.relationship('Student', backref=db.backref('certificates', lazy=True, cascade="all, delete-orphan"))
+
 

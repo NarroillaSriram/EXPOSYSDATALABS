@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, flash, redirect, url_for, request, session
+from flask import Blueprint, render_template, flash, redirect, url_for, request, session, current_app
 from flask_login import login_user, logout_user, login_required, current_user
 from models.models import Student, Admin
 from models import db, login_manager
@@ -27,8 +27,11 @@ def register():
             if not payment:
                 return redirect(url_for('student.payment'))
             return redirect(url_for('student.dashboard'))
-        return redirect(url_for('student.dashboard'))
+        elif isinstance(current_user._get_current_object(), Admin):
+            return redirect(url_for('admin.dashboard'))
     form = RegistrationForm()
+    if request.method == 'GET' and request.args.get('domain'):
+        form.internship_domain.data = request.args.get('domain')
     if form.validate_on_submit():
         existing = Student.query.filter_by(email=form.email.data).first()
         if existing:
@@ -55,11 +58,6 @@ def register():
         login_user(student)
         flash(f'Welcome {student.name}! Please complete your payment to confirm registration.', 'success')
         return redirect(url_for('student.payment'))
-    # Show form errors clearly
-    if form.errors:
-        for field, errors in form.errors.items():
-            for error in errors:
-                flash(f'{error}', 'danger')
     return render_template('auth/register.html', form=form)
 
 
@@ -71,7 +69,9 @@ def login():
             payment = Payment.query.filter_by(student_id=current_user.id).first()
             if not payment:
                 return redirect(url_for('student.payment'))
-        return redirect(url_for('main.index'))
+            return redirect(url_for('student.dashboard'))
+        elif isinstance(current_user._get_current_object(), Admin):
+            return redirect(url_for('admin.dashboard'))
     form = LoginForm()
     if form.validate_on_submit():
         student = Student.query.filter_by(email=form.email.data).first()
@@ -91,58 +91,7 @@ def login():
     return render_template('auth/login.html', form=form)
 
 
-@auth_bp.route('/login/google')
-def login_google():
-    redirect_uri = url_for('auth.auth_google', _external=True)
-    return oauth.google.authorize_redirect(redirect_uri)
 
-
-@auth_bp.route('/auth/google')
-def auth_google():
-    token = oauth.google.authorize_access_token()
-    user_info = token.get('userinfo')
-    if not user_info:
-        flash('Failed to retrieve user information from Google.', 'danger')
-        return redirect(url_for('auth.login'))
-        
-    email = user_info.get('email')
-    name = user_info.get('name')
-    
-    student = Student.query.filter_by(email=email).first()
-    
-    if not student:
-        # Create a new student with placeholder values
-        student = Student(
-            name=name or 'Google User',
-            email=email,
-            branch='N/A',
-            college='N/A',
-            phone='0000000000',
-            tenth_percentage=0.0,
-            twelfth_percentage=0.0,
-            location='N/A',
-            internship_domain='Web Development', # Default
-            duration='1 Month' # Default
-        )
-        # Give them a random secure password since they use Google to login
-        random_pwd = str(uuid.uuid4())
-        student.set_password(random_pwd)
-        db.session.add(student)
-        db.session.commit()
-        flash('Account created via Google. Please complete your registration payment.', 'success')
-        login_user(student)
-        return redirect(url_for('student.payment'))
-        
-    login_user(student)
-    flash(f'Welcome back, {student.name}!', 'success')
-    
-    # Check if student has a payment
-    from models.models import Payment
-    payment = Payment.query.filter_by(student_id=student.id).first()
-    if not payment:
-        return redirect(url_for('student.payment'))
-        
-    return redirect(url_for('student.dashboard'))
 
 
 @auth_bp.route('/logout')
@@ -155,6 +104,11 @@ def logout():
 
 @auth_bp.route('/admin/login', methods=['GET', 'POST'])
 def admin_login():
+    if current_user.is_authenticated:
+        if isinstance(current_user._get_current_object(), Admin):
+            return redirect(url_for('admin.dashboard'))
+        elif isinstance(current_user._get_current_object(), Student):
+            return redirect(url_for('student.dashboard'))
     form = AdminLoginForm()
     if form.validate_on_submit():
         admin = Admin.query.filter_by(email=form.email.data).first()

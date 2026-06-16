@@ -2,7 +2,7 @@
 {% block title %}Register - Exposys Data Labs{% endblock %}
 
 {% block content %}
-<div style="padding-top:80px;background:var(--gradient);min-height:100vh;padding-bottom:60px;">
+<div style="padding-top:100px;background:var(--gradient);min-height:100vh;padding-bottom:60px;">
   <div class="container py-5">
     <div class="row justify-content-center">
       <div class="col-lg-9">
@@ -14,20 +14,28 @@
             <p style="color:var(--text-muted);font-size:0.9rem;">Fill in your details to apply for an internship</p>
           </div>
 
+          <!-- Local alerts block inside the card -->
+          {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+              <div class="local-alerts mb-3">
+                {% for category, message in messages %}
+                  <div class="alert alert-{{ 'danger' if category == 'error' or category == 'danger' else category }} alert-dismissible fade show py-2 px-3 small border-0 shadow-sm" role="alert" style="border-radius: 12px; font-weight: 500;">
+                    <i class="fas fa-{% if category == 'success' %}check-circle{% else %}exclamation-circle{% endif %} me-2"></i>
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" style="padding: 0.85rem 1rem; font-size: 0.75rem;"></button>
+                  </div>
+                {% endfor %}
+              </div>
+            {% endif %}
+          {% endwith %}
+
           <form method="POST" action="{{ url_for('auth.register') }}" id="registrationForm" novalidate>
             {{ form.hidden_tag() }}
 
             {% if form.errors %}
-            <div class="alert alert-danger" style="border-radius:10px;">
-              <i class="fas fa-exclamation-circle me-2"></i>
-              <strong>Please fix the following errors:</strong>
-              <ul class="mb-0 mt-2">
-                {% for field, errors in form.errors.items() %}
-                {% for error in errors %}
-                <li>{{ form[field].label.text }}: {{ error }}</li>
-                {% endfor %}
-                {% endfor %}
-              </ul>
+            <div class="alert alert-danger mb-4" style="border-radius:12px; border: none; background: rgba(232, 69, 69, 0.08); color: #c0392b;">
+              <i class="fas fa-exclamation-circle me-2" style="color: var(--secondary);"></i>
+              <strong>Please fix the errors below in the form.</strong>
             </div>
             {% endif %}
 
@@ -39,23 +47,23 @@
               <div class="row g-3">
                 <div class="col-md-6">
                   <label class="form-label">{{ form.name.label.text }} <span class="text-danger">*</span></label>
-                  {{ form.name(class="form-control", placeholder="Enter your full name") }}
-                  {% for e in form.name.errors %}<div class="text-danger small mt-1">{{ e }}</div>{% endfor %}
+                  {{ form.name(class="form-control is-invalid" if form.name.errors else "form-control", placeholder="Enter your full name") }}
+                  {% for e in form.name.errors %}<div class="text-danger small mt-1"><i class="fas fa-exclamation-circle me-1"></i>{{ e }}</div>{% endfor %}
                 </div>
                 <div class="col-md-6">
                   <label class="form-label">{{ form.email.label.text }} <span class="text-danger">*</span></label>
-                  {{ form.email(class="form-control", placeholder="your@email.com") }}
-                  {% for e in form.email.errors %}<div class="text-danger small mt-1">{{ e }}</div>{% endfor %}
+                  {{ form.email(class="form-control is-invalid" if form.email.errors else "form-control", placeholder="your@email.com") }}
+                  {% for e in form.email.errors %}<div class="text-danger small mt-1"><i class="fas fa-exclamation-circle me-1"></i>{{ e }}</div>{% endfor %}
                 </div>
                 <div class="col-md-6">
                   <label class="form-label">{{ form.phone.label.text }} <span class="text-danger">*</span></label>
-                  {{ form.phone(class="form-control", placeholder="10-digit mobile number") }}
-                  {% for e in form.phone.errors %}<div class="text-danger small mt-1">{{ e }}</div>{% endfor %}
+                  {{ form.phone(class="form-control is-invalid" if form.phone.errors else "form-control", placeholder="10-digit mobile number") }}
+                  {% for e in form.phone.errors %}<div class="text-danger small mt-1"><i class="fas fa-exclamation-circle me-1"></i>{{ e }}</div>{% endfor %}
                 </div>
                 <div class="col-md-6">
                   <label class="form-label">{{ form.location.label.text }} <span class="text-danger">*</span></label>
-                  {{ form.location(class="form-control", placeholder="City, State") }}
-                  {% for e in form.location.errors %}<div class="text-danger small mt-1">{{ e }}</div>{% endfor %}
+                  {{ form.location(class="form-control is-invalid" if form.location.errors else "form-control", placeholder="City, State") }}
+                  {% for e in form.location.errors %}<div class="text-danger small mt-1"><i class="fas fa-exclamation-circle me-1"></i>{{ e }}</div>{% endfor %}
                 </div>
               </div>
             </div>
@@ -68,37 +76,37 @@
               <div class="row g-3">
                 <div class="col-md-6">
                   <label class="form-label">{{ form.college.label.text }} <span class="text-danger">*</span></label>
-                  {{ form.college(class="form-control", placeholder="Your college/university name") }}
-                  {% for e in form.college.errors %}<div class="text-danger small mt-1">{{ e }}</div>{% endfor %}
+                  {{ form.college(class="form-control is-invalid" if form.college.errors else "form-control", placeholder="Your college/university name") }}
+                  {% for e in form.college.errors %}<div class="text-danger small mt-1"><i class="fas fa-exclamation-circle me-1"></i>{{ e }}</div>{% endfor %}
                 </div>
                 <div class="col-md-6">
                   <label class="form-label">{{ form.branch.label.text }} <span class="text-danger">*</span></label>
-                  {{ form.branch(class="form-select") }}
-                  {% for e in form.branch.errors %}<div class="text-danger small mt-1">{{ e }}</div>{% endfor %}
+                  {{ form.branch(class="form-select is-invalid" if form.branch.errors else "form-select") }}
+                  {% for e in form.branch.errors %}<div class="text-danger small mt-1"><i class="fas fa-exclamation-circle me-1"></i>{{ e }}</div>{% endfor %}
                 </div>
                 <div class="col-md-6">
                   <label class="form-label">{{ form.tenth_percentage.label.text }} <span
                       class="text-danger">*</span></label>
-                  {{ form.tenth_percentage(class="form-control", placeholder="e.g. 85.5", type="number", step="any",
+                  {{ form.tenth_percentage(class="form-control is-invalid" if form.tenth_percentage.errors else "form-control", placeholder="e.g. 85.5", type="number", step="any",
                   min="0", max="100") }}
-                  {% for e in form.tenth_percentage.errors %}<div class="text-danger small mt-1">{{ e }}</div>{% endfor
-                  %}
+                  {% for e in form.tenth_percentage.errors %}<div class="text-danger small mt-1"><i class="fas fa-exclamation-circle me-1"></i>{{ e }}</div>{% endfor %}
                 </div>
                 <div class="col-md-6">
                   <label class="form-label">{{ form.twelfth_percentage.label.text }} <span
                       class="text-danger">*</span></label>
-                  {{ form.twelfth_percentage(class="form-control", placeholder="e.g. 78.0", type="number", step="any",
+                  {{ form.twelfth_percentage(class="form-control is-invalid" if form.twelfth_percentage.errors else "form-control", placeholder="e.g. 78.0", type="number", step="any",
                   min="0", max="100") }}
-                  {% for e in form.twelfth_percentage.errors %}<div class="text-danger small mt-1">{{ e }}</div>{%
-                  endfor %}
+                  {% for e in form.twelfth_percentage.errors %}<div class="text-danger small mt-1"><i class="fas fa-exclamation-circle me-1"></i>{{ e }}</div>{% endfor %}
                 </div>
                 <div class="col-md-6">
                   <label class="form-label">{{ form.ug.label.text }}</label>
-                  {{ form.ug(class="form-control", placeholder="e.g. B.Tech CSE (Optional)") }}
+                  {{ form.ug(class="form-control is-invalid" if form.ug.errors else "form-control", placeholder="e.g. B.Tech CSE (Optional)") }}
+                  {% for e in form.ug.errors %}<div class="text-danger small mt-1"><i class="fas fa-exclamation-circle me-1"></i>{{ e }}</div>{% endfor %}
                 </div>
                 <div class="col-md-6">
                   <label class="form-label">{{ form.pg.label.text }}</label>
-                  {{ form.pg(class="form-control", placeholder="e.g. M.Tech (Optional)") }}
+                  {{ form.pg(class="form-control is-invalid" if form.pg.errors else "form-control", placeholder="e.g. M.Tech (Optional)") }}
+                  {% for e in form.pg.errors %}<div class="text-danger small mt-1"><i class="fas fa-exclamation-circle me-1"></i>{{ e }}</div>{% endfor %}
                 </div>
               </div>
             </div>
@@ -112,14 +120,13 @@
                 <div class="col-md-6">
                   <label class="form-label">{{ form.internship_domain.label.text }} <span
                       class="text-danger">*</span></label>
-                  {{ form.internship_domain(class="form-select") }}
-                  {% for e in form.internship_domain.errors %}<div class="text-danger small mt-1">{{ e }}</div>{% endfor
-                  %}
+                  {{ form.internship_domain(class="form-select is-invalid" if form.internship_domain.errors else "form-select") }}
+                  {% for e in form.internship_domain.errors %}<div class="text-danger small mt-1"><i class="fas fa-exclamation-circle me-1"></i>{{ e }}</div>{% endfor %}
                 </div>
                 <div class="col-md-6">
                   <label class="form-label">{{ form.duration.label.text }} <span class="text-danger">*</span></label>
-                  {{ form.duration(class="form-select") }}
-                  {% for e in form.duration.errors %}<div class="text-danger small mt-1">{{ e }}</div>{% endfor %}
+                  {{ form.duration(class="form-select is-invalid" if form.duration.errors else "form-select") }}
+                  {% for e in form.duration.errors %}<div class="text-danger small mt-1"><i class="fas fa-exclamation-circle me-1"></i>{{ e }}</div>{% endfor %}
                 </div>
               </div>
             </div>
@@ -133,27 +140,25 @@
                 <div class="col-md-6">
                   <label class="form-label">{{ form.password.label.text }} <span class="text-danger">*</span></label>
                   <div class="password-field-container">
-                    {{ form.password(class="form-control", placeholder="Min 6 characters", id="password") }}
+                    {{ form.password(class="form-control is-invalid" if form.password.errors else "form-control", placeholder="Min 6 characters", id="password") }}
                     <button type="button" class="password-toggle-btn" data-pw-target="#password"
                       aria-label="Toggle Password Visibility">
                       <i class="fas fa-eye-slash"></i>
                     </button>
                   </div>
-                  {% for e in form.password.errors %}<div class="text-danger small mt-1">{{ e }}</div>{% endfor %}
+                  {% for e in form.password.errors %}<div class="text-danger small mt-1"><i class="fas fa-exclamation-circle me-1"></i>{{ e }}</div>{% endfor %}
                 </div>
                 <div class="col-md-6">
                   <label class="form-label">{{ form.confirm_password.label.text }} <span
                       class="text-danger">*</span></label>
                   <div class="password-field-container">
-                    {{ form.confirm_password(class="form-control", placeholder="Repeat password", id="confirm_password")
-                    }}
+                    {{ form.confirm_password(class="form-control is-invalid" if form.confirm_password.errors else "form-control", placeholder="Repeat password", id="confirm_password") }}
                     <button type="button" class="password-toggle-btn" data-pw-target="#confirm_password"
                       aria-label="Toggle Confirm Password Visibility">
                       <i class="fas fa-eye-slash"></i>
                     </button>
                   </div>
-                  {% for e in form.confirm_password.errors %}<div class="text-danger small mt-1">{{ e }}</div>{% endfor
-                  %}
+                  {% for e in form.confirm_password.errors %}<div class="text-danger small mt-1"><i class="fas fa-exclamation-circle me-1"></i>{{ e }}</div>{% endfor %}
                 </div>
               </div>
             </div>

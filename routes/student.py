@@ -3,11 +3,11 @@ import hmac
 import hashlib
 import razorpay
 from flask import (Blueprint, render_template, flash, redirect, url_for,
-                   request, current_app, jsonify)
+                   request, current_app, jsonify, session, abort)
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
-from models.models import Payment, Student, AddonPayment
-from models import db
+from models.models import Payment, Student, AddonPayment, Certificate
+from models import db, csrf
 from forms import PaymentForm
 from domain_content import get_domain_content
 
@@ -37,11 +37,17 @@ def student_required(f):
 def student_has_domain_access(student, domain):
     """Returns True if student has access to the given domain (registered or addon verified)."""
     if student.internship_domain and student.internship_domain.lower() == domain.lower():
-        return True
+        main_payment = Payment.query.filter_by(student_id=student.id).first()
+        if main_payment and main_payment.status == 'verified':
+            return True
+            
     addon = AddonPayment.query.filter_by(
-        student_id=student.id, domain=domain, status='verified'
+        student_id=student.id, domain=domain
     ).first()
-    return addon is not None
+    if addon and addon.status == 'verified':
+        return True
+        
+    return False
 
 
 def verify_razorpay_signature(order_id, payment_id, signature):
@@ -64,13 +70,62 @@ def verify_razorpay_signature(order_id, payment_id, signature):
 @login_required
 @student_required
 def dashboard():
-    payment = Payment.query.filter_by(student_id=current_user.id).order_by(Payment.created_at.desc()).first()
-    if not payment:
+    main_payments = Payment.query.filter_by(student_id=current_user.id).all()
+    # Check if student has at least one main payment to access the dashboard
+    has_main_payment = len(main_payments) > 0
+    if not has_main_payment:
         flash('Please complete your payment to access the dashboard.', 'warning')
         return redirect(url_for('student.payment'))
+        
     addon_payments = AddonPayment.query.filter_by(student_id=current_user.id).all()
-    return render_template('student/dashboard.html', student=current_user, payment=payment,
-                           addon_payments=addon_payments)
+    
+    # Unified list for rendering in the payments history table
+    all_payments = []
+    for p in main_payments:
+        all_payments.append({
+            'id': p.id,
+            'type_raw': 'main',
+            'type': 'Main Registration',
+            'domain': current_user.internship_domain or 'Registration',
+            'amount': p.amount,
+            'transaction_id': p.transaction_id,
+            'status': p.status,
+            'created_at': p.created_at,
+            'updated_at': p.updated_at
+        })
+    for ap in addon_payments:
+        all_payments.append({
+            'id': ap.id,
+            'type_raw': 'addon',
+            'type': 'Add-on',
+            'domain': ap.domain,
+            'amount': ap.amount,
+            'transaction_id': ap.transaction_id,
+            'status': ap.status,
+            'created_at': ap.created_at,
+            'updated_at': ap.updated_at
+        })
+    # Sort payments by created_at descending
+    all_payments.sort(key=lambda x: x['created_at'], reverse=True)
+
+    # Get string of all verified domains
+    active_domains = [current_user.internship_domain] if current_user.internship_domain else []
+    for ap in addon_payments:
+        active_domains.append(ap.domain)
+    domains_str = ", ".join(active_domains)
+
+    # Re-fetch the latest payment for backward compatibility
+    latest_payment = next((p for p in reversed(main_payments) if p.status == 'verified'), None) or (main_payments[-1] if main_payments else None)
+
+    certificates = Certificate.query.filter_by(student_id=current_user.id, status='approved').all()
+
+    return render_template('student/dashboard.html', 
+                           student=current_user, 
+                           payment=latest_payment,
+                           addon_payments=addon_payments,
+                           all_payments=all_payments,
+                           domains_str=domains_str,
+                           certificates=certificates)
 
 
 # ─────────────────────────────────────────────
@@ -83,11 +138,44 @@ def dashboard():
 def payment():
     existing = Payment.query.filter_by(student_id=current_user.id).first()
     razorpay_key = current_app.config['RAZORPAY_KEY_ID']
+
+    # Fetch all payments for history display
+    main_payments = Payment.query.filter_by(student_id=current_user.id).all()
+    addon_payments = AddonPayment.query.filter_by(student_id=current_user.id).all()
+    all_payments = []
+    for p in main_payments:
+        all_payments.append({
+            'id': p.id,
+            'type_raw': 'main',
+            'type': 'Main Registration',
+            'domain': current_user.internship_domain or 'Registration',
+            'amount': p.amount,
+            'transaction_id': p.transaction_id,
+            'status': p.status,
+            'created_at': p.created_at,
+            'updated_at': p.updated_at
+        })
+    for ap in addon_payments:
+        all_payments.append({
+            'id': ap.id,
+            'type_raw': 'addon',
+            'type': 'Add-on',
+            'domain': ap.domain,
+            'amount': ap.amount,
+            'transaction_id': ap.transaction_id,
+            'status': ap.status,
+            'created_at': ap.created_at,
+            'updated_at': ap.updated_at
+        })
+    all_payments.sort(key=lambda x: x['created_at'], reverse=True)
+
     return render_template('student/payment.html', existing=existing,
-                           razorpay_key=razorpay_key, amount=PAYMENT_AMOUNT)
+                           razorpay_key=razorpay_key, amount=PAYMENT_AMOUNT,
+                           all_payments=all_payments)
 
 
 @student_bp.route('/create-order', methods=['POST'])
+@csrf.exempt
 @login_required
 @student_required
 def create_order():
@@ -124,6 +212,7 @@ def create_order():
 
 
 @student_bp.route('/verify-payment', methods=['POST'])
+@csrf.exempt
 @login_required
 @student_required
 def verify_payment():
@@ -155,10 +244,68 @@ def verify_payment():
     db.session.add(pay)
     db.session.commit()
 
+    # Send receipt email to student
+    from routes.email_utils import send_receipt_email
+    send_receipt_email(current_user._get_current_object(), pay)
+
     return jsonify({
         'success': True,
         'redirect': url_for('student.registration_success')
     })
+
+
+# ─────────────────────────────────────────────
+# UPI / QR MANUAL PAYMENT SUBMISSION
+# ─────────────────────────────────────────────
+
+@student_bp.route('/submit-upi-payment', methods=['POST'])
+@csrf.exempt
+@login_required
+@student_required
+def submit_upi_payment():
+    """Accept a UPI transaction ID + screenshot and create a pending payment record."""
+    # Prevent duplicate submissions
+    existing = Payment.query.filter_by(student_id=current_user.id).first()
+    if existing:
+        if existing.status == 'verified':
+            return jsonify({'success': False, 'error': 'Payment already verified.'}), 400
+        if existing.status == 'pending':
+            return jsonify({'success': False, 'error': 'Payment already submitted, pending verification.'}), 400
+
+    transaction_id = request.form.get('transaction_id', '').strip()
+    if not transaction_id:
+        return jsonify({'success': False, 'error': 'Transaction ID is required.'}), 400
+
+    screenshot = request.files.get('screenshot')
+    screenshot_filename = None
+    if screenshot and screenshot.filename:
+        ext = screenshot.filename.rsplit('.', 1)[-1].lower()
+        allowed = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+        if ext not in allowed:
+            return jsonify({'success': False, 'error': 'Screenshot must be an image (png, jpg, jpeg, gif, webp).'}), 400
+        safe_name = secure_filename(f"upi_{current_user.id}_{transaction_id[:12]}.{ext}")
+        upload_folder = current_app.config['UPLOAD_FOLDER']
+        os.makedirs(upload_folder, exist_ok=True)
+        screenshot.save(os.path.join(upload_folder, safe_name))
+        screenshot_filename = safe_name
+
+    pay = Payment(
+        student_id=current_user.id,
+        amount=PAYMENT_AMOUNT,
+        transaction_id=transaction_id,
+        status='pending',
+        payment_method='UPI/QR',
+    )
+    if screenshot_filename:
+        pay.screenshot_filename = screenshot_filename
+
+    db.session.add(pay)
+    db.session.commit()
+
+    current_app.logger.info(
+        f"UPI payment submitted — student_id={current_user.id}, txn={transaction_id}, file={screenshot_filename}"
+    )
+    return jsonify({'success': True})
 
 
 # ─────────────────────────────────────────────
@@ -171,6 +318,58 @@ def verify_payment():
 def registration_success():
     payment = Payment.query.filter_by(student_id=current_user.id).order_by(Payment.created_at.desc()).first()
     return render_template('student/success.html', student=current_user, payment=payment)
+
+
+# ─────────────────────────────────────────────
+# MY COURSES & CERTIFICATES
+# ─────────────────────────────────────────────
+
+@student_bp.route('/my-courses')
+@login_required
+@student_required
+def my_courses():
+    main_payment = Payment.query.filter_by(student_id=current_user.id).first()
+    addon_payments = AddonPayment.query.filter_by(student_id=current_user.id).all()
+    
+    courses = []
+    if main_payment and main_payment.status == 'verified' and current_user.internship_domain:
+        courses.append(current_user.internship_domain)
+        
+    for ap in addon_payments:
+        if ap.status == 'verified' and ap.domain and ap.domain not in courses:
+            courses.append(ap.domain)
+            
+    return render_template('student/my_courses.html', my_courses=courses, student=current_user)
+
+
+@student_bp.route('/certificates')
+@login_required
+@student_required
+def certificates():
+    certs = Certificate.query.filter_by(student_id=current_user.id, status='approved').all()
+    
+    return render_template('student/certificates.html', 
+                           certificates=certs, 
+                           student=current_user)
+
+@student_bp.route('/download-certificate/<certificate_id>')
+@login_required
+@student_required
+def download_certificate(certificate_id):
+    cert = Certificate.query.filter_by(student_id=current_user.id, certificate_id=certificate_id, status='approved').first_or_404()
+    
+    from flask import send_from_directory, current_app, abort
+    base = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+        'certificate_system', 'backend', 'uploads', 'certificates'
+    )
+    
+    filename = f"{certificate_id}.pdf"
+    if not os.path.exists(os.path.join(base, filename)):
+        abort(404)
+        
+    return send_from_directory(base, filename, as_attachment=False)
+
 
 
 # ─────────────────────────────────────────────
@@ -192,10 +391,10 @@ def profile():
 @login_required
 @student_required
 def addon_payment(domain):
-    main_payment = Payment.query.filter_by(student_id=current_user.id, status='verified').first()
+    main_payment = Payment.query.filter_by(student_id=current_user.id).first()
     if not main_payment:
         flash('Your main internship payment must be verified before unlocking additional domains.', 'warning')
-        return redirect(url_for('student.dashboard'))
+        return redirect(url_for('student.payment'))
 
     if current_user.internship_domain and current_user.internship_domain.lower() == domain.lower():
         flash('This is already your registered domain.', 'info')
@@ -214,6 +413,7 @@ def addon_payment(domain):
 
 
 @student_bp.route('/create-addon-order/<path:domain>', methods=['POST'])
+@csrf.exempt
 @login_required
 @student_required
 def create_addon_order(domain):
@@ -251,6 +451,7 @@ def create_addon_order(domain):
 
 
 @student_bp.route('/verify-addon-payment/<path:domain>', methods=['POST'])
+@csrf.exempt
 @login_required
 @student_required
 def verify_addon_payment(domain):
@@ -283,10 +484,70 @@ def verify_addon_payment(domain):
     db.session.add(addon)
     db.session.commit()
 
+    # Send receipt email to student
+    from routes.email_utils import send_receipt_email
+    send_receipt_email(current_user._get_current_object(), addon)
+
     return jsonify({
         'success': True,
         'redirect': url_for('student.domain_detail', domain=domain)
     })
+
+
+@student_bp.route('/submit-upi-addon-payment/<path:domain>', methods=['POST'])
+@csrf.exempt
+@login_required
+@student_required
+def submit_upi_addon_payment(domain):
+    """Accept a UPI transaction ID + screenshot and create a pending addon payment record."""
+    main_payment = Payment.query.filter_by(student_id=current_user.id).first()
+    if not main_payment:
+        return jsonify({'success': False, 'error': 'Main internship payment must be submitted before unlocking additional domains.'}), 400
+
+    existing_addon = AddonPayment.query.filter_by(
+        student_id=current_user.id, domain=domain
+    ).first()
+    if existing_addon:
+        if existing_addon.status == 'verified':
+            return jsonify({'success': False, 'error': 'Domain already unlocked.'}), 400
+        if existing_addon.status == 'pending':
+            return jsonify({'success': False, 'error': 'Payment already submitted, pending verification.'}), 400
+
+    transaction_id = request.form.get('transaction_id', '').strip()
+    if not transaction_id:
+        return jsonify({'success': False, 'error': 'Transaction ID is required.'}), 400
+
+    screenshot = request.files.get('screenshot')
+    screenshot_filename = None
+    if screenshot and screenshot.filename:
+        ext = screenshot.filename.rsplit('.', 1)[-1].lower()
+        allowed = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+        if ext not in allowed:
+            return jsonify({'success': False, 'error': 'Screenshot must be an image (png, jpg, jpeg, gif, webp).'}), 400
+        safe_name = secure_filename(f"upi_addon_{current_user.id}_{transaction_id[:12]}.{ext}")
+        upload_folder = current_app.config['UPLOAD_FOLDER']
+        os.makedirs(upload_folder, exist_ok=True)
+        screenshot.save(os.path.join(upload_folder, safe_name))
+        screenshot_filename = safe_name
+
+    addon = AddonPayment(
+        student_id=current_user.id,
+        domain=domain,
+        amount=PAYMENT_AMOUNT,
+        transaction_id=transaction_id,
+        status='pending',
+    )
+    if screenshot_filename:
+        addon.screenshot_filename = screenshot_filename
+
+    db.session.add(addon)
+    db.session.commit()
+
+    current_app.logger.info(
+        f"UPI addon payment submitted — student_id={current_user.id}, domain={domain}, txn={transaction_id}, file={screenshot_filename}"
+    )
+    return jsonify({'success': True})
+
 
 
 # ─────────────────────────────────────────────
@@ -297,7 +558,7 @@ def verify_addon_payment(domain):
 @login_required
 @student_required
 def domain_detail(domain):
-    main_payment = Payment.query.filter_by(student_id=current_user.id, status='verified').first()
+    main_payment = Payment.query.filter_by(student_id=current_user.id).first()
     if not main_payment:
         flash('Please complete your payment to access internship content.', 'warning')
         return redirect(url_for('student.payment'))
@@ -309,3 +570,32 @@ def domain_detail(domain):
     content = get_domain_content(domain)
     return render_template('student/domain_detail.html', domain=domain,
                            student=current_user, content=content)
+
+
+# ─────────────────────────────────────────────
+# PAYMENT RECEIPT VIEW
+# ─────────────────────────────────────────────
+
+@student_bp.route('/receipt/<string:payment_type>/<int:payment_id>')
+@login_required
+def view_receipt(payment_type, payment_id):
+    if payment_type == 'main':
+        payment = Payment.query.get_or_404(payment_id)
+        if payment.status != 'verified':
+            abort(403)
+        if not session.get('is_admin') and payment.student_id != current_user.id:
+            abort(403)
+        student = Student.query.get_or_404(payment.student_id)
+        domain = student.internship_domain or 'Registration'
+    elif payment_type == 'addon':
+        payment = AddonPayment.query.get_or_404(payment_id)
+        if payment.status != 'verified':
+            abort(403)
+        if not session.get('is_admin') and payment.student_id != current_user.id:
+            abort(403)
+        student = Student.query.get_or_404(payment.student_id)
+        domain = payment.domain
+    else:
+        abort(404)
+
+    return render_template('student/receipt_view.html', payment=payment, student=student, domain=domain, type_raw=payment_type)

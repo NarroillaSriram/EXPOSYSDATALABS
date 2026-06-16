@@ -8,7 +8,7 @@
     <h5><i class="fas fa-users me-2" style="color:var(--secondary);"></i>All Students ({{ students|length }})</h5>
     <div class="d-flex gap-2 flex-wrap">
       <a href="{{ url_for('admin.export_students') }}" class="btn btn-sm btn-success">
-        <i class="fas fa-file-csv me-1"></i>Export CSV
+        <i class="fas fa-eye me-1"></i>Preview &amp; Export
       </a>
     </div>
   </div>
@@ -46,6 +46,7 @@
           <th>College</th>
           <th>Domain</th>
           <th>Duration</th>
+          <th>Certificate</th>
           <th>Registered</th>
           <th>Action</th>
         </tr>
@@ -71,20 +72,53 @@
           </td>
           <td style="font-size:0.82rem;">{{ s.college[:25] }}{% if s.college|length > 25 %}...{% endif %}</td>
           <td>
-            <span style="background:rgba(10,36,99,0.08);color:var(--primary);padding:3px 10px;border-radius:10px;font-size:0.78rem;font-weight:600;">
-              {{ s.internship_domain }}
-            </span>
+            <div class="d-flex flex-column gap-1">
+              {% if s.internship_domain %}
+              <span style="background:rgba(10,36,99,0.08);color:var(--primary);padding:3px 10px;border-radius:10px;font-size:0.78rem;font-weight:600;width:fit-content;white-space:nowrap;">
+                {{ s.internship_domain }} <span style="font-size:0.65rem;opacity:0.75;">(Main)</span>
+              </span>
+              {% endif %}
+              {% for addon in s.addon_payments %}
+                {% if addon.status == 'verified' %}
+                <span style="background:rgba(5,150,105,0.08);color:#059669;padding:3px 10px;border-radius:10px;font-size:0.78rem;font-weight:600;width:fit-content;white-space:nowrap;" title="Add-on Domain">
+                  {{ addon.domain }} <span style="font-size:0.65rem;opacity:0.75;">(Add-on)</span>
+                </span>
+                {% endif %}
+              {% endfor %}
+              {% if not s.internship_domain and not s.addon_payments %}—{% endif %}
+            </div>
           </td>
           <td style="font-size:0.82rem;">{{ s.duration }}</td>
+          <td style="font-size:0.82rem;">
+            {% set cert = s.certificates[0] if s.certificates else none %}
+            {% if cert %}
+              {% if cert.status == 'approved' %}
+                <span class="badge bg-success text-white" style="font-size:0.75rem; padding: 4px 8px;"><i class="fas fa-check-circle me-1"></i>Approved</span>
+              {% elif cert.status == 'held' %}
+                <span class="badge bg-warning text-dark" style="font-size:0.75rem; padding: 4px 8px;"><i class="fas fa-clock me-1"></i>On Hold</span>
+              {% elif cert.status == 'rejected' %}
+                <span class="badge bg-danger text-white" style="font-size:0.75rem; padding: 4px 8px;"><i class="fas fa-times-circle me-1"></i>Rejected</span>
+              {% elif cert.status == 'revoked' %}
+                <span class="badge bg-dark text-danger" style="font-size:0.75rem; padding: 4px 8px; border: 1px dashed #ef4444;"><i class="fas fa-ban me-1"></i>Revoked</span>
+              {% endif %}
+            {% else %}
+              <span class="badge bg-secondary" style="font-size:0.75rem; padding: 4px 8px;">Not Issued</span>
+            {% endif %}
+          </td>
           <td style="font-size:0.82rem;">{{ s.created_at.strftime('%d %b %Y') }}</td>
           <td>
-            <form method="POST" action="{{ url_for('admin.delete_student', student_id=s.id) }}"
-                  onsubmit="return confirm('Delete {{ s.name }}? This cannot be undone.')">
-              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-              <button type="submit" class="btn btn-sm btn-outline-danger">
-                <i class="fas fa-trash"></i>
-              </button>
-            </form>
+            <!-- Step 1: Trash button → opens modal -->
+            <button type="button" class="btn btn-sm btn-outline-danger"
+                    onclick="openDeleteModal(
+                      {{ s.id }},
+                      '{{ s.name | e }}',
+                      '{{ s.email | e }}',
+                      '{{ s.internship_domain | e }}',
+                      '{{ url_for('admin.delete_student', student_id=s.id) }}'
+                    )"
+                    title="Delete student">
+              <i class="fas fa-trash"></i>
+            </button>
           </td>
         </tr>
         {% else %}
@@ -99,4 +133,88 @@
     </table>
   </div>
 </div>
+
+<!-- ═══════════════════════════════════════════════
+     STEP 2: Delete Confirmation Modal
+════════════════════════════════════════════════ -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius:20px;border:none;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.2);">
+
+      <!-- Modal Header -->
+      <div style="background:linear-gradient(135deg,#dc2626,#b91c1c);padding:24px 28px;color:#fff;">
+        <div style="display:flex;align-items:center;gap:14px;">
+          <div style="width:48px;height:48px;background:rgba(255,255,255,0.2);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <i class="fas fa-exclamation-triangle" style="font-size:1.3rem;"></i>
+          </div>
+          <div>
+            <h5 id="deleteModalLabel" style="margin:0;font-weight:800;">Confirm Deletion</h5>
+            <p style="margin:2px 0 0;font-size:0.82rem;color:rgba(255,255,255,0.8);">This action is permanent and cannot be undone.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="modal-body" style="padding:28px;">
+        <p style="color:#374151;font-size:0.9rem;margin-bottom:18px;">
+          You are about to permanently delete the following student and all their associated payment records:
+        </p>
+
+        <!-- Student Info Card -->
+        <div style="background:#fef2f2;border:1.5px solid rgba(220,38,38,0.15);border-radius:14px;padding:16px 20px;margin-bottom:20px;">
+          <div style="display:flex;align-items:center;gap:14px;">
+            <div id="modalAvatar" style="width:44px;height:44px;background:linear-gradient(135deg,#dc2626,#b91c1c);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:1rem;flex-shrink:0;"></div>
+            <div>
+              <div id="modalName" style="font-weight:800;color:#111827;font-size:0.95rem;"></div>
+              <div id="modalEmail" style="font-size:0.8rem;color:#6b7280;"></div>
+              <div id="modalDomain" style="font-size:0.78rem;color:#dc2626;font-weight:600;margin-top:2px;"></div>
+            </div>
+          </div>
+        </div>
+
+        <div style="background:#fff7ed;border:1px solid rgba(234,88,12,0.2);border-radius:10px;padding:12px 16px;font-size:0.8rem;color:#92400e;">
+          <i class="fas fa-info-circle me-2"></i>
+          All payments, records and data linked to this student will also be deleted.
+        </div>
+      </div>
+
+      <!-- Modal Footer — Step 2 confirmation -->
+      <div class="modal-footer" style="padding:16px 28px 24px;border:none;gap:10px;">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal"
+                style="border-radius:10px;padding:10px 22px;font-weight:600;">
+          <i class="fas fa-times me-1"></i> Cancel
+        </button>
+
+        <!-- Hidden form — only submitted on Step 2 confirm -->
+        <form id="deleteForm" method="POST" style="margin:0;">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="btn btn-danger"
+                  style="border-radius:10px;padding:10px 24px;font-weight:700;background:linear-gradient(135deg,#dc2626,#b91c1c);border:none;">
+            <i class="fas fa-trash me-2"></i>Yes, Delete Permanently
+          </button>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  function openDeleteModal(id, name, email, domain, actionUrl) {
+    // Populate modal with student info
+    document.getElementById('modalAvatar').textContent = name.charAt(0).toUpperCase();
+    document.getElementById('modalName').textContent   = name;
+    document.getElementById('modalEmail').textContent  = email;
+    document.getElementById('modalDomain').textContent = domain || 'No domain assigned';
+    document.getElementById('deleteForm').action       = actionUrl;
+
+    // Show modal (Step 2)
+    const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+    modal.show();
+  }
+</script>
 {% endblock %}

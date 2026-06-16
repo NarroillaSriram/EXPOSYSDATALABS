@@ -2,41 +2,73 @@
 {% block title %}Admin Login - Exposys Data Labs{% endblock %}
 
 {% block content %}
-<div class="auth-wrapper" style="background:linear-gradient(135deg,#060e1f,#0a2463);">
-  <div class="auth-card">
-    <div class="auth-logo">
-      <div style="width:60px;height:60px;background:var(--gradient);border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 15px;">
-        <i class="fas fa-shield-alt" style="font-size:1.5rem;color:#fff;"></i>
+<div class="auth-wrapper" style="padding: 100px 20px 60px; min-height: 100vh; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle at 50% 50%, #0d1527 0%, #050a14 100%); position: relative; overflow: hidden;">
+  <!-- High-Tech Neon Glow Orbs -->
+  <div style="position: absolute; width: 350px; height: 350px; background: rgba(0, 245, 255, 0.1); filter: blur(120px); border-radius: 50%; top: -10%; right: 15%; pointer-events: none;"></div>
+  <div style="position: absolute; width: 350px; height: 350px; background: rgba(232, 69, 69, 0.08); filter: blur(120px); border-radius: 50%; bottom: -10%; left: 15%; pointer-events: none;"></div>
+
+  <div class="auth-card" style="background: rgba(13, 21, 39, 0.65); border: 1px solid rgba(0, 245, 255, 0.15); backdrop-filter: blur(25px); border-radius: 24px; padding: 45px 40px; box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1); width: 100%; max-width: 460px; z-index: 5;" data-aos="zoom-in" data-aos-duration="800">
+    <div class="auth-logo text-center mb-4">
+      <div style="width: 65px; height: 65px; background: linear-gradient(135deg, #00f5ff 0%, #0a2463 100%); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; box-shadow: 0 0 20px rgba(0, 245, 255, 0.25);">
+        <i class="fas fa-shield-alt" style="font-size: 1.8rem; color: #fff;"></i>
       </div>
-      <h2>Admin <span>Portal</span></h2>
-      <p>Exposys Data Labs Administration</p>
+      <h2 style="font-weight: 800; font-size: 2.1rem; letter-spacing: -0.5px; margin-bottom: 5px; color: #ffffff;">
+        Admin <span style="background: linear-gradient(135deg, #00f5ff 0%, #ffffff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Portal</span>
+      </h2>
+      <p style="color: #94a3b8; font-size: 0.95rem; font-weight: 500;">Exposys Data Labs Administration</p>
     </div>
 
-    <form method="POST" action="{{ url_for('auth.admin_login') }}">
-      {{ form.hidden_tag() }}
-      <div class="mb-3">
-        <label class="form-label">{{ form.email.label.text }}</label>
-        {{ form.email(class="form-control", placeholder="admin@exposys.com") }}
-        {% for e in form.email.errors %}<div class="text-danger small mt-1">{{ e }}</div>{% endfor %}
-      </div>
-      <div class="mb-4">
-        <label class="form-label">{{ form.password.label.text }}</label>
-        <div class="password-field-container">
-          {{ form.password(class="form-control", placeholder="Admin password", id="password") }}
-          <button type="button" class="password-toggle-btn" data-pw-target="#password" aria-label="Toggle Password Visibility">
-              <i class="fas fa-eye-slash"></i>
-            </button>
+    <!-- Local alerts block inside the card -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="local-alerts mb-3">
+          {% for category, message in messages %}
+            <div class="alert alert-{{ 'danger' if category == 'error' or category == 'danger' else category }} alert-dismissible fade show py-2 px-3 small border-0 shadow-sm" role="alert" style="border-radius: 12px; background: rgba(232, 69, 69, 0.15); color: #ff6b6b; font-weight: 500;">
+              <i class="fas fa-{% if category == 'success' %}check-circle{% else %}exclamation-circle{% endif %} me-2"></i>
+              {{ message }}
+              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" style="padding: 0.85rem 1rem; font-size: 0.75rem;"></button>
+            </div>
+          {% endfor %}
         </div>
-        {% for e in form.password.errors %}<div class="text-danger small mt-1">{{ e }}</div>{% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST" action="{{ url_for('auth.admin_login') }}" novalidate>
+      {{ form.hidden_tag() }}
+      
+      <div class="mb-3">
+        <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">{{ form.email.label.text }}</label>
+        <div class="input-group-custom" style="position: relative;">
+          <i class="fas fa-user-shield" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #64748b; transition: color 0.3s; z-index: 5;"></i>
+          {{ form.email(class="form-control is-invalid" if form.email.errors else "form-control", placeholder="Admin email", style="padding-left: 45px; border-radius: 12px; height: 50px; background: rgba(15, 23, 42, 0.4); border: 1.5px solid rgba(255, 255, 255, 0.1); color: #ffffff; font-weight: 500; transition: all 0.3s;") }}
+        </div>
+        {% for e in form.email.errors %}
+          <div class="text-danger small mt-1 font-medium" style="font-size: 0.82rem;"><i class="fas fa-exclamation-circle me-1"></i>{{ e }}</div>
+        {% endfor %}
       </div>
-      <button type="submit" class="btn-primary-custom w-100">
-        <i class="fas fa-lock-open me-2"></i>Admin Login
+
+      <div class="mb-4">
+        <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">{{ form.password.label.text }}</label>
+        <div class="password-field-container" style="position: relative; display: flex; align-items: center;">
+          <i class="fas fa-key" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #64748b; transition: color 0.3s; z-index: 5;"></i>
+          {{ form.password(class="form-control is-invalid" if form.password.errors else "form-control", placeholder="Admin password", id="password", style="padding-left: 45px; padding-right: 45px; border-radius: 12px; height: 50px; background: rgba(15, 23, 42, 0.4); border: 1.5px solid rgba(255, 255, 255, 0.1); color: #ffffff; font-weight: 500; width: 100%; transition: all 0.3s;") }}
+          <button type="button" class="password-toggle-btn" data-pw-target="#password" aria-label="Toggle Password Visibility" style="position: absolute; right: 12px; background: transparent; border: none; color: #64748b; cursor: pointer; display: flex; align-items: center; justify-content: center; height: 100%; padding: 0 10px; z-index: 10; font-size: 1.1rem;">
+            <i class="fas fa-eye-slash"></i>
+          </button>
+        </div>
+        {% for e in form.password.errors %}
+          <div class="text-danger small mt-1 font-medium" style="font-size: 0.82rem;"><i class="fas fa-exclamation-circle me-1"></i>{{ e }}</div>
+        {% endfor %}
+      </div>
+
+      <button type="submit" class="btn-primary-custom w-100 mb-3" style="height: 50px; border-radius: 12px; font-weight: 700; font-size: 1rem; display: flex; align-items: center; justify-content: center; gap: 8px; border: none; background: linear-gradient(135deg, #00f5ff 0%, #0088ff 100%); color: #0d1527; box-shadow: 0 10px 25px rgba(0, 245, 255, 0.15); transition: all 0.3s;">
+        <i class="fas fa-lock-open"></i> Authenticate
       </button>
     </form>
 
     <div class="text-center mt-4">
-      <a href="{{ url_for('main.index') }}" style="color:var(--text-muted);font-size:0.88rem;">
-        <i class="fas fa-arrow-left me-1"></i>Back to Website
+      <a href="{{ url_for('main.index') }}" style="color: #94a3b8; font-size: 0.88rem; text-decoration: none; border-bottom: 2px solid transparent; transition: all 0.2s; font-weight: 500;" onmouseover="this.style.color='#00f5ff'; this.style.borderBottomColor='#00f5ff'" onmouseout="this.style.color='#94a3b8'; this.style.borderBottomColor='transparent'">
+        <i class="fas fa-arrow-left me-1"></i> Back to Website
       </a>
     </div>
   </div>

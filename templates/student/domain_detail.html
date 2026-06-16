@@ -1,241 +1,519 @@
 {% extends "student/base_student.html" %}
 {% block title %}{{ domain }} Internship - Exposys{% endblock %}
-{% block page_title %}{{ domain }}{% endblock %}
+{% block page_title %}{{ domain }} Program{% endblock %}
 
 {% block content %}
 <style>
-  .domain-hero {
-    background: linear-gradient(135deg, var(--primary) 0%, #1a3a8f 100%);
-    border-radius: 20px; padding: 36px 40px; color: #fff;
-    margin-bottom: 28px; position: relative; overflow: hidden;
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+  /* Typography & Core Styling */
+  .domain-detail-page {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: #1f2937;
+    animation: pageFadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
   }
-  .domain-hero::before {
-    content: ''; position: absolute; top: -50px; right: -50px;
-    width: 220px; height: 220px; background: rgba(255,255,255,0.05); border-radius: 50%;
+  .heading-font {
+    font-family: 'Outfit', sans-serif;
   }
-  .domain-hero::after {
-    content: ''; position: absolute; bottom: -60px; left: -30px;
-    width: 160px; height: 160px; background: rgba(255,255,255,0.04); border-radius: 50%;
+
+  /* Fade in animation keyframes */
+  @keyframes pageFadeIn {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
   }
-  .badge-access {
-    display: inline-flex; align-items: center; gap: 6px;
-    background: #d1fae5; color: #065f46; border: 1px solid #10b981;
-    border-radius: 20px; padding: 4px 14px; font-size: 0.78rem; font-weight: 700;
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
   }
-  .tech-pill {
-    display: inline-block; background: rgba(255,255,255,0.15);
-    color: #fff; border-radius: 20px; padding: 4px 14px;
-    font-size: 0.78rem; font-weight: 600; margin: 3px 3px 3px 0;
-    border: 1px solid rgba(255,255,255,0.2);
+
+  /* Cascade animations delay classes */
+  .anim-delay-1 { animation-delay: 0.1s; }
+  .anim-delay-2 { animation-delay: 0.2s; }
+  .anim-delay-3 { animation-delay: 0.3s; }
+  .anim-delay-4 { animation-delay: 0.4s; }
+
+  /* Premium Glassmorphic Hero Banner */
+  .domain-hero-card {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+    border-radius: 24px;
+    padding: 48px 40px;
+    color: #ffffff;
+    margin-bottom: 36px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.08);
   }
-  .section-card {
-    background: #fff; border-radius: 16px; padding: 28px;
-    border: 1px solid rgba(10,36,99,0.08); height: 100%;
+  .domain-hero-card::before {
+    content: '';
+    position: absolute;
+    top: -80px;
+    right: -80px;
+    width: 250px;
+    height: 250px;
+    background: radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
   }
-  .section-card-title {
-    font-weight: 800; color: var(--primary); font-size: 1rem;
-    margin-bottom: 20px; display: flex; align-items: center; gap: 10px;
+  .domain-hero-card::after {
+    content: '';
+    position: absolute;
+    bottom: -90px;
+    left: -50px;
+    width: 200px;
+    height: 200px;
+    background: radial-gradient(circle, rgba(232, 69, 69, 0.15) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
   }
-  .section-card-title .title-icon {
-    width: 38px; height: 38px; border-radius: 10px;
-    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+
+  /* Massive background decorative icon */
+  .hero-bg-icon {
+    position: absolute;
+    right: 40px;
+    bottom: -20px;
+    font-size: 14rem;
+    color: rgba(255, 255, 255, 0.03);
+    pointer-events: none;
+    transform: rotate(12deg);
+    transition: all 0.6s ease;
   }
-  .task-item {
-    display: flex; align-items: flex-start; gap: 12px;
-    padding: 10px 0; border-bottom: 1px solid rgba(10,36,99,0.05);
-    font-size: 0.875rem; color: #374151;
+  .domain-hero-card:hover .hero-bg-icon {
+    transform: rotate(18deg) scale(1.05);
+    color: rgba(255, 255, 255, 0.05);
   }
-  .task-item:last-child { border-bottom: none; }
-  .task-bullet {
-    width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 0.7rem; font-weight: 800; color: #fff;
-    background: var(--primary); margin-top: 1px;
+
+  .badge-granted {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(16, 185, 129, 0.25));
+    color: #34d399;
+    border: 1px solid rgba(52, 211, 153, 0.3);
+    border-radius: 30px;
+    padding: 6px 16px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.1);
   }
-  .outcome-card {
-    background: var(--light); border-radius: 12px; padding: 16px;
-    display: flex; align-items: flex-start; gap: 14px;
-    border: 1px solid rgba(10,36,99,0.06);
+
+  .tech-pill-premium {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.06);
+    color: #f1f5f9;
+    border-radius: 12px;
+    padding: 6px 16px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin: 4px 6px 4px 0;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(4px);
     transition: all 0.25s ease;
   }
-  .outcome-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(10,36,99,0.10); border-color: var(--secondary); }
-  .outcome-icon {
-    width: 42px; height: 42px; border-radius: 12px; flex-shrink: 0;
-    display: flex; align-items: center; justify-content: center;
-    background: linear-gradient(135deg, var(--primary), #1a3a8f);
+  .tech-pill-premium:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.25);
+    transform: translateY(-1px);
   }
-  .outcome-icon i { color: #fff; font-size: 1rem; }
-  .roadmap-step {
-    display: flex; align-items: flex-start; gap: 16px;
-    padding: 16px 0; border-bottom: 1px solid rgba(10,36,99,0.06);
+
+  /* Cards Styling */
+  .premium-card {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 32px;
+    border: 1px solid rgba(15, 23, 42, 0.06);
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.03);
+    height: 100%;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   }
-  .roadmap-step:last-child { border-bottom: none; }
-  .step-num {
-    width: 38px; height: 38px; border-radius: 50%; flex-shrink: 0;
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
-    color: #fff; font-weight: 800; font-size: 0.85rem;
-    display: flex; align-items: center; justify-content: center;
+  .premium-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.07);
+    border-color: rgba(15, 23, 42, 0.1);
   }
-  .info-highlight {
-    background: linear-gradient(135deg, rgba(10,36,99,0.04), rgba(26,58,143,0.04));
-    border-radius: 12px; padding: 20px;
-    border-left: 4px solid var(--secondary);
-    font-size: 0.85rem; color: var(--text-muted);
+
+  .card-header-premium {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 800;
+    color: #0f172a;
+    font-size: 1.15rem;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .card-header-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+  }
+
+  /* Tasks Styling */
+  .task-list-container {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .task-item-premium {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 16px 20px;
+    transition: all 0.25s ease;
+  }
+  .task-item-premium:hover {
+    background: #ffffff;
+    border-color: var(--primary);
+    box-shadow: 0 8px 20px rgba(10, 36, 99, 0.06);
+    transform: translateX(4px);
+  }
+  .task-num-badge {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary) 0%, #1e3a8a 100%);
+    color: #ffffff;
+    font-weight: 800;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 4px 8px rgba(10, 36, 99, 0.15);
+  }
+  .task-text {
+    font-size: 0.88rem;
+    color: #334155;
+    font-weight: 600;
+    flex: 1;
+    line-height: 1.5;
+  }
+  .task-status-icon {
+    color: #10b981;
+    font-size: 1rem;
+    opacity: 0.4;
+    transition: all 0.25s ease;
+  }
+  .task-item-premium:hover .task-status-icon {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+
+  /* Outcomes Cards Styling */
+  .outcome-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .outcome-card-premium {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 18px;
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    transition: all 0.25s ease;
+  }
+  .outcome-card-premium:hover {
+    background: #ffffff;
+    border-color: #10b981;
+    box-shadow: 0 10px 25px rgba(16, 185, 129, 0.08);
+    transform: translateY(-2px);
+  }
+  .outcome-icon-wrap {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: #ffffff;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+  }
+  .outcome-title {
+    font-weight: 700;
+    font-size: 0.92rem;
+    color: #0f172a;
+    font-family: 'Outfit', sans-serif;
+  }
+  .outcome-desc {
+    font-size: 0.8rem;
+    color: #64748b;
+    margin-top: 4px;
+    line-height: 1.4;
+  }
+
+  /* Benefits Row Styling */
+  .benefit-item-premium {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 0;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  .benefit-item-premium:last-child {
+    border-bottom: none;
+  }
+  .benefit-icon-box {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: rgba(245, 166, 35, 0.1);
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 0.95rem;
+    box-shadow: 0 2px 6px rgba(245, 166, 35, 0.04);
+  }
+  .benefit-label {
+    font-weight: 700;
+    font-size: 0.88rem;
+    color: #0f172a;
+  }
+  .benefit-desc {
+    font-size: 0.78rem;
+    color: #64748b;
+    margin-top: 1px;
+  }
+
+  /* Roadmap Section with Connector Line */
+  .roadmap-container-premium {
+    position: relative;
+    padding: 10px 0;
+  }
+  .roadmap-line {
+    position: absolute;
+    left: 21px;
+    top: 30px;
+    bottom: 30px;
+    width: 2px;
+    background: linear-gradient(to bottom, var(--primary) 0%, #a5b4fc 50%, #10b981 100%);
+    z-index: 1;
+  }
+  .roadmap-step-premium {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: 24px;
+    padding: 20px 0 20px 0;
+    z-index: 2;
+  }
+  .step-num-premium {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #ffffff;
+    border: 3px solid var(--primary);
+    color: var(--primary);
+    font-weight: 900;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+  }
+  .roadmap-step-premium:hover .step-num-premium {
+    background: var(--primary);
+    color: #ffffff;
+    transform: scale(1.1);
+    box-shadow: 0 6px 15px rgba(10, 36, 99, 0.3);
+  }
+  .step-card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 20px;
+    flex: 1;
+    transition: all 0.3s ease;
+  }
+  .roadmap-step-premium:hover .step-card {
+    background: #ffffff;
+    border-color: #a5b4fc;
+    box-shadow: 0 10px 25px rgba(165, 180, 252, 0.15);
+    transform: translateX(4px);
+  }
+  .step-title {
+    font-weight: 800;
+    font-size: 0.95rem;
+    color: #0f172a;
+    font-family: 'Outfit', sans-serif;
+  }
+  .step-desc {
+    font-size: 0.84rem;
+    color: #475569;
+    margin-top: 6px;
+    line-height: 1.5;
   }
 </style>
 
-<!-- Hero Banner -->
-<div class="domain-hero">
-  <div style="position:relative;z-index:1;">
-    <span class="badge-access mb-3 d-inline-flex">
-      <i class="fas fa-check-circle"></i> Access Granted
-    </span>
-    <div class="d-flex align-items-center gap-3 mb-2 mt-2">
-      <div style="width:54px;height:54px;background:rgba(255,255,255,0.15);border-radius:14px;display:flex;align-items:center;justify-content:center;">
-        <i class="fas {{ content.icon }}" style="font-size:1.5rem;color:var(--accent);"></i>
-      </div>
-      <h2 style="font-size:1.8rem;font-weight:800;margin:0;">{{ domain }}</h2>
-    </div>
-    <p style="color:rgba(255,255,255,0.8);margin:0 0 16px;max-width:600px;">
-      Welcome, <strong>{{ student.name }}</strong>! You have full access to this internship program.
-      Work on real tasks, build your portfolio, and earn your certificate.
-    </p>
-    <div>
-      {% for tech in content.technologies %}
-        <span class="tech-pill">{{ tech }}</span>
-      {% endfor %}
-    </div>
-  </div>
-</div>
+<div class="domain-detail-page py-3">
 
-<!-- Main Content Grid -->
-<div class="row g-4 mb-4">
-
-  <!-- Internship Tasks -->
-  <div class="col-lg-7">
-    <div class="section-card">
-      <div class="section-card-title">
-        <div class="title-icon" style="background:linear-gradient(135deg,var(--primary),#1a3a8f);">
-          <i class="fas fa-tasks" style="color:#fff;font-size:1rem;"></i>
+  <!-- Premium Hero Header -->
+  <div class="domain-hero-card">
+    <!-- Big rotating shadow icon in the background -->
+    <i class="fas {{ content.icon }} hero-bg-icon"></i>
+    
+    <div style="position:relative;z-index:2;">
+      <span class="badge-granted mb-3">
+        <i class="fas fa-shield-alt"></i> Access Active
+      </span>
+      
+      <div class="d-flex align-items-center gap-3 mb-3 mt-2">
+        <div style="width:60px;height:60px;background:rgba(255,255,255,0.1);backdrop-filter:blur(8px);border-radius:16px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.2);">
+          <i class="fas {{ content.icon }}" style="font-size:1.8rem;color:var(--accent);"></i>
         </div>
-        Internship Tasks
-        <span style="margin-left:auto;background:rgba(10,36,99,0.08);color:var(--primary);font-size:0.72rem;padding:3px 10px;border-radius:20px;font-weight:700;">
-          {{ content.tasks | length }} Tasks
-        </span>
+        <h1 class="heading-font" style="font-size:2.2rem;font-weight:900;margin:0;letter-spacing:-0.5px;">{{ domain }} Internship</h1>
       </div>
-      {% for task in content.tasks %}
-      <div class="task-item">
-        <div class="task-bullet">{{ loop.index }}</div>
-        <span>{{ task }}</span>
-      </div>
-      {% endfor %}
-    </div>
-  </div>
-
-  <!-- Right Column -->
-  <div class="col-lg-5">
-    <!-- Learning Outcomes -->
-    <div class="section-card mb-4">
-      <div class="section-card-title">
-        <div class="title-icon" style="background:linear-gradient(135deg,#10b981,#059669);">
-          <i class="fas fa-graduation-cap" style="color:#fff;font-size:1rem;"></i>
-        </div>
-        Learning Outcomes
-      </div>
-      <div class="d-flex flex-column gap-3">
-        {% for icon, title, desc in content.outcomes %}
-        <div class="outcome-card">
-          <div class="outcome-icon">
-            <i class="fas {{ icon }}"></i>
-          </div>
-          <div>
-            <div style="font-weight:700;font-size:0.88rem;color:var(--primary);">{{ title }}</div>
-            <div style="font-size:0.79rem;color:var(--text-muted);margin-top:2px;">{{ desc }}</div>
-          </div>
-        </div>
+      
+      <p style="color:rgba(241,245,249,0.85);margin:0 0 24px;max-width:620px;font-size:0.95rem;line-height:1.6;">
+        Welcome back, <strong>{{ student.name }}</strong>! Your credentials have been authorized. Explore your personalized task sheets, track learning objectives, and review your orientation dashboard.
+      </p>
+      
+      <div style="display:flex;flex-wrap:wrap;gap:4px;">
+        {% for tech in content.technologies %}
+          <span class="tech-pill-premium">{{ tech }}</span>
         {% endfor %}
       </div>
     </div>
+  </div>
 
-    <!-- Quick Info -->
-    <div class="section-card">
-      <div class="section-card-title">
-        <div class="title-icon" style="background:linear-gradient(135deg,#f59e0b,#d97706);">
-          <i class="fas fa-info-circle" style="color:#fff;font-size:1rem;"></i>
+  <!-- Primary Content Layout Grid -->
+  <div class="row g-4 mb-4">
+    
+    <!-- Left Column: Internship Tasks (Lighter and Clean) -->
+    <div class="col-lg-7">
+      <div class="premium-card">
+        <div class="card-header-premium">
+          <div class="card-header-icon" style="background:rgba(10,36,99,0.08);color:var(--primary);">
+            <i class="fas fa-tasks"></i>
+          </div>
+          <span>Internship Assignments</span>
+          <span style="margin-left:auto;background:rgba(10,36,99,0.08);color:var(--primary);font-size:0.75rem;padding:4px 12px;border-radius:20px;font-weight:700;">
+            {{ content.tasks | length }} Modules
+          </span>
         </div>
-        Program Benefits
+        
+        <div class="task-list-container">
+          {% for task in content.tasks %}
+          <div class="task-item-premium" style="animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both; animation-delay: {{ loop.index0 * 0.05 }}s;">
+            <div class="task-num-badge">{{ loop.index }}</div>
+            <div class="task-text">{{ task }}</div>
+            <i class="fas fa-check-circle task-status-icon"></i>
+          </div>
+          {% endfor %}
+        </div>
       </div>
-      {% for icon, label, value in [
-        ('fa-certificate', 'Certificate', 'Industry-recognized on completion'),
-        ('fa-file-alt', 'Letter of Recommendation', 'From Exposys Data Labs'),
-        ('fa-user-tie', 'Expert Mentorship', 'Guided by industry professionals'),
-        ('fa-project-diagram', 'Live Project', 'Real-world project experience'),
-        ('fa-envelope', 'Resources via Email', 'Delivered within 24 hrs of verification'),
+    </div>
+
+    <!-- Right Column: Benefits & Learning Outcomes -->
+    <div class="col-lg-5">
+      <div class="d-flex flex-column gap-4">
+        
+        <!-- Learning Outcomes -->
+        <div class="premium-card">
+          <div class="card-header-premium">
+            <div class="card-header-icon" style="background:rgba(16,185,129,0.08);color:#10b981;">
+              <i class="fas fa-graduation-cap"></i>
+            </div>
+            <span>Target Learning Outcomes</span>
+          </div>
+          
+          <div class="outcome-grid">
+            {% for icon, title, desc in content.outcomes %}
+            <div class="outcome-card-premium">
+              <div class="outcome-icon-wrap">
+                <i class="fas {{ icon }}"></i>
+              </div>
+              <div style="flex:1;">
+                <div class="outcome-title">{{ title }}</div>
+                <div class="outcome-desc">{{ desc }}</div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Program Benefits -->
+        <div class="premium-card">
+          <div class="card-header-premium">
+            <div class="card-header-icon" style="background:rgba(245,166,35,0.08);color:var(--accent);">
+              <i class="fas fa-gift"></i>
+            </div>
+            <span>Internship Privileges</span>
+          </div>
+          
+          <div class="d-flex flex-column">
+            {% for icon, label, value in [
+              ('fa-certificate', 'Official Certificate', 'Verifiable and industry-recognized credential'),
+              ('fa-file-alt', 'Letter of Recommendation', 'Performance-based recommendation from mentors'),
+              ('fa-user-tie', 'Corporate Mentorship', 'Direct orientation loops with stack leads'),
+              ('fa-project-diagram', 'Live Capstone Project', 'End-to-end practical client simulator case'),
+              ('fa-envelope', 'Cloud Sync Materials', 'Direct study packages delivered via mail server'),
+            ] %}
+            <div class="benefit-item-premium">
+              <div class="benefit-icon-box">
+                <i class="fas {{ icon }}"></i>
+              </div>
+              <div style="flex:1;">
+                <div class="benefit-label">{{ label }}</div>
+                <div class="benefit-desc">{{ value }}</div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Connected Roadmap Section -->
+  <div class="premium-card mb-4">
+    <div class="card-header-premium">
+      <div class="card-header-icon" style="background:rgba(99,102,241,0.08);color:#6366f1;">
+        <i class="fas fa-route"></i>
+      </div>
+      <span>Your Internship Journey Roadmap</span>
+    </div>
+    
+    <div class="roadmap-container-premium">
+      <div class="roadmap-line"></div>
+      
+      {% for num, title, desc in [
+        ('1', 'Orientation & Onboarding', 'Receive your onboarding brief, project directives, mentor contact listings, and repository materials.'),
+        ('2', 'Skills Development Loops', 'Analyze core documentation guides, reference repository codes, and complete learning assignments.'),
+        ('3', 'Capstone Project Phase', 'Collaborate on the program design framework and create clean source components with mentoring assistance.'),
+        ('4', 'Code Submission & Review', 'Push your commits to evaluation. Review constructive code comments and refactor parameters.'),
+        ('5', 'Release & Certification', 'Graduate the course guidelines and retrieve your official credential tokens and reference letter.')
       ] %}
-      <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(10,36,99,0.05);">
-        <i class="fas {{ icon }}" style="color:var(--secondary);width:18px;text-align:center;"></i>
-        <div>
-          <div style="font-weight:700;font-size:0.83rem;color:var(--primary);">{{ label }}</div>
-          <div style="font-size:0.78rem;color:var(--text-muted);">{{ value }}</div>
+      <div class="roadmap-step-premium" style="animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both; animation-delay: {{ loop.index0 * 0.1 }}s;">
+        <div class="step-num-premium">{{ num }}</div>
+        <div class="step-card">
+          <div class="step-title">{{ title }}</div>
+          <div class="step-desc">{{ desc }}</div>
         </div>
       </div>
       {% endfor %}
     </div>
   </div>
-</div>
 
-<!-- Learning Roadmap -->
-<div class="section-card mb-4">
-  <div class="section-card-title">
-    <div class="title-icon" style="background:linear-gradient(135deg,#6366f1,#4f46e5);">
-      <i class="fas fa-road" style="color:#fff;font-size:1rem;"></i>
-    </div>
-    Your Learning Roadmap
-  </div>
-  <div class="row g-0">
-    {% for num, title, desc in [
-      ('1', 'Orientation & Onboarding', 'Receive your joining kit, mentor introduction, program schedule, and study materials via email.'),
-      ('2', 'Core Learning Phase', 'Study domain-specific materials, attend mentorship sessions, and complete learning modules.'),
-      ('3', 'Live Project Development', 'Work on a real-world project under expert guidance. Apply your skills to solve actual problems.'),
-      ('4', 'Submission & Review', 'Submit your project, receive detailed feedback from mentors, and incorporate improvements.'),
-      ('5', 'Certification & Completion', 'Receive your industry-recognized certificate and Letter of Recommendation from Exposys Data Labs.'),
-    ] %}
-    <div class="col-12">
-      <div class="roadmap-step">
-        <div class="step-num">{{ num }}</div>
-        <div>
-          <div style="font-weight:700;font-size:0.9rem;color:var(--primary);">{{ title }}</div>
-          <div style="font-size:0.82rem;color:var(--text-muted);margin-top:3px;">{{ desc }}</div>
-        </div>
-      </div>
-    </div>
-    {% endfor %}
-  </div>
-</div>
-
-<!-- Info + Support CTA -->
-<div class="row g-4">
-  <div class="col-md-6">
-    <div class="info-highlight">
-      <div style="font-weight:700;color:var(--primary);margin-bottom:6px;">
-        <i class="fas fa-envelope me-2" style="color:var(--secondary);"></i>What happens next?
-      </div>
-      Our team will send you the complete study materials, project brief, and mentor details
-      to your registered email (<strong>{{ student.email }}</strong>) within 24 hours of payment verification.
-    </div>
-  </div>
-  <div class="col-md-6">
-    <div style="background:#fff;border-radius:12px;padding:20px;border:1px solid rgba(10,36,99,0.08);display:flex;align-items:center;gap:16px;flex-wrap:wrap;height:100%;">
-      <div style="flex:1;min-width:150px;">
-        <div style="font-weight:700;color:var(--primary);margin-bottom:4px;">Need Help?</div>
-        <div style="font-size:0.82rem;color:var(--text-muted);">
-          Reach out for queries about your <strong>{{ domain }}</strong> program.
-        </div>
-      </div>
-      <a href="{{ url_for('main.contact') }}" class="btn btn-primary" style="border-radius:10px;font-weight:700;padding:10px 20px;white-space:nowrap;">
-        <i class="fas fa-envelope me-2"></i>Contact Support
-      </a>
-    </div>
-  </div>
 </div>
 {% endblock %}

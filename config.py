@@ -5,6 +5,8 @@ load_dotenv()
 
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY', 'exposys_fallback_key')
+    WTF_CSRF_SECRET_KEY = os.environ.get('SECRET_KEY', 'exposys_fallback_key')
+    WTF_CSRF_TIME_LIMIT = None  # Tokens never expire — avoids "CSRF token expired" errors
     # Cloud DB: set DATABASE_URL in .env (e.g. from Neon/Supabase)
     # Local DB: set individual DB_* variables
     _db_url = os.environ.get('DATABASE_URL', '')
@@ -21,6 +23,21 @@ class Config:
         )
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    # Fix Neon/cloud DB idle connection drops
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        'pool_pre_ping': True,       # Test connection before using — auto-reconnects if dropped
+        'pool_recycle': 280,         # Recycle connections every 4.5 min (Neon drops after 5 min idle)
+        'pool_size': 5,
+        'max_overflow': 2,
+        'connect_args': {
+            'connect_timeout': 10,
+            'keepalives': 1,
+            'keepalives_idle': 30,
+            'keepalives_interval': 10,
+            'keepalives_count': 5,
+        }
+    }
+
     UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'uploads')
     MAX_CONTENT_LENGTH = 5 * 1024 * 1024  # 5MB
     ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'pdf'}

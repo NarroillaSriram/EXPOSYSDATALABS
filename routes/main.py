@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, flash, redirect, url_for, request
-from models.models import Contact, Internship, AddonPayment
+from models.models import Contact, Internship, AddonPayment, Payment
 from models import db
 from forms import ContactForm
 from flask_login import login_required, current_user
@@ -14,6 +14,50 @@ main_bp = Blueprint('main', __name__)
 def index():
     internships = Internship.query.filter_by(is_active=True).limit(6).all()
     return render_template('index.html', internships=internships)
+
+
+@main_bp.route('/go-to-domain/<path:domain_name>')
+def go_to_domain(domain_name):
+    # Map display names from the homepage to standard choice keys from forms.py
+    mapping = {
+        'Data Science / ML / AI': 'Data Science / ML / AI Intern',
+        'UI/UX Design': 'UI/UX Designer',
+    }
+    form_domain = mapping.get(domain_name, domain_name)
+
+    if not current_user.is_authenticated:
+        return redirect(url_for('auth.register', domain=form_domain))
+
+    # If logged in as student
+    if isinstance(current_user._get_current_object(), Student):
+        # Check if they have verified main payment
+        has_payment = Payment.query.filter_by(student_id=current_user.id, status='verified').first() is not None
+        if not has_payment:
+            return redirect(url_for('student.payment'))
+
+        # Check if they have access to this domain
+        is_registered = current_user.internship_domain and current_user.internship_domain.lower() == form_domain.lower()
+        is_verified_addon = AddonPayment.query.filter_by(
+            student_id=current_user.id, domain=form_domain, status='verified'
+        ).first() is not None
+
+        if is_registered or is_verified_addon:
+            return redirect(url_for('student.domain_detail', domain=form_domain))
+        
+        # Check if they have a pending addon
+        is_pending_addon = AddonPayment.query.filter_by(
+            student_id=current_user.id, domain=form_domain, status='pending'
+        ).first() is not None
+        
+        if is_pending_addon:
+            flash(f'Payment for {form_domain} is pending verification.', 'info')
+            return redirect(url_for('main.internships'))
+        
+        # Otherwise redirect to unlock addon
+        return redirect(url_for('student.addon_payment', domain=form_domain))
+    
+    # If logged in as admin or other non-student
+    return redirect(url_for('admin.dashboard'))
 
 
 @main_bp.route('/about')

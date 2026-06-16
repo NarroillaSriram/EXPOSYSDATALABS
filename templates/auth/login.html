@@ -2,52 +2,81 @@
 {% block title %}Student Login - Exposys Data Labs{% endblock %}
 
 {% block content %}
-<div class="auth-wrapper" style="padding-top:100px; min-height:100vh; display:flex; align-items:center; justify-content:center; background:var(--gradient);">
-  <div class="auth-card" data-aos="zoom-in" data-aos-duration="1000">
+<div class="auth-wrapper" style="padding: 100px 20px 60px; min-height: 100vh; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle at 10% 20%, rgba(10, 36, 99, 1) 0%, rgba(13, 17, 30, 1) 90%); position: relative; overflow: hidden;">
+  <!-- Background Glow Orbs -->
+  <div style="position: absolute; width: 300px; height: 300px; background: rgba(232, 69, 69, 0.15); filter: blur(100px); border-radius: 50%; top: 10%; left: 10%; pointer-events: none;"></div>
+  <div style="position: absolute; width: 400px; height: 400px; background: rgba(10, 36, 99, 0.4); filter: blur(120px); border-radius: 50%; bottom: 10%; right: 10%; pointer-events: none;"></div>
+
+  <div class="auth-card" data-aos="zoom-in" data-aos-duration="800" style="background: rgba(255, 255, 255, 0.95); border: 1px solid rgba(255, 255, 255, 0.5); backdrop-filter: blur(20px); border-radius: 24px; padding: 45px 40px; box-shadow: 0 20px 50px rgba(10, 36, 99, 0.15); width: 100%; max-width: 460px; z-index: 5;">
+    
     <div class="auth-logo text-center mb-4">
-      <h2 style="font-weight:800; color:var(--primary); font-size: 2rem;">Exposys <span style="color:var(--secondary);">Data</span> Labs</h2>
-      <p style="color:var(--text-muted); font-size: 1rem;">Student Portal Login</p>
+      <h2 style="font-weight: 800; font-size: 2.2rem; letter-spacing: -0.5px; margin-bottom: 5px;">
+        <span style="color: var(--primary);">Exposys</span> <span style="background: linear-gradient(135deg, var(--secondary) 0%, #ff6b6b 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Data</span> <span style="color: var(--primary);">Labs</span>
+      </h2>
+      <p style="color: var(--text-muted); font-size: 0.95rem; font-weight: 500;">Student Portal Login</p>
     </div>
 
-    <form method="POST" action="{{ url_for('auth.login') }}">
+    <!-- Local alerts block inside the card -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="local-alerts mb-3 animate__animated animate__fadeIn">
+          {% for category, message in messages %}
+            <div class="alert alert-{{ 'danger' if category == 'error' or category == 'danger' else category }} alert-dismissible fade show py-2 px-3 small border-0 shadow-sm" role="alert" style="border-radius: 12px; font-weight: 500;">
+              <i class="fas fa-{% if category == 'success' %}check-circle{% else %}exclamation-circle{% endif %} me-2"></i>
+              {{ message }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" style="padding: 0.85rem 1rem; font-size: 0.75rem;"></button>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST" action="{{ url_for('auth.login') }}" novalidate>
       {{ form.hidden_tag() }}
+      
       <div class="mb-3">
-        <label class="form-label">{{ form.email.label.text }}</label>
-        {{ form.email(class="form-control", placeholder="your@email.com") }}
-        {% for e in form.email.errors %}<div class="text-danger small mt-1">{{ e }}</div>{% endfor %}
-      </div>
-      <div class="mb-3">
-        <label class="form-label">{{ form.password.label.text }}</label>
-        <div class="password-field-container">
-          {{ form.password(class="form-control", placeholder="Your password", id="password") }}
-          <button type="button" class="password-toggle-btn" data-pw-target="#password" aria-label="Toggle Password Visibility">
-              <i class="fas fa-eye-slash"></i>
-            </button>
+        <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #4a5568; text-transform: uppercase; letter-spacing: 0.5px;">{{ form.email.label.text }}</label>
+        <div class="input-group-custom" style="position: relative;">
+          <i class="fas fa-envelope" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #a0aec0; transition: color 0.3s; z-index: 5;"></i>
+          {{ form.email(class="form-control is-invalid" if form.email.errors else "form-control", placeholder="your@email.com", style="padding-left: 45px; border-radius: 12px; height: 50px; border: 1.5px solid #e2e8f0; font-weight: 500; transition: all 0.3s;") }}
         </div>
-        {% for e in form.password.errors %}<div class="text-danger small mt-1">{{ e }}</div>{% endfor %}
+        {% for e in form.email.errors %}
+          <div class="text-danger small mt-1 font-medium" style="font-size: 0.82rem;"><i class="fas fa-exclamation-circle me-1"></i>{{ e }}</div>
+        {% endfor %}
       </div>
+
+      <div class="mb-3">
+        <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #4a5568; text-transform: uppercase; letter-spacing: 0.5px;">{{ form.password.label.text }}</label>
+        <div class="password-field-container" style="position: relative; display: flex; align-items: center;">
+          <i class="fas fa-lock" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #a0aec0; transition: color 0.3s; z-index: 5;"></i>
+          {{ form.password(class="form-control is-invalid" if form.password.errors else "form-control", placeholder="••••••••", id="password", style="padding-left: 45px; padding-right: 45px; border-radius: 12px; height: 50px; border: 1.5px solid #e2e8f0; font-weight: 500; width: 100%; transition: all 0.3s;") }}
+          <button type="button" class="password-toggle-btn" data-pw-target="#password" aria-label="Toggle Password Visibility" style="position: absolute; right: 12px; background: transparent; border: none; color: #a0aec0; cursor: pointer; display: flex; align-items: center; justify-content: center; height: 100%; padding: 0 10px; z-index: 10; font-size: 1.1rem;">
+            <i class="fas fa-eye-slash"></i>
+          </button>
+        </div>
+        {% for e in form.password.errors %}
+          <div class="text-danger small mt-1 font-medium" style="font-size: 0.82rem;"><i class="fas fa-exclamation-circle me-1"></i>{{ e }}</div>
+        {% endfor %}
+      </div>
+
       <div class="mb-4 d-flex justify-content-between align-items-center">
-        <div class="form-check">
-          {{ form.remember(class="form-check-input") }}
-          <label class="form-check-label" style="font-size:0.88rem;">Remember me</label>
+        <div class="form-check d-flex align-items-center gap-2">
+          {{ form.remember(class="form-check-input", style="width: 17px; height: 17px; border-radius: 4px; border: 1.5px solid #cbd5e0; cursor: pointer; margin-top: 0;") }}
+          <label class="form-check-label" style="font-size: 0.88rem; font-weight: 500; color: #4a5568; cursor: pointer; line-height: 1;">Remember me</label>
         </div>
       </div>
-      <button type="submit" class="btn-primary-custom w-100 mb-3">
-        <i class="fas fa-sign-in-alt me-2"></i>Login
+
+      <button type="submit" class="btn-primary-custom w-100 mb-3" style="height: 50px; border-radius: 12px; font-weight: 700; font-size: 1rem; display: flex; align-items: center; justify-content: center; gap: 8px; border: none; background: linear-gradient(135deg, var(--primary) 0%, #1e3a8a 100%); color: #fff; box-shadow: 0 10px 20px rgba(10, 36, 99, 0.2); transition: all 0.3s;">
+        <i class="fas fa-sign-in-alt"></i> Login
       </button>
-      <a href="{{ url_for('auth.login_google') }}" class="btn btn-outline-dark w-100" style="padding:12px; font-weight:600; border-radius:8px;">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google" style="width:20px; margin-right:8px; margin-top:-2px;">
-        Login with Google
-      </a>
     </form>
 
-    <div class="auth-divider">or</div>
-    <div class="text-center">
-      <p style="font-size:0.9rem;color:var(--text-muted);">
-        New student? <a href="{{ url_for('auth.register') }}" style="color:var(--secondary);font-weight:600;">Register here</a>
+    <div class="text-center mt-4">
+      <p style="font-size: 0.9rem; color: var(--text-muted); font-weight: 500;">
+        New student? <a href="{{ url_for('auth.register') }}" style="color: var(--secondary); font-weight: 600; text-decoration: none; border-bottom: 2px solid transparent; transition: all 0.2s;" onmouseover="this.style.borderBottomColor='var(--secondary)'" onmouseout="this.style.borderBottomColor='transparent'">Register here</a>
       </p>
-      <p style="font-size:0.85rem;color:var(--text-muted);">
-        Admin? <a href="{{ url_for('auth.admin_login') }}" style="color:var(--primary);font-weight:600;">Admin Login</a>
+      <p style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500;" class="mt-2">
+        Admin? <a href="{{ url_for('auth.admin_login') }}" style="color: var(--primary); font-weight: 600; text-decoration: none; border-bottom: 2px solid transparent; transition: all 0.2s;" onmouseover="this.style.borderBottomColor='var(--primary)'" onmouseout="this.style.borderBottomColor='transparent'">Admin Login</a>
       </p>
     </div>
   </div>

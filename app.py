@@ -3,7 +3,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from flask import Flask
 from config import Config
-from models import db, login_manager, oauth
+from models import db, login_manager, oauth, csrf, mail
 from models.models import Admin
 from werkzeug.security import generate_password_hash
  
@@ -16,6 +16,8 @@ def create_app():
 
     db.init_app(app)
     login_manager.init_app(app)
+    csrf.init_app(app)
+    mail.init_app(app)
     login_manager.login_view = 'auth.login'
     login_manager.login_message = 'Please login to access this page.'
     login_manager.login_message_category = 'warning'
@@ -48,7 +50,7 @@ def create_app():
         if current_user.is_authenticated:
             from models.models import Student, Payment
             if isinstance(current_user._get_current_object(), Student):
-                has_payment = Payment.query.filter_by(student_id=current_user.id).first() is not None
+                has_payment = Payment.query.filter_by(student_id=current_user.id, status='verified').first() is not None
         return dict(has_payment=has_payment)
 
     with app.app_context():
@@ -61,13 +63,18 @@ def create_app():
 def seed_data():
     from models.models import Admin, Internship
 
-    if not Admin.query.first():
+    admin = Admin.query.first()
+    if not admin:
         admin = Admin(
             name='Admin',
             email=os.environ.get('ADMIN_EMAIL', 'admin@exposys.com')
         )
         admin.set_password(os.environ.get('ADMIN_PASSWORD', 'Admin@123'))
         db.session.add(admin)
+    else:
+        # Update existing admin details to match current configuration
+        admin.email = os.environ.get('ADMIN_EMAIL', 'admin@exposys.com')
+        admin.set_password(os.environ.get('ADMIN_PASSWORD', 'Admin@123'))
 
     if not Internship.query.first():
         internships = [

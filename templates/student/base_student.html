@@ -24,15 +24,22 @@
 <div class="dashboard-wrapper">
   <!-- Sidebar -->
   <aside class="sidebar" id="sidebar">
-    {% if has_payment %}
-    <div class="sidebar-brand">
+    <!-- Brand always visible -->
+    <a href="{{ url_for('main.index') }}" class="sidebar-brand text-decoration-none">
       Exposys <span>Data</span> Labs
-    </div>
-    {% endif %}
+    </a>
+
     <nav class="sidebar-nav">
       {% if has_payment %}
+      <!-- Full nav for paid students -->
       <a href="{{ url_for('student.dashboard') }}" class="{{ 'active' if request.endpoint == 'student.dashboard' }}">
         <i class="fas fa-tachometer-alt"></i> Dashboard
+      </a>
+      <a href="{{ url_for('student.my_courses') }}" class="{{ 'active' if request.endpoint == 'student.my_courses' }}">
+        <i class="fas fa-book"></i> My Courses
+      </a>
+      <a href="{{ url_for('student.certificates') }}" class="{{ 'active' if request.endpoint == 'student.certificates' }}">
+        <i class="fas fa-certificate"></i> Certificates
       </a>
       <a href="{{ url_for('student.profile') }}" class="{{ 'active' if request.endpoint == 'student.profile' }}">
         <i class="fas fa-user"></i> My Profile
@@ -46,13 +53,28 @@
       <a href="{{ url_for('main.contact') }}">
         <i class="fas fa-envelope"></i> Support
       </a>
+
+      {% else %}
+      <!-- Minimal nav for unpaid students — payment link always shown -->
+      <a href="{{ url_for('student.payment') }}"
+         class="{{ 'active' if request.endpoint == 'student.payment' }}"
+         style="background:linear-gradient(135deg,rgba(232,69,69,0.2),rgba(232,69,69,0.1));
+                border-left:3px solid var(--secondary);margin:8px 12px;border-radius:10px;">
+        <i class="fas fa-credit-card" style="color:var(--secondary);"></i>
+        <span style="color:#fff;font-weight:700;">Complete Payment</span>
+      </a>
+      <a href="{{ url_for('main.contact') }}">
+        <i class="fas fa-envelope"></i> Support
+      </a>
+      {% endif %}
+
       <hr style="border-color:rgba(255,255,255,0.1);margin:10px 20px;">
       <a href="{{ url_for('auth.logout') }}" style="color:rgba(232,69,69,0.8);">
         <i class="fas fa-sign-out-alt"></i> Logout
       </a>
-      {% endif %}
     </nav>
   </aside>
+
 
   <!-- Main Content -->
   <div class="main-content">
