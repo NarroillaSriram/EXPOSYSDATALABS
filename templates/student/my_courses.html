@@ -1,0 +1,35 @@
+{% extends "student/base_student.html" %}
+{% block title %}My Courses - Exposys{% endblock %}
+{% block page_title %}My Courses{% endblock %}
+
+{% block content %}
+<div class="row">
+  {% if my_courses %}
+    {% for course in my_courses %}
+      <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card shadow-sm border-0 h-100" style="background: linear-gradient(145deg, #ffffff, #f8f9fa); border-radius: 12px; transition: transform 0.2s;">
+          <div class="card-body">
+            <div class="d-flex align-items-center mb-3">
+              <div style="width: 45px; height: 45px; background: rgba(10,36,99,0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--primary);">
+                <i class="fas fa-book-open fa-lg"></i>
+              </div>
+              <h5 class="card-title ms-3 mb-0" style="color: var(--primary); font-weight: 700;">{{ course }}</h5>
+            </div>
+            <p class="text-muted mb-4" style="font-size:0.85rem;">Status: <span class="badge bg-success">Unlocked</span></p>
+            <a href="{{ url_for('student.domain_detail', domain=course) }}" class="btn btn-primary w-100" style="border-radius: 8px;">
+              <i class="fas fa-play-circle me-2"></i>Start Learning
+            </a>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  {% else %}
+    <div class="col-12 text-center py-5">
+      <i class="fas fa-book text-muted mb-3" style="font-size:3rem;"></i>
+      <h5 class="text-muted">No Courses Unlocked</h5>
+      <p class="text-muted" style="font-size:0.9rem;">Register and complete payment for a domain to unlock your course.</p>
+      <a href="{{ url_for('main.internships') }}" class="btn btn-outline-primary mt-2">Explore Internships</a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

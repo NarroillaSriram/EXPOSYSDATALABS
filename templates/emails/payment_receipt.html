@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Payment Receipt - Exposys Data Labs</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f1f5f9; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;-webkit-font-smoothing: antialiased;">
+  <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f1f5f9; padding: 40px 0;">
+    <tr>
+      <td align="center">
+        <!-- Receipt Card Container -->
+        <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 440px; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); overflow: hidden; text-align: left;">
+          
+          <!-- Top Accent Strip -->
+          <tr>
+            <td style="height: 6px; background: linear-gradient(to right, #10b981, #059669); line-height: 6px; font-size: 1px;">&nbsp;</td>
+          </tr>
+
+          <!-- Header Bar -->
+          <tr>
+            <td style="background-color: #f8fafc; padding: 18px 24px; border-bottom: 1px solid #e2e8f0;">
+              <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                <tr>
+                  <!-- Logo Icon -->
+                  <td width="54" valign="middle">
+                    <table border="0" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; width: 40px; height: 40px; text-align: center;">
+                      <tr>
+                        <td align="center" valign="middle" style="padding: 6px;">
+                          <div style="font-size: 14px; font-weight: 900; color: #109489; font-family: monospace; letter-spacing: -0.5px; line-height: 1;">CDI</div>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                  <!-- Brand name -->
+                  <td valign="middle">
+                    <div style="color: #0f172a; font-size: 18px; font-weight: 800; letter-spacing: -0.3px; line-height: 1.2;">Exposys Data Labs</div>
+                    <div style="color: #64748b; font-size: 12px; font-weight: 500; margin-top: 1px;">Official Payment Receipt</div>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Body -->
+          <tr>
+            <td style="padding: 32px 24px;">
+              
+              <!-- Checkmark Circle -->
+              <table border="0" cellpadding="0" cellspacing="0" align="center" style="margin-bottom: 16px;">
+                <tr>
+                  <td align="center" style="width: 80px; height: 80px; background-color: #d1fae5; border-radius: 50%;">
+                    <table border="0" cellpadding="0" cellspacing="0" align="center" style="width: 60px; height: 60px; background-color: #10b981; border-radius: 50%;">
+                      <tr>
+                        <td align="center" valign="middle" style="color: #ffffff; font-size: 24px; font-weight: bold;">
+                          ✓
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Title -->
+              <div style="text-align: center; color: #065f46; font-size: 22px; font-weight: 800; margin-bottom: 24px; letter-spacing: -0.3px;">
+                Payment Successful!
+              </div>
+
+              <!-- Receipt Details Box -->
+              <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 24px;">
+                <!-- Payment ID -->
+                <tr>
+                  <td style="color: #64748b; font-size: 14px; font-weight: 600; padding-bottom: 10px;">Payment ID</td>
+                  <td align="right" style="font-family: monospace; font-weight: 700; font-size: 14px; color: #0f172a; word-break: break-all; padding-left: 10px; padding-bottom: 10px;">{{ payment.transaction_id }}</td>
+                </tr>
+                <tr>
+                  <td colspan="2" style="border-top: 1px dashed #e2e8f0; padding-bottom: 10px;"></td>
+                </tr>
+                <!-- Amount -->
+                <tr>
+                  <td style="color: #64748b; font-size: 14px; font-weight: 600; padding-bottom: 10px;">Amount</td>
+                  <td align="right" style="font-weight: 800; color: #0f172a; font-size: 18px; padding-bottom: 10px;">₹ {{ "%.2f"|format(payment.amount) }}</td>
+                </tr>
+                <tr>
+                  <td colspan="2" style="border-top: 1px dashed #e2e8f0; padding-bottom: 10px;"></td>
+                </tr>
+                <!-- Paid to -->
+                <tr>
+                  <td style="color: #64748b; font-size: 14px; font-weight: 600; padding-bottom: 10px;">Paid to</td>
+                  <td align="right" style="font-weight: 700; color: #0f172a; padding-bottom: 10px;">Exposys Data Labs</td>
+                </tr>
+                <tr>
+                  <td colspan="2" style="border-top: 1px dashed #e2e8f0; padding-bottom: 10px;"></td>
+                </tr>
+                <!-- Paid on -->
+                <tr>
+                  <td style="color: #64748b; font-size: 14px; font-weight: 600;">Paid on</td>
+                  <td align="right" style="font-weight: 600; color: #0f172a;">{{ payment.updated_at.strftime('%B %d, %Y at %I:%M%p').replace(' 0', ' ').replace('AM', 'am').replace('PM', 'pm') }}</td>
+                </tr>
+              </table>
+
+              <!-- Student info -->
+              <div style="background-color: #f0f9ff; border: 1px solid #e0f2fe; border-radius: 12px; padding: 16px; margin-bottom: 24px; color: #0369a1; font-size: 14px; line-height: 1.5;">
+                Hello <strong>{{ student.name }}</strong>,<br><br>
+                Thank you for completing your registration. Your internship for the domain <strong>{% if payment.domain is defined and payment.domain %}{{ payment.domain }}{% else %}{{ student.internship_domain }}{% endif %}</strong> is confirmed! Joining instructions will be sent shortly.
+              </div>
+
+              <!-- Contact / Support -->
+              <div style="text-align: center; color: #64748b; font-size: 13px; line-height: 1.5; padding-top: 10px; border-top: 1px solid #e2e8f0;">
+                For any queries or concerns, please contact us at <a href="mailto:hr@exposysdata.com" style="color: #10b981; text-decoration: none; font-weight: bold;">hr@exposysdata.com</a>.
+              </div>
+
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td align="center" style="background-color: #f8fafc; padding: 20px; border-top: 1px solid #e2e8f0; color: #64748b; font-size: 11px;">
+              &copy; 2026 Exposys Data Labs. All rights reserved.
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

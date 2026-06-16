@@ -1,0 +1,15 @@
+{
+  "name": "exposys-blockchain",
+  "version": "1.0.0",
+  "description": "Smart contracts for Exposys Certificate Verification",
+  "main": "hardhat.config.js",
+  "scripts": {
+    "compile": "npx hardhat compile",
+    "test": "npx hardhat test",
+    "node-run": "npx hardhat node"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^3.0.0",
+    "hardhat": "^2.19.1"
+  }
+}

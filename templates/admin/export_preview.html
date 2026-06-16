@@ -1,0 +1,206 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Export Students - Admin{% endblock %}
+{% block page_title %}Export Student Data{% endblock %}
+
+{% block content %}
+<style>
+  .export-header-card {
+    background: linear-gradient(135deg, var(--primary) 0%, #1a3a8f 100%);
+    border-radius: 18px; padding: 28px 32px; color: #fff;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 16px; margin-bottom: 24px;
+    box-shadow: 0 8px 30px rgba(10,36,99,0.2);
+  }
+  .export-header-card h4 { margin: 0; font-weight: 800; font-size: 1.2rem; }
+  .export-header-card p  { margin: 4px 0 0; color: rgba(255,255,255,0.75); font-size: 0.88rem; }
+
+  .download-btn {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: #fff; border: none; border-radius: 12px;
+    padding: 13px 28px; font-size: 1rem; font-weight: 700;
+    display: inline-flex; align-items: center; gap: 10px;
+    text-decoration: none; transition: all 0.3s; cursor: pointer;
+    box-shadow: 0 4px 15px rgba(16,185,129,0.35);
+  }
+  .download-btn:hover {
+    color: #fff; transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(16,185,129,0.45);
+  }
+  .download-btn-bottom {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: #fff; border: none; border-radius: 14px;
+    padding: 16px 40px; font-size: 1.1rem; font-weight: 800;
+    display: inline-flex; align-items: center; gap: 12px;
+    text-decoration: none; transition: all 0.3s;
+    box-shadow: 0 6px 20px rgba(16,185,129,0.35);
+  }
+  .download-btn-bottom:hover {
+    color: #fff; transform: translateY(-2px);
+    box-shadow: 0 12px 30px rgba(16,185,129,0.45);
+  }
+
+  .stat-pill {
+    background: rgba(255,255,255,0.15);
+    border-radius: 20px; padding: 6px 16px;
+    font-size: 0.82rem; font-weight: 700; color: #fff;
+    display: inline-flex; align-items: center; gap:6px;
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+
+  .preview-table-wrap {
+    background: #fff; border-radius: 18px;
+    border: 1px solid rgba(10,36,99,0.08);
+    box-shadow: 0 6px 30px rgba(10,36,99,0.08);
+    max-height: 460px;
+    overflow: auto;
+    margin-bottom: 28px;
+    position: relative;
+    width: 100%;
+    max-width: 100%;
+  }
+  .preview-table-wrap .table { margin: 0; }
+  .preview-table-wrap thead th {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: #f8f9ff;
+    color: var(--primary); font-weight: 700;
+    font-size: 0.78rem; text-transform: uppercase;
+    letter-spacing: 0.5px; border-bottom: 2px solid rgba(10,36,99,0.1);
+    padding: 12px 14px; white-space: nowrap;
+    box-shadow: inset 0 -2px 0 rgba(10,36,99,0.1);
+  }
+  .preview-table-wrap tbody td {
+    font-size: 0.82rem; color: #374151;
+    padding: 11px 14px; vertical-align: middle;
+    border-color: rgba(10,36,99,0.05);
+  }
+  .preview-table-wrap tbody tr:hover { background: rgba(10,36,99,0.02); }
+
+  /* Custom inner scrollbar styling for preview container */
+  .preview-table-wrap::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  .preview-table-wrap::-webkit-scrollbar-track {
+    background: #f8fafc;
+  }
+  .preview-table-wrap::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+  }
+  .preview-table-wrap::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+  }
+
+  .download-footer {
+    background: linear-gradient(135deg, rgba(16,185,129,0.06), rgba(5,150,105,0.04));
+    border: 2px dashed rgba(16,185,129,0.3);
+    border-radius: 18px; padding: 32px;
+    text-align: center; margin-top: 8px;
+  }
+  .download-footer h5 { font-weight: 800; color: #065f46; margin-bottom: 6px; }
+  .download-footer p  { color: #6b7280; font-size: 0.88rem; margin-bottom: 20px; }
+</style>
+
+<!-- Header Card -->
+<div class="export-header-card">
+  <div>
+    <h4><i class="fas fa-file-csv me-2" style="color:#6ee7b7;"></i>Student Data Preview</h4>
+    <p>Review all student records below before downloading the CSV file.</p>
+    <div class="d-flex gap-2 mt-3 flex-wrap">
+      <span class="stat-pill"><i class="fas fa-users"></i> {{ students|length }} Students</span>
+      <span class="stat-pill"><i class="fas fa-calendar"></i> As of {{ now }}</span>
+    </div>
+  </div>
+  <a href="{{ url_for('admin.download_csv') }}" class="download-btn">
+    <i class="fas fa-download"></i> Download CSV
+  </a>
+</div>
+
+<!-- Preview Table -->
+<div class="preview-table-wrap">
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <th>S.No</th>
+          <th>Name</th>
+          <th>Branch</th>
+          <th>Email</th>
+          <th>Phone</th>
+          <th>College</th>
+          <th>Location</th>
+          <th>Domain</th>
+          <th>Duration</th>
+          <th>10th %</th>
+          <th>12th %</th>
+          <th>UG</th>
+          <th>PG</th>
+          <th>Registered</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for s in students %}
+        <tr>
+          <td style="color:var(--text-muted);font-weight:600;">{{ loop.index }}</td>
+          <td>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div style="width:30px;height:30px;background:var(--gradient);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:0.8rem;flex-shrink:0;">
+                {{ s.name[0].upper() }}
+              </div>
+              <span style="font-weight:700;">{{ s.name }}</span>
+            </div>
+          </td>
+          <td>{{ s.branch or '—' }}</td>
+          <td style="color:#0a2463;">{{ s.email }}</td>
+          <td>{{ s.phone or '—' }}</td>
+          <td>{{ s.college or '—' }}</td>
+          <td>{{ s.location or '—' }}</td>
+          <td>
+            <div class="d-flex flex-column gap-1">
+              {% if s.internship_domain %}
+              <span style="background:rgba(10,36,99,0.08);color:var(--primary);padding:3px 10px;border-radius:10px;font-size:0.75rem;font-weight:700;white-space:nowrap;width:fit-content;">
+                {{ s.internship_domain }} <span style="font-size:0.65rem;opacity:0.75;">(Main)</span>
+              </span>
+              {% endif %}
+              {% for addon in s.addon_payments %}
+                {% if addon.status == 'verified' %}
+                <span style="background:rgba(5,150,105,0.08);color:#059669;padding:3px 10px;border-radius:10px;font-size:0.75rem;font-weight:700;white-space:nowrap;width:fit-content;" title="Add-on Domain">
+                  {{ addon.domain }} <span style="font-size:0.65rem;opacity:0.75;">(Add-on)</span>
+                </span>
+                {% endif %}
+              {% endfor %}
+              {% if not s.internship_domain and not s.addon_payments %}—{% endif %}
+            </div>
+          </td>
+          <td>{{ s.duration or '—' }}</td>
+          <td>{{ s.tenth_percentage or '—' }}</td>
+          <td>{{ s.twelfth_percentage or '—' }}</td>
+          <td>{{ s.ug or '—' }}</td>
+          <td>{{ s.pg or '—' }}</td>
+          <td style="white-space:nowrap;">{{ s.created_at.strftime('%d %b %Y') }}</td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="14" class="text-center text-muted py-5">
+            <i class="fas fa-users" style="font-size:2rem;"></i>
+            <p class="mt-2">No students registered yet.</p>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+</div>
+
+<!-- Download Footer Button -->
+{% if students %}
+<div class="download-footer">
+  <h5><i class="fas fa-check-circle me-2" style="color:#10b981;"></i>Ready to Export</h5>
+  <p>{{ students|length }} student record{{ 's' if students|length != 1 }} will be downloaded as a CSV file.</p>
+  <a href="{{ url_for('admin.download_csv') }}" class="download-btn-bottom">
+    <i class="fas fa-file-download"></i>
+    Download CSV File
+  </a>
+</div>
+{% endif %}
+{% endblock %}

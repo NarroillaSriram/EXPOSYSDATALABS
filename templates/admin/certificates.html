@@ -1,0 +1,325 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Certificates - Admin{% endblock %}
+{% block page_title %}Certificate Management Registry{% endblock %}
+
+{% block content %}
+<div class="data-table">
+  <div class="data-table-header flex-wrap gap-3">
+    <h5><i class="fas fa-award me-2" style="color:var(--secondary);"></i>Internship Certificates Registry</h5>
+  </div>
+
+  <!-- Search & Filter -->
+  <div class="p-3 border-bottom">
+    <form method="GET" action="{{ url_for('admin.certificates') }}" class="row g-2">
+      <div class="col-md-5">
+        <input type="text" name="search" class="form-control form-control-sm"
+               placeholder="Search by student name or email..." value="{{ search }}">
+      </div>
+      <div class="col-md-4">
+        <select name="domain" class="form-select form-select-sm">
+          <option value="">All Domains</option>
+          {% for d in domains %}
+          <option value="{{ d }}" {{ 'selected' if domain_filter == d }}>{{ d }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-3">
+        <button type="submit" class="btn btn-sm btn-primary w-100">
+          <i class="fas fa-search me-1"></i>Filter
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-hover mb-0">
+      <thead>
+        <tr>
+          <th>S.No</th>
+          <th>Student</th>
+          <th>Course / Domain</th>
+          <th>Type</th>
+          <th>Duration</th>
+          <th>Status</th>
+          <th style="min-width:180px;">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for c in courses %}
+        <tr>
+          <td style="font-size:0.85rem;color:var(--text-muted);">{{ loop.index }}</td>
+          <td>
+            <div style="font-weight:700;font-size:0.88rem;">{{ c.student.name }}</div>
+            <div style="font-size:0.78rem;color:var(--text-muted);">{{ c.student.email }}</div>
+          </td>
+          <td>
+            <span style="font-weight:600;font-size:0.88rem;color:var(--primary);">{{ c.domain }}</span>
+          </td>
+          <td>
+            {% if c.type == 'Main' %}
+            <span class="badge bg-primary-subtle text-primary" style="font-size:0.72rem; font-weight:700; padding:3px 8px; border-radius:10px;">Main Course</span>
+            {% else %}
+            <span class="badge bg-success-subtle text-success" style="font-size:0.72rem; font-weight:700; padding:3px 8px; border-radius:10px;">Add-on</span>
+            {% endif %}
+          </td>
+          <td style="font-size:0.82rem;">{{ c.duration }}</td>
+          <td>
+            {% if c.certificate %}
+              {% if c.certificate.status == 'approved' %}
+                <span class="badge bg-success" style="font-size:0.75rem; padding:4px 8px;"><i class="fas fa-check-circle me-1"></i>Approved</span>
+              {% elif c.certificate.status == 'held' %}
+                <span class="badge bg-warning text-dark" style="font-size:0.75rem; padding:4px 8px;"><i class="fas fa-clock me-1"></i>On Hold</span>
+              {% elif c.certificate.status == 'rejected' %}
+                <span class="badge bg-danger" style="font-size:0.75rem; padding:4px 8px;"><i class="fas fa-times-circle me-1"></i>Rejected</span>
+              {% elif c.certificate.status == 'revoked' %}
+                <span class="badge bg-dark" style="font-size:0.75rem; padding:4px 8px; border:1px dashed #ef4444; color:#ef4444;"><i class="fas fa-ban me-1"></i>Revoked</span>
+              {% endif %}
+            {% else %}
+              <span class="badge bg-secondary" style="font-size:0.75rem; padding:4px 8px;">Not Issued</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if c.certificate and c.certificate.status == 'approved' %}
+              <div class="d-flex gap-1 align-items-center">
+                <a href="/cert-files/{{ c.certificate.pdf_path | replace('/uploads/', '') }}" target="_blank" class="btn btn-sm btn-outline-primary" style="font-size: 0.78rem; padding: 4px 8px;">
+                  <i class="fas fa-download me-1"></i>PDF
+                </a>
+                <button type="button" class="btn btn-sm btn-outline-danger" style="font-size:0.78rem; padding:4px 8px;" data-bs-toggle="modal" data-bs-target="#revokeModal{{ loop.index }}">
+                  <i class="fas fa-ban me-1"></i>Revoke
+                </button>
+
+                <!-- Revoke Modal -->
+                <div class="modal fade text-start" id="revokeModal{{ loop.index }}" tabindex="-1" aria-hidden="true">
+                  <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content" style="white-space: normal;">
+                      <div class="modal-header border-0 pb-0">
+                        <h5 class="modal-title text-danger" style="font-weight:700;"><i class="fas fa-exclamation-triangle me-2"></i>Confirm Revocation</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div class="modal-body">
+                        <p class="mb-1" style="font-size: 0.95rem;">Are you sure you want to <strong>revoke</strong> the certificate for <strong>{{ c.student.name }}</strong> ({{ c.domain }})?</p>
+                        <p class="text-danger small mb-0 fw-bold">WARNING: This action cannot be undone without re-issuing.</p>
+                      </div>
+                      <div class="modal-footer border-0 pt-0">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <form action="{{ url_for('admin.revoke_certificate', certificate_id=c.certificate.certificate_id) }}" method="POST">
+                          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                          <button type="submit" class="btn btn-sm btn-danger">Yes, Revoke</button>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            {% elif c.certificate and c.certificate.status == 'revoked' %}
+              <!-- Re-issue button for revoked certificates -->
+              <button type="button" class="btn btn-sm btn-warning" style="font-weight:600; font-size:0.8rem;" onclick="openReissueModal({{ c.student.id }}, '{{ c.student.name | e }}', '{{ c.domain | e }}', '{{ c.duration | e }}')">
+                <i class="fas fa-redo me-1"></i>Re-issue
+              </button>
+
+            {% else %}
+              <button type="button" class="btn btn-sm btn-primary" style="font-weight:600;" onclick="openCertificateModal({{ c.student.id }}, '{{ c.student.name | e }}', '{{ c.domain | e }}', '{{ c.duration | e }}')">
+                <i class="fas fa-award me-1"></i>Issue Certificate
+              </button>
+            {% endif %}
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="7" class="text-center text-muted py-5">
+            <i class="fas fa-award" style="font-size:2.5rem; color:var(--text-muted);"></i>
+            <p class="mt-2">No course records found for certificate processing.</p>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Certificate Deferral & Approval Modal -->
+<div class="modal fade" id="certificateModal" tabindex="-1" aria-labelledby="certificateModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius:20px;border:none;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.2);">
+      
+      <!-- Header -->
+      <div style="background:linear-gradient(135deg,var(--primary),#1a3a8f);padding:24px 28px;color:#fff;">
+        <div style="display:flex;align-items:center;gap:14px;">
+          <div style="width:48px;height:48px;background:rgba(255,255,255,0.2);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <i class="fas fa-award" style="font-size:1.3rem;"></i>
+          </div>
+          <div>
+            <h5 id="certificateModalLabel" style="margin:0;font-weight:800;">Configure Certificate</h5>
+            <p style="margin:2px 0 0;font-size:0.82rem;color:rgba(255,255,255,0.8);">Approve, reject, or place certificate application on hold.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Body -->
+      <div class="modal-body" style="padding:28px;">
+        <div class="mb-3">
+          <label class="form-label" style="font-size:0.8rem; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Student</label>
+          <div id="certStudentName" style="font-weight:800; color:#111827; font-size:1.05rem;">Student Name</div>
+        </div>
+        <div class="mb-4">
+          <label class="form-label" style="font-size:0.8rem; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Internship Domain</label>
+          <div id="certDomainDisplay" style="font-weight:700; color:var(--primary); font-size:0.95rem;">Domain Name</div>
+        </div>
+        
+        <form id="approveCertForm" method="POST" style="margin:0;">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="domain_name" id="certDomainApprove">
+          
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label" style="font-size:0.8rem; font-weight:700; color:var(--text-muted);">START DATE</label>
+              <input type="date" name="start_date" id="certStartDate" class="form-control form-control-sm" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" style="font-size:0.8rem; font-weight:700; color:var(--text-muted);">END DATE</label>
+              <input type="date" name="end_date" id="certEndDate" class="form-control form-control-sm" required>
+            </div>
+            <div class="col-md-12">
+              <label class="form-label" style="font-size:0.8rem; font-weight:700; color:var(--text-muted);">DATE OF ISSUE</label>
+              <input type="date" name="issue_date" id="certIssueDate" class="form-control form-control-sm" required>
+            </div>
+          </div>
+
+          <div class="d-flex gap-2 justify-content-between mt-4">
+            <button type="submit" class="btn btn-success flex-grow-1" style="border-radius:10px; padding:10px; font-weight:700;">
+              <i class="fas fa-check-circle me-1"></i> Approve &amp; Register on Blockchain
+            </button>
+          </div>
+        </form>
+
+        <div class="d-flex gap-2 justify-content-between mt-3 pt-3 border-top" style="border-color:#e5e7eb;">
+          <form id="holdCertForm" method="POST" style="flex:1; margin:0;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="domain_name" id="certDomainHold">
+            <button type="submit" class="btn btn-outline-warning w-100" style="border-radius:10px; padding:8px; font-weight:600; font-size:0.85rem;">
+              <i class="fas fa-clock me-1"></i> Put On Hold
+            </button>
+          </form>
+          <form id="rejectCertForm" method="POST" style="flex:1; margin:0;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="domain_name" id="certDomainReject">
+            <button type="submit" class="btn btn-outline-danger w-100" style="border-radius:10px; padding:8px; font-weight:600; font-size:0.85rem;">
+              <i class="fas fa-times-circle me-1"></i> Reject
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Re-issue Certificate Modal -->
+<div class="modal fade" id="reissueModal" tabindex="-1" aria-labelledby="reissueModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius:20px;border:none;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.2);">
+      <div style="background:linear-gradient(135deg,#b45309,#d97706);padding:24px 28px;color:#fff;">
+        <div style="display:flex;align-items:center;gap:14px;">
+          <div style="width:48px;height:48px;background:rgba(255,255,255,0.2);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <i class="fas fa-redo" style="font-size:1.3rem;"></i>
+          </div>
+          <div>
+            <h5 id="reissueModalLabel" style="margin:0;font-weight:800;">Re-issue Certificate</h5>
+            <p style="margin:2px 0 0;font-size:0.82rem;color:rgba(255,255,255,0.85);">Generate a fresh certificate to replace the revoked one.</p>
+          </div>
+        </div>
+      </div>
+      <div class="modal-body" style="padding:28px;">
+        <div class="mb-3">
+          <label class="form-label" style="font-size:0.8rem; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Student</label>
+          <div id="reissueStudentName" style="font-weight:800; color:#111827; font-size:1.05rem;">Student Name</div>
+        </div>
+        <div class="mb-4">
+          <label class="form-label" style="font-size:0.8rem; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Internship Domain</label>
+          <div id="reissueDomainDisplay" style="font-weight:700; color:var(--primary); font-size:0.95rem;">Domain Name</div>
+        </div>
+        <form id="reissueCertForm" method="POST" style="margin:0;">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="domain_name" id="reissueDomain">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label" style="font-size:0.8rem; font-weight:700; color:var(--text-muted);">START DATE</label>
+              <input type="date" name="start_date" id="reissueStartDate" class="form-control form-control-sm" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" style="font-size:0.8rem; font-weight:700; color:var(--text-muted);">END DATE</label>
+              <input type="date" name="end_date" id="reissueEndDate" class="form-control form-control-sm" required>
+            </div>
+            <div class="col-md-12">
+              <label class="form-label" style="font-size:0.8rem; font-weight:700; color:var(--text-muted);">DATE OF ISSUE</label>
+              <input type="date" name="issue_date" id="reissueIssueDate" class="form-control form-control-sm" required>
+            </div>
+          </div>
+          <div class="d-flex gap-2 justify-content-between mt-4">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" style="border-radius:10px; padding:10px 20px;">Cancel</button>
+            <button type="submit" class="btn btn-warning flex-grow-1" style="border-radius:10px; padding:10px; font-weight:700; color:#fff;">
+              <i class="fas fa-redo me-1"></i>Generate New Certificate
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  function openCertificateModal(id, name, domain, duration) {
+    document.getElementById('certStudentName').textContent = name;
+    document.getElementById('certDomainDisplay').textContent = domain;
+    
+    // Setup Form Actions
+    document.getElementById('approveCertForm').action = "/admin/students/approve-certificate/" + id;
+    document.getElementById('holdCertForm').action = "/admin/students/hold-certificate/" + id;
+    document.getElementById('rejectCertForm').action = "/admin/students/reject-certificate/" + id;
+
+    // Set Domain Value in hidden fields
+    document.getElementById('certDomainApprove').value = domain;
+    document.getElementById('certDomainHold').value = domain;
+    document.getElementById('certDomainReject').value = domain;
+
+    // Default Dates
+    const today = new Date();
+    document.getElementById('certIssueDate').value = today.toISOString().split('T')[0];
+    document.getElementById('certEndDate').value = today.toISOString().split('T')[0];
+
+    const start = new Date(today);
+    let durationMonths = 1;
+    const parsed = parseInt(duration);
+    if (!isNaN(parsed)) durationMonths = parsed;
+    start.setMonth(start.getMonth() - durationMonths);
+    document.getElementById('certStartDate').value = start.toISOString().split('T')[0];
+
+    const modal = new bootstrap.Modal(document.getElementById('certificateModal'));
+    modal.show();
+  }
+
+  function openReissueModal(id, name, domain, duration) {
+    document.getElementById('reissueStudentName').textContent = name;
+    document.getElementById('reissueDomainDisplay').textContent = domain;
+    document.getElementById('reissueDomain').value = domain;
+    document.getElementById('reissueCertForm').action = "/admin/students/reissue-certificate/" + id;
+
+    // Default Dates
+    const today = new Date();
+    document.getElementById('reissueIssueDate').value = today.toISOString().split('T')[0];
+    document.getElementById('reissueEndDate').value = today.toISOString().split('T')[0];
+
+    const start = new Date(today);
+    let durationMonths = 1;
+    const parsed = parseInt(duration);
+    if (!isNaN(parsed)) durationMonths = parsed;
+    start.setMonth(start.getMonth() - durationMonths);
+    document.getElementById('reissueStartDate').value = start.toISOString().split('T')[0];
+
+    const modal = new bootstrap.Modal(document.getElementById('reissueModal'));
+    modal.show();
+  }
+</script>
+{% endblock %}
