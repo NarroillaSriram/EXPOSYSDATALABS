@@ -1,7 +1,7 @@
 # Exposys Data Labs - Internship & Training Management System
 First Change
 A full-stack web application built with Python Flask and MySQL, inspired by Exposys Data Labs.
-second 
+second
 ## Tech Stack
 - **Frontend**: HTML5, CSS3, Bootstrap 5, JavaScript
 - **Backend**: Python Flask
