@@ -1509,3 +1509,50 @@ section {
   border-color: #00f5ff !important;
   box-shadow: 0 0 0 4px rgba(0, 245, 255, 0.2) !important;
 }
+
+/* ===== EXTRA MOBILE RESPONSIVENESS ===== */
+@media (max-width: 576px) {
+  .hero-title {
+    font-size: 1.5rem !important;
+  }
+  .btn-primary, .btn-secondary, .btn-outline-primary {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+  .auth-card {
+    padding: 20px 15px;
+    margin: 10px;
+  }
+  .footer-brand, .footer-desc {
+    text-align: center;
+  }
+  .footer h6, .footer-links {
+    text-align: center;
+  }
+  .footer-social {
+    justify-content: center;
+  }
+  .marquee-card {
+    width: 280px;
+  }
+  .stat-card {
+    flex-direction: column;
+    text-align: center;
+  }
+  .data-table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  .navbar-nav .nav-item {
+    text-align: center;
+    padding: 8px 0;
+  }
+  .navbar-collapse {
+    background: #fff;
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    margin-top: 10px;
+  }
+}

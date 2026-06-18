@@ -6,10 +6,12 @@ from config import Config
 from models import db, login_manager, oauth, csrf, mail
 from models.models import Admin
 from werkzeug.security import generate_password_hash
+from werkzeug.middleware.proxy_fix import ProxyFix
  
 
 def create_app():
     app = Flask(__name__)
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
     app.config.from_object(Config)
 
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
