@@ -384,7 +384,26 @@ app.get('/api/certificates/verify/:certificateId', async (req, res) => {
   const { certificateId } = req.params;
 
   try {
-    const result = await db.query('SELECT * FROM certificates WHERE certificate_id = $1', [certificateId]);
+    let queryStr = `
+      SELECT c.* FROM certificates c
+      LEFT JOIN students s ON c.student_id = s.id
+      WHERE c.certificate_id = $1 
+         OR s.email = $1
+    `;
+    let queryParams = [certificateId];
+
+    if (/^\d+$/.test(certificateId)) {
+      queryStr = `
+        SELECT c.* FROM certificates c
+        LEFT JOIN students s ON c.student_id = s.id
+        WHERE c.certificate_id = $1 
+           OR s.email = $1
+           OR c.student_id = $2
+      `;
+      queryParams.push(parseInt(certificateId, 10));
+    }
+
+    const result = await db.query(queryStr, queryParams);
     if (result.rows.length === 0) {
       return res.json({ verified: false, status: 'invalid', message: '❌ Invalid Certificate: Certificate ID not found' });
     }

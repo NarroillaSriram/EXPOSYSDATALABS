@@ -570,7 +570,7 @@ function PublicVerify() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState('');
-  const [uploadName, setUploadName] = useState('');
+  const [uniqueEid, setUniqueEid] = useState('');
 
   const runVerification = async (searchId) => {
     if (!searchId.trim()) return;
@@ -592,50 +592,6 @@ function PublicVerify() {
       runVerification(id);
     }
   }, [id]);
-
-  const handleQRUpload = (e) => {
-    const file = e.target.files[0];
-    if (!file) {
-      setUploadName('');
-      return;
-    }
-    setUploadName(file.name);
-
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        const context = canvas.getContext('2d');
-        canvas.width = img.width;
-        canvas.height = img.height;
-        context.drawImage(img, 0, 0, img.width, img.height);
-        
-        try {
-          const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-          const code = jsQR(imageData.data, imageData.width, imageData.height);
-          
-          if (code) {
-            const qrText = code.data;
-            const match = qrText.match(/EXPOSYS-[A-Z]+-\d+-[A-Z0-9]+/i);
-            if (match) {
-              setCertId(match[0]);
-              runVerification(match[0]);
-            } else {
-              alert(`QR code scanned successfully, but no valid Exposys Certificate ID was found in it.\\n\\nQR Data: ${qrText}`);
-            }
-          } else {
-            alert("Could not detect any QR code in the uploaded image. Please ensure the image is clear and contains a QR code.");
-          }
-        } catch (err) {
-          console.error(err);
-          alert("Error processing the image.");
-        }
-      };
-      img.src = event.target.result;
-    };
-    reader.readAsDataURL(file);
-  };
 
   return (
     <div className="min-h-screen bg-brand-darker text-white p-6 relative overflow-hidden flex flex-col items-center justify-center">
@@ -680,21 +636,25 @@ function PublicVerify() {
               </div>
             </div>
 
-            {/* QR Scan Upload */}
+            {/* Unique EID Input */}
             <div className="space-y-2">
-              <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider">Verify by QR Code Image</label>
-              <label className="flex items-center gap-3 w-full bg-brand-dark/70 border border-dashed border-gray-700 hover:border-blue-500 rounded-xl px-4 py-3 cursor-pointer transition-all">
-                <UploadCloud className="w-5 h-5 text-gray-500 shrink-0" />
-                <span className={uploadName ? "text-blue-400 text-sm truncate font-medium" : "text-gray-400 text-sm truncate"}>
-                  {uploadName ? `Scanning: ${uploadName}...` : 'Upload QR Code image...'}
-                </span>
+              <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider">Verify by Unique EID</label>
+              <div className="relative">
                 <input 
-                  type="file" 
-                  accept="image/*"
-                  className="hidden" 
-                  onChange={handleQRUpload}
+                  type="text"
+                  placeholder="Enter Unique EID (e.g. 5)"
+                  className="w-full bg-brand-dark/70 border border-gray-700 rounded-xl pl-4 pr-10 py-3 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-white"
+                  value={uniqueEid}
+                  onChange={(e) => setUniqueEid(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && runVerification(uniqueEid)}
                 />
-              </label>
+                <button 
+                  onClick={() => runVerification(uniqueEid)}
+                  className="absolute right-2 top-2 p-1.5 text-blue-500 hover:text-blue-400 rounded-lg hover:bg-gray-800 transition"
+                >
+                  <Search className="w-4 h-4" />
+                </button>
+              </div>
             </div>
 
           </div>
