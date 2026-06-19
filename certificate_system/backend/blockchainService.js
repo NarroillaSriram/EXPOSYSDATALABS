@@ -1,7 +1,7 @@
 const { ethers } = require('ethers');
 const fs = require('fs');
 const path = require('path');
-require('dotenv').config(); // Load environment variables
+require('dotenv').config({ path: path.join(__dirname, '../../.env') }); // Load environment variables from project root
 
 // Load contract ABI (compiled by Hardhat)
 let contractAbi = null;

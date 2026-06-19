@@ -617,7 +617,7 @@ function PublicVerify() {
           
           if (code) {
             const qrText = code.data;
-            const match = qrText.match(/EXPOSYS-[A-Z]+-\d+-\d+/);
+            const match = qrText.match(/EXPOSYS-[A-Z]+-\d+-[A-Z0-9]+/i);
             if (match) {
               setCertId(match[0]);
               runVerification(match[0]);
