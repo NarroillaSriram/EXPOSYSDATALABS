@@ -11,32 +11,31 @@ class Config:
     # Local DB: set individual DB_* variables
     _db_url = os.environ.get('DATABASE_URL', '')
     if _db_url:
-        # Neon/Supabase provide postgres:// — SQLAlchemy needs postgresql://
-        SQLALCHEMY_DATABASE_URI = _db_url.replace('postgres://', 'postgresql://', 1)
+        SQLALCHEMY_DATABASE_URI = _db_url
     else:
         SQLALCHEMY_DATABASE_URI = (
-            f"postgresql+psycopg2://{os.environ.get('DB_USERNAME','postgres')}:"
+            f"mysql+pymysql://{os.environ.get('DB_USERNAME','root')}:"
             f"{os.environ.get('DB_PASSWORD','password')}@"
             f"{os.environ.get('DB_HOST','localhost')}:"
-            f"{os.environ.get('DB_PORT','5432')}/"
+            f"{os.environ.get('DB_PORT','3306')}/"
             f"{os.environ.get('DB_NAME','exposys_db')}"
         )
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    # Fix Neon/cloud DB idle connection drops
-    SQLALCHEMY_ENGINE_OPTIONS = {
-        'pool_pre_ping': True,       # Test connection before using — auto-reconnects if dropped
-        'pool_recycle': 280,         # Recycle connections every 4.5 min (Neon drops after 5 min idle)
-        'pool_size': 5,
-        'max_overflow': 2,
-        'connect_args': {
-            'connect_timeout': 10,
-            'keepalives': 1,
-            'keepalives_idle': 30,
-            'keepalives_interval': 10,
-            'keepalives_count': 5,
+    
+    if "tidbcloud" in os.environ.get('DB_HOST', ''):
+        SQLALCHEMY_ENGINE_OPTIONS = {
+            'connect_args': {
+                'ssl': {'ssl_verify_cert': True, 'ssl_verify_identity': True}
+            }
         }
-    }
+    else:
+        SQLALCHEMY_ENGINE_OPTIONS = {
+            'pool_pre_ping': True,
+            'pool_recycle': 280,
+            'pool_size': 5,
+            'max_overflow': 2
+        }
 
     UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'uploads')
     MAX_CONTENT_LENGTH = 5 * 1024 * 1024  # 5MB
