@@ -39,6 +39,9 @@ def dashboard():
         Student.internship_domain, func.count(Student.id)
     ).group_by(Student.internship_domain).all()
     recent_students = Student.query.order_by(Student.created_at.desc()).limit(5).all()
+    
+    pending_submissions_count = ProjectSubmission.query.filter_by(status='submitted').count()
+    recent_submissions = ProjectSubmission.query.order_by(ProjectSubmission.created_at.desc()).limit(5).all()
 
     return render_template('admin/dashboard.html',
         total_students=total_students,
@@ -49,7 +52,9 @@ def dashboard():
         pending_addon_count=pending_addons_count,
         unread_contacts=unread_contacts,
         domain_stats=domain_stats,
-        recent_students=recent_students
+        recent_students=recent_students,
+        pending_submissions_count=pending_submissions_count,
+        recent_submissions=recent_submissions
     )
 
 
@@ -356,6 +361,12 @@ def _issue_certificate(student_id, redirect_to=None, replace_existing=False):
             status='approved',
         )
         db.session.add(cert)
+        
+        # Update submission status if it exists
+        submission = ProjectSubmission.query.filter_by(student_id=student_id, domain_name=domain_name).first()
+        if submission:
+            submission.status = 'approved'
+            
         db.session.commit()
 
         flash(f'Certificate for {student.name} ({domain_name}) generated successfully! ✅', 'success')
@@ -512,7 +523,25 @@ def serve_cert_file(filepath):
     """Serve certificate PDFs and QR code images from the configured upload folder."""
     from flask import current_app, send_from_directory as sfd
     # Use the upload folder configured in the app's settings (certificate files are stored there)
-    base = current_app.config['UPLOAD_FOLDER']
+    base = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                        'certificate_system', 'backend', 'uploads')
+    full_path = os.path.join(base, filepath)
+    if not os.path.exists(full_path):
+        abort(404)
+    directory = os.path.dirname(full_path)
+    filename = os.path.basename(full_path)
+    return sfd(directory, filename)
+
+
+@admin_bp.route('/public/cert-files/<path:filepath>')
+def serve_cert_file_public(filepath):
+    """Public route — serves QR code images for the public verification page (no login required)."""
+    from flask import send_from_directory as sfd
+    # Only allow qr_codes sub-folder for public access (not PDFs)
+    if not filepath.startswith('qr_codes/'):
+        abort(403)
+    base = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                        'certificate_system', 'backend', 'uploads')
     full_path = os.path.join(base, filepath)
     if not os.path.exists(full_path):
         abort(404)

@@ -8,6 +8,14 @@ from models.models import Student
 main_bp = Blueprint('main', __name__)
 
 
+@main_bp.route('/verify/<certificate_id>')
+def verify_certificate(certificate_id):
+    """Public certificate verification page — no login required."""
+    from models.models import Certificate
+    cert = Certificate.query.filter_by(certificate_id=certificate_id).first()
+    return render_template('verify_certificate.html', cert=cert, certificate_id=certificate_id)
+
+
 
 
 @main_bp.route('/')

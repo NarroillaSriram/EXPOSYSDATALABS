@@ -356,19 +356,53 @@ def certificates():
 @login_required
 @student_required
 def download_certificate(certificate_id):
-    cert = Certificate.query.filter_by(student_id=current_user.id, certificate_id=certificate_id, status='approved').first_or_404()
-    
-    from flask import send_from_directory, current_app, abort
-    base = os.path.join(
+    from flask import send_from_directory, current_app
+    cert = Certificate.query.filter_by(
+        student_id=current_user.id,
+        certificate_id=certificate_id,
+        status='approved'
+    ).first_or_404()
+
+    cert_dir = os.path.join(
         os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
         'certificate_system', 'backend', 'uploads', 'certificates'
     )
-    
     filename = f"{certificate_id}.pdf"
-    if not os.path.exists(os.path.join(base, filename)):
-        abort(404)
-        
-    return send_from_directory(base, filename, as_attachment=False)
+    full_path = os.path.join(cert_dir, filename)
+
+    # If the PDF doesn't exist yet, regenerate it from stored certificate data
+    if not os.path.exists(full_path):
+        try:
+            from routes.cert_generator import generate_qr_code, generate_certificate_pdf
+            import os as _os
+            frontend_url = _os.environ.get('FRONTEND_URL', 'http://localhost:3000')
+            verification_url = f"{frontend_url}/verify/{certificate_id}"
+            qr_dir = _os.path.join(
+                _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))),
+                'certificate_system', 'backend', 'uploads', 'qr_codes'
+            )
+            qr_path = _os.path.join(qr_dir, f"{certificate_id}.png")
+            if not _os.path.exists(qr_path):
+                qr_path = generate_qr_code(certificate_id, verification_url)
+            generate_certificate_pdf(
+                student_name=cert.student_name,
+                domain_name=cert.domain_name,
+                start_date=cert.start_date,
+                end_date=cert.end_date,
+                issue_date=cert.issue_date,
+                certificate_id=certificate_id,
+                qr_code_path=qr_path
+            )
+        except Exception as regen_err:
+            current_app.logger.error(f"Certificate regen failed for {certificate_id}: {regen_err}")
+            flash('Certificate file could not be generated. Please contact support.', 'danger')
+            return redirect(url_for('student.certificates'))
+
+    if not os.path.exists(full_path):
+        flash('Certificate file not found. Please contact support.', 'danger')
+        return redirect(url_for('student.certificates'))
+
+    return send_from_directory(cert_dir, filename, as_attachment=False)
 
 
 

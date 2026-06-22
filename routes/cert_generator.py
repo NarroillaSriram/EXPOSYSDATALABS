@@ -146,7 +146,10 @@ def generate_certificate_pdf(
             d2 = datetime.strptime(str(end_date), '%Y-%m-%d') if not isinstance(end_date, date) else end_date
             months = round((d2 - d1).days / 30.0)
             if months < 1: months = 1
-            duration_text = f"{months} months"
+            if months == 1:
+                duration_text = "1 month"
+            else:
+                duration_text = f"{months} months"
         except:
             duration_text = "the specified period"
             
@@ -165,7 +168,7 @@ def generate_certificate_pdf(
         alignment=1 # Center align
     )
     
-    paragraph_text = f"For the Completing Internship with <b>Exposys Data Labs</b> under the domain <b>{domain_name}</b> of duration {duration_text} from {start_fmt} to {end_fmt}. During this Intership program, he/She demonstrated technical competence, problem-solving skills, and professionalism throughout the internship period."
+    paragraph_text = f"For the Completing Internship with <b>Exposys Data Labs</b> under the domain <b>{domain_name}</b> of duration {duration_text} from {start_fmt} to {end_fmt}. During this Internship program, he/She demonstrated technical competence, problem-solving skills, and professionalism throughout the internship period."
     
     p = Paragraph(paragraph_text, style)
     p_width = W - 200
