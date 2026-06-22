@@ -37,6 +37,9 @@
       <a href="{{ url_for('admin.students') }}" class="{{ 'active' if request.endpoint == 'admin.students' }}">
         <i class="fas fa-users"></i> Students
       </a>
+      <a href="{{ url_for('admin.submissions') }}" class="{{ 'active' if request.endpoint == 'admin.submissions' }}">
+        <i class="fas fa-file-upload"></i> Submissions
+      </a>
       <a href="{{ url_for('admin.certificates') }}" class="{{ 'active' if request.endpoint == 'admin.certificates' }}">
         <i class="fas fa-award"></i> Certificates
       </a>

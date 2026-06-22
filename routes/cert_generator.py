@@ -97,70 +97,48 @@ def generate_certificate_pdf(
     W, H = landscape(A4)  # 841.89 × 595.28 pt
     c = rl_canvas.Canvas(pdf_path, pagesize=(W, H))
 
-    # ── Happy, Peaceful Blue Color Palette ─────────────────────────────────
-    BG_COLOR = HexColor('#F0F8FF')       # Soft Alice Blue (very peaceful and happy)
-    SOFT_SLATE = HexColor('#94A3B8')     # Peaceful gentle border color
-    MUTED_GOLD = HexColor('#D4AF37')     # Elegant gold for inner accent
-    TEXT_MAIN = HexColor('#1E293B')      # Deep slate for main text
-    TEXT_SUBTLE = HexColor('#475569')    # Subtle grey for reading text
-    DARK_BLUE = HexColor('#0F172A')      # Very deep dark blue/navy
-    EXPOSYS_BLUE = HexColor('#1D4ED8')   # Highlight dark blue for Exposys
+    # Color Palette
+    TEXT_MAIN = HexColor('#0f172a')
+    EXPOSYS_BLUE = HexColor('#1e40af')
+    TEXT_SUBTLE = HexColor('#334155')
 
     CX = W / 2
 
-    # 1. Background Fill
-    c.setFillColor(BG_COLOR)
-    c.rect(0, 0, W, H, fill=1, stroke=0)
+    # 1. Background Image
+    bg_path = os.path.join(_BASE, 'certificate_system', 'backend', 'certificate_template_blue.png')
+    if os.path.exists(bg_path):
+        c.drawImage(bg_path, 0, 0, width=W, height=H)
+    else:
+        # Fallback if image not found
+        c.setFillColor(white)
+        c.rect(0, 0, W, H, fill=1, stroke=0)
 
-    # 2. Peaceful Rounded Borders
-    # Outer border (Soft Dark Blue)
-    M_OUT = 40
-    c.setStrokeColor(DARK_BLUE)
-    c.setLineWidth(1.5)
-    c.roundRect(M_OUT, M_OUT, W - 2*M_OUT, H - 2*M_OUT, radius=25, stroke=1, fill=0)
-
-    # Inner border (Muted Gold)
-    M_IN = 50
-    c.setStrokeColor(MUTED_GOLD)
-    c.setLineWidth(0.8)
-    c.roundRect(M_IN, M_IN, W - 2*M_IN, H - 2*M_IN, radius=20, stroke=1, fill=0)
-
-    # 3. Soft Header (Exposys highlighted in Dark Blue)
-    Y = H - 120
-    _center(c, "E X P O S Y S   D A T A   L A B S", 'Helvetica-Bold', 18, EXPOSYS_BLUE, Y, W-100, W, charSpace=1.5)
+    # 2. Header
+    Y = H - 90
+    _center(c, "EXPOSYS DATA LABS", 'Helvetica-Bold', 18, EXPOSYS_BLUE, Y, W-100, W, charSpace=1.5)
     
-    Y -= 15
-    c.setStrokeColor(MUTED_GOLD)
-    c.setLineWidth(1)
-    c.line(CX - 40, Y + 6, CX + 40, Y + 6)
-    
-    # 4. Certificate Title
-    Y -= 55
-    _center(c, "CERTIFICATE OF COMPLETION", 'Times-Bold', 40, DARK_BLUE, Y, W-100, W)
+    Y -= 50
+    _center(c, "CERTIFICATE", 'Times-Bold', 42, EXPOSYS_BLUE, Y, W-100, W, charSpace=2)
+    Y -= 30
+    _center(c, "OF COMPLETION", 'Times-Bold', 28, EXPOSYS_BLUE, Y, W-100, W, charSpace=1)
 
-    Y -= 40
-    _center(c, "This certificate is proudly awarded to", 'Times-Italic', 18, TEXT_SUBTLE, Y, W-100, W)
+    Y -= 50
+    _center(c, "This certificate is proudly presented to", 'Helvetica', 16, TEXT_SUBTLE, Y, W-100, W)
 
-    # 5. Student Name (Hero Element)
-    Y -= 75
+    # 3. Student Name (Cursive/Italicized hero text)
+    Y -= 70
     name_str = _tc(student_name)
-    tw, _ = _center(c, name_str, 'Helvetica-Bold', 42, EXPOSYS_BLUE, Y, W-200, W, charSpace=1)
+    tw, _ = _center(c, name_str, 'Times-Italic', 46, EXPOSYS_BLUE, Y, W-200, W, charSpace=1)
 
-    # Very delicate line under name
-    Y -= 20
-    line_w = max(tw + 80, 350)
-    c.setStrokeColor(SOFT_SLATE)
-    c.setLineWidth(0.5)
+    # Line under name
+    Y -= 15
+    line_w = max(tw + 80, 400)
+    c.setStrokeColor(HexColor('#94a3b8'))
+    c.setLineWidth(1)
     c.line(CX - line_w/2, Y, CX + line_w/2, Y)
 
-    # 6. Description & Domain (Standard professional wording)
+    # 4. Paragraph Content (From Picture 1)
     Y -= 40
-    _center(c, "for successfully completing the internship program in", 'Times-Italic', 16, TEXT_SUBTLE, Y, W-100, W)
-
-    Y -= 40
-    _center(c, domain_name, 'Times-Bold', 22, DARK_BLUE, Y, W-100, W, charSpace=0.5)
-
-    Y -= 35
     if not duration_text:
         try:
             from datetime import datetime
@@ -168,58 +146,71 @@ def generate_certificate_pdf(
             d2 = datetime.strptime(str(end_date), '%Y-%m-%d') if not isinstance(end_date, date) else end_date
             months = round((d2 - d1).days / 30.0)
             if months < 1: months = 1
-            duration_text = f"{months} Month{'s' if months > 1 else ''}"
+            duration_text = f"{months} months"
         except:
             duration_text = "the specified period"
+            
+    start_fmt = _fmt(start_date)
+    end_fmt = _fmt(end_date)
+    
+    from reportlab.platypus import Paragraph
+    from reportlab.lib.styles import ParagraphStyle
+    
+    style = ParagraphStyle(
+        name='Normal',
+        fontName='Helvetica',
+        fontSize=13,
+        textColor=TEXT_SUBTLE,
+        leading=18,
+        alignment=1 # Center align
+    )
+    
+    paragraph_text = f"For the Completing Internship with <b>Exposys Data Labs</b> under the domain <b>{domain_name}</b> of duration {duration_text} from {start_fmt} to {end_fmt}. During this Intership program, he/She demonstrated technical competence, problem-solving skills, and professionalism throughout the internship period."
+    
+    p = Paragraph(paragraph_text, style)
+    p_width = W - 200
+    p_height = p.wrap(p_width, H)[1]
+    p.drawOn(c, 100, Y - p_height + 15)
 
-    dur_str = f"for a duration of {duration_text}."
-    _center(c, dur_str, 'Helvetica', 14, TEXT_SUBTLE, Y, W-100, W)
-
-    # 7. Peaceful, perfectly balanced footer
-    FOOT_Y_LINE = 110
+    Y -= p_height + 25
     
-    # Left: Date
-    DATE_X = 180
-    c.setFont('Times-Bold', 14)
-    c.setFillColor(DARK_BLUE)
-    date_text = _fmt(issue_date)
-    c.drawString(DATE_X - c.stringWidth(date_text, 'Times-Bold', 14)/2, FOOT_Y_LINE + 5, date_text)
-    
-    c.setStrokeColor(SOFT_SLATE)
-    c.setLineWidth(0.5)
-    c.line(DATE_X - 50, FOOT_Y_LINE - 5, DATE_X + 50, FOOT_Y_LINE - 5)
-    
-    c.setFont('Helvetica', 9)
+    # ID and Date
+    c.setFont('Helvetica', 12)
     c.setFillColor(TEXT_SUBTLE)
-    c.drawString(DATE_X - c.stringWidth("Date of Issue", 'Helvetica', 9)/2, FOOT_Y_LINE - 20, "Date of Issue")
+    c.drawString(CX - 100, Y, f"Unique id: [ {certificate_id} ]")
+    c.drawString(CX - 100, Y - 20, f"Issued Date: [ {_fmt(issue_date)} ]")
 
-    # Center: Signature
-    SIG_X = CX
-    c.setFont('Times-BoldItalic', 20)
-    c.setFillColor(EXPOSYS_BLUE)
-    sig_name = "Vishnuvardhan Y"
-    c.drawString(SIG_X - c.stringWidth(sig_name, 'Times-BoldItalic', 20)/2, FOOT_Y_LINE + 5, sig_name)
+    # 5. Footer (Signatures and Badge)
+    FOOT_Y_LINE = 100
     
-    c.setStrokeColor(SOFT_SLATE)
+    # Left Signature
+    SIG_L_X = 220
+    c.setFont('Helvetica-Bold', 13)
+    c.setFillColor(TEXT_MAIN)
+    c.drawString(SIG_L_X - c.stringWidth("Vishnuvardhan y", 'Helvetica-Bold', 13)/2, FOOT_Y_LINE + 5, "Vishnuvardhan y")
+    c.setStrokeColor(TEXT_SUBTLE)
     c.setLineWidth(0.5)
-    c.line(SIG_X - 70, FOOT_Y_LINE - 5, SIG_X + 70, FOOT_Y_LINE - 5)
-    
-    c.setFont('Helvetica-Bold', 9)
-    c.setFillColor(DARK_BLUE)
-    title_text = "Chief Product Officer"
-    c.drawString(SIG_X - c.stringWidth(title_text, 'Helvetica-Bold', 9)/2, FOOT_Y_LINE - 20, title_text)
+    c.line(SIG_L_X - 80, FOOT_Y_LINE - 5, SIG_L_X + 80, FOOT_Y_LINE - 5)
+    c.setFont('Helvetica', 11)
+    c.drawString(SIG_L_X - c.stringWidth("Chief Product Officer", 'Helvetica', 11)/2, FOOT_Y_LINE - 20, "Chief Product Officer")
 
-    # Right: Clean, Soft QR Code Integration
+    # Right Signature
+    SIG_R_X = W - 220
+    c.setFont('Helvetica-Bold', 13)
+    c.setFillColor(TEXT_MAIN)
+    c.drawString(SIG_R_X - c.stringWidth("Mothukuri Karthik", 'Helvetica-Bold', 13)/2, FOOT_Y_LINE + 5, "Mothukuri Karthik")
+    c.setStrokeColor(TEXT_SUBTLE)
+    c.setLineWidth(0.5)
+    c.line(SIG_R_X - 80, FOOT_Y_LINE - 5, SIG_R_X + 80, FOOT_Y_LINE - 5)
+    c.setFont('Helvetica', 11)
+    c.drawString(SIG_R_X - c.stringWidth("Chief Operation Manager", 'Helvetica', 11)/2, FOOT_Y_LINE - 20, "Chief Operation Manager")
+
+    # Center QR Code / Badge
     if qr_code_path and os.path.exists(qr_code_path):
-        QR_SIZE = 60
-        QR_X = W - 180
-        QR_Y = FOOT_Y_LINE - 25
+        QR_SIZE = 75
+        QR_X = CX
+        QR_Y = FOOT_Y_LINE - 30
         c.drawImage(qr_code_path, QR_X - QR_SIZE/2, QR_Y, width=QR_SIZE, height=QR_SIZE, preserveAspectRatio=True)
-        
-        c.setFont('Helvetica', 7)
-        c.setFillColor(TEXT_SUBTLE)
-        id_text = f"ID: {certificate_id}"
-        c.drawString(QR_X - c.stringWidth(id_text, 'Helvetica', 7)/2, QR_Y - 12, id_text)
 
     c.save()
     return pdf_path

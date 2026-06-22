@@ -1,0 +1,24 @@
+{
+  "EXPOSYS-CERT-5-4A8C2A07": {
+    "certificateId": "EXPOSYS-CERT-5-4A8C2A07",
+    "studentName": "Pavani Munnanooru",
+    "domainName": "Full Stack Developer",
+    "issueDate": "2026-06-18T18:30:00.000Z",
+    "certificateHash": "43bac37e4efedee1d80cbf87b291ec6a4163c6136ef0b146cec76cb156122adf",
+    "verificationUrl": "http://localhost:5173/verify/EXPOSYS-CERT-5-4A8C2A07",
+    "txHash": "0x74eb1b3daa1083edc0056fff7701eb324732e5d602203fbdf00c1af06bb0ceac",
+    "isRevoked": false,
+    "registeredAt": "2026-06-19T07:02:38.711Z"
+  },
+  "EXPOSYS-CERT-5-695AC98A": {
+    "certificateId": "EXPOSYS-CERT-5-695AC98A",
+    "studentName": "Pavani Munnanooru",
+    "domainName": "Full Stack Developer",
+    "issueDate": "2026-06-18T18:30:00.000Z",
+    "certificateHash": "c1f784797b5a084749ca494d7f334ed94e510c3f7810ca31a4f5e8ca5d3833b2",
+    "verificationUrl": "http://localhost:5173/verify/EXPOSYS-CERT-5-695AC98A",
+    "txHash": "0x9e6ef80e10dc6170c91e23a36756e74af21de781cd681f47c550d5251d7631b2",
+    "isRevoked": false,
+    "registeredAt": "2026-06-19T07:02:51.884Z"
+  }
+}

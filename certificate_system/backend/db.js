@@ -1,5 +1,6 @@
 const { Pool } = require('pg');
-require('dotenv').config(); // Load environment variables
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '../../.env') }); // Load environment variables from project root
 
 const pool = new Pool({
   user: process.env.DB_USERNAME || 'postgres',

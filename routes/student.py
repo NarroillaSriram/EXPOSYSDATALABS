@@ -6,7 +6,7 @@ from flask import (Blueprint, render_template, flash, redirect, url_for,
                    request, current_app, jsonify, session, abort)
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
-from models.models import Payment, Student, AddonPayment, Certificate
+from models.models import Payment, Student, AddonPayment, Certificate, ProjectSubmission
 from models import db, csrf
 from forms import PaymentForm
 from domain_content import get_domain_content
@@ -568,8 +568,9 @@ def domain_detail(domain):
         return redirect(url_for('student.addon_payment', domain=domain))
 
     content = get_domain_content(domain)
+    submission = ProjectSubmission.query.filter_by(student_id=current_user.id, domain=domain).first()
     return render_template('student/domain_detail.html', domain=domain,
-                           student=current_user, content=content)
+                           student=current_user, content=content, submission=submission)
 
 
 # ─────────────────────────────────────────────
@@ -599,3 +600,58 @@ def view_receipt(payment_type, payment_id):
         abort(404)
 
     return render_template('student/receipt_view.html', payment=payment, student=student, domain=domain, type_raw=payment_type)
+
+
+# ─────────────────────────────────────────────
+# PROJECT SUBMISSION
+# ─────────────────────────────────────────────
+
+@student_bp.route('/submit-project/<path:domain>', methods=['POST'])
+@login_required
+@student_required
+def submit_project(domain):
+    if not student_has_domain_access(current_user._get_current_object(), domain):
+        flash('You do not have access to submit a project for this domain.', 'danger')
+        return redirect(url_for('student.dashboard'))
+
+    if 'project_file' not in request.files:
+        flash('No file part', 'danger')
+        return redirect(request.referrer or url_for('student.dashboard'))
+        
+    file = request.files['project_file']
+    if file.filename == '':
+        flash('No selected file', 'danger')
+        return redirect(request.referrer or url_for('student.dashboard'))
+        
+    if file:
+        filename = secure_filename(file.filename)
+        # Create unique filename
+        import uuid
+        unique_filename = f"{current_user.id}_{uuid.uuid4().hex[:8]}_{filename}"
+        
+        upload_folder = os.path.join(current_app.config['UPLOAD_FOLDER'], 'projects')
+        os.makedirs(upload_folder, exist_ok=True)
+        file_path = os.path.join(upload_folder, unique_filename)
+        file.save(file_path)
+        
+        # Check if already submitted
+        submission = ProjectSubmission.query.filter_by(
+            student_id=current_user.id, 
+            domain_name=domain
+        ).first()
+        
+        if submission:
+            submission.file_path = unique_filename
+            submission.status = 'submitted'
+        else:
+            submission = ProjectSubmission(
+                student_id=current_user.id,
+                domain_name=domain,
+                file_path=unique_filename
+            )
+            db.session.add(submission)
+            
+        db.session.commit()
+        flash('Your project has been submitted successfully!', 'success')
+        
+    return redirect(request.referrer or url_for('student.domain_detail', domain=domain))
