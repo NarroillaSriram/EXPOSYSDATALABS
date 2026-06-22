@@ -1,0 +1,505 @@
+{% extends "base.html" %}
+{% block title %}Verify Certificate — Exposys Data Labs{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* ── PAGE WRAPPER ── */
+  .verify-page {
+    min-height: 100vh;
+    padding: 120px 0 80px;
+    background: linear-gradient(160deg, #0a1628 0%, #0f2460 40%, #0a1628 100%);
+    position: relative;
+    overflow: hidden;
+  }
+  .verify-page::before {
+    content: '';
+    position: absolute;
+    top: -200px; right: -200px;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(250,204,21,0.06) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  .verify-page::after {
+    content: '';
+    position: absolute;
+    bottom: -150px; left: -150px;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(59,130,246,0.08) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  /* ── HERO SECTION ── */
+  .verify-hero {
+    text-align: center;
+    margin-bottom: 52px;
+    position: relative; z-index: 2;
+  }
+  .verify-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(250,204,21,0.1);
+    border: 1px solid rgba(250,204,21,0.3);
+    color: #facc15; border-radius: 30px;
+    padding: 7px 20px; font-size: 0.8rem;
+    font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+    margin-bottom: 24px;
+    animation: fadeDown 0.6s cubic-bezier(0.16,1,0.3,1) both;
+  }
+  .verify-hero h1 {
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 900; color: #fff;
+    line-height: 1.15; margin-bottom: 16px;
+    animation: fadeDown 0.7s cubic-bezier(0.16,1,0.3,1) both; animation-delay: 0.05s;
+  }
+  .verify-hero h1 span { color: #facc15; }
+  .verify-hero p {
+    color: rgba(255,255,255,0.6); font-size: 1.05rem;
+    max-width: 520px; margin: 0 auto;
+    animation: fadeDown 0.8s cubic-bezier(0.16,1,0.3,1) both; animation-delay: 0.1s;
+  }
+
+  /* ── SEARCH BOX ── */
+  .search-card {
+    background: rgba(255,255,255,0.04);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 24px; padding: 40px 40px 36px;
+    max-width: 680px; margin: 0 auto 48px;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.35);
+    position: relative; z-index: 2;
+    animation: fadeUp 0.8s cubic-bezier(0.16,1,0.3,1) both; animation-delay: 0.15s;
+  }
+  .search-label {
+    font-size: 0.8rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.8px; color: rgba(255,255,255,0.5); margin-bottom: 12px;
+  }
+  .search-input-wrap {
+    display: flex; gap: 12px;
+  }
+  .cert-input {
+    flex: 1;
+    background: rgba(255,255,255,0.07);
+    border: 1.5px solid rgba(255,255,255,0.15);
+    border-radius: 14px; padding: 15px 20px;
+    color: #fff; font-size: 1rem; font-family: monospace;
+    letter-spacing: 0.5px;
+    outline: none; transition: all 0.25s;
+  }
+  .cert-input::placeholder { color: rgba(255,255,255,0.3); font-family: inherit; }
+  .cert-input:focus { border-color: rgba(250,204,21,0.5); background: rgba(255,255,255,0.1); box-shadow: 0 0 0 4px rgba(250,204,21,0.1); }
+  .search-btn {
+    background: linear-gradient(135deg, #facc15 0%, #f59e0b 100%);
+    color: #0f172a; border: none; border-radius: 14px;
+    padding: 15px 28px; font-weight: 800; font-size: 0.95rem;
+    cursor: pointer; transition: all 0.25s; white-space: nowrap;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .search-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(250,204,21,0.3); }
+  .search-hint {
+    margin-top: 14px; font-size: 0.78rem; color: rgba(255,255,255,0.35);
+    display: flex; align-items: center; gap: 6px;
+  }
+
+  /* ── RESULT CARD ── */
+  .result-card {
+    max-width: 760px; margin: 0 auto;
+    border-radius: 24px; overflow: hidden;
+    box-shadow: 0 30px 70px rgba(0,0,0,0.4);
+    position: relative; z-index: 2;
+    animation: fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) both;
+  }
+
+  /* ── RESULT BANNER ── */
+  .result-banner {
+    padding: 32px 36px;
+    display: flex; align-items: center; gap: 22px; flex-wrap: wrap;
+  }
+  .result-banner.valid   { background: linear-gradient(135deg, #064e3b, #065f46); border-bottom: 1px solid rgba(16,185,129,0.25); }
+  .result-banner.invalid { background: linear-gradient(135deg, #450a0a, #7f1d1d); border-bottom: 1px solid rgba(239,68,68,0.25); }
+
+  .result-icon-ring {
+    width: 70px; height: 70px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.9rem; flex-shrink: 0;
+  }
+  .valid   .result-icon-ring { background: rgba(16,185,129,0.15); color: #34d399; border: 2px solid rgba(52,211,153,0.4); animation: pulse-green 2.5s ease-in-out infinite; }
+  .invalid .result-icon-ring { background: rgba(239,68,68,0.15);  color: #f87171; border: 2px solid rgba(248,113,113,0.4); }
+
+  .result-text .tag {
+    font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 1px; opacity: 0.7; margin-bottom: 6px;
+  }
+  .valid   .result-text .tag { color: #6ee7b7; }
+  .invalid .result-text .tag { color: #fca5a5; }
+  .result-text h2 { font-weight: 900; font-size: 1.55rem; margin-bottom: 6px; color: #fff; }
+  .result-text p  { font-size: 0.87rem; color: rgba(255,255,255,0.65); margin: 0; line-height: 1.5; }
+  .cert-id-pill {
+    display: inline-flex; align-items: center; gap: 7px; margin-top: 10px;
+    background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 30px; padding: 5px 14px;
+    font-size: 0.75rem; font-family: monospace; color: rgba(255,255,255,0.8);
+  }
+
+  /* ── DETAIL GRID ── */
+  .result-body { background: rgba(255,255,255,0.03); padding: 32px 36px; }
+  .detail-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;
+  }
+  @media (max-width: 580px) { .detail-grid { grid-template-columns: 1fr; } }
+
+  .detail-item {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 14px; padding: 18px 20px;
+    transition: all 0.2s;
+  }
+  .detail-item:hover { background: rgba(255,255,255,0.08); }
+  .detail-key {
+    font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.7px; color: rgba(255,255,255,0.4);
+    display: flex; align-items: center; gap: 6px; margin-bottom: 7px;
+  }
+  .detail-val { font-size: 0.95rem; font-weight: 700; color: #fff; }
+  .detail-val.highlight { color: #facc15; font-size: 1.05rem; }
+
+  /* ── STATUS STAMP ── */
+  .status-stamp-valid {
+    margin-left: auto; flex-shrink: 0;
+    width: 80px; height: 80px; border-radius: 50%;
+    border: 3px solid rgba(52,211,153,0.5);
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; gap: 2px;
+    font-size: 0.55rem; font-weight: 800; text-transform: uppercase;
+    letter-spacing: 0.3px; color: #34d399;
+  }
+  .status-stamp-valid i { font-size: 1.4rem; }
+
+  /* ── BLOCKCHAIN BOX ── */
+  .blockchain-section {
+    background: linear-gradient(135deg, rgba(30,64,175,0.12), rgba(59,130,246,0.06));
+    border: 1px solid rgba(59,130,246,0.2);
+    border-radius: 16px; padding: 22px 24px; margin-bottom: 20px;
+  }
+  .bc-title {
+    font-size: 0.88rem; font-weight: 800; color: #93c5fd;
+    display: flex; align-items: center; gap: 8px; margin-bottom: 14px;
+  }
+  .bc-row { margin-bottom: 10px; }
+  .bc-row:last-child { margin-bottom: 0; }
+  .bc-key { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: rgba(147,197,253,0.55); margin-bottom: 3px; }
+  .bc-val { font-family: monospace; font-size: 0.78rem; color: #bfdbfe; word-break: break-all; line-height: 1.5; }
+
+  /* ── ACTIONS ── */
+  .result-actions {
+    display: flex; gap: 12px; flex-wrap: wrap; margin-top: 24px;
+  }
+  .btn-view-cert {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: linear-gradient(135deg, #facc15, #f59e0b);
+    color: #0f172a; border: none; border-radius: 12px;
+    padding: 13px 24px; font-weight: 800; font-size: 0.9rem;
+    text-decoration: none; cursor: pointer; transition: all 0.25s;
+  }
+  .btn-view-cert:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(250,204,21,0.3); color: #0f172a; }
+  .btn-download-cert {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(16,185,129,0.15); border: 1.5px solid rgba(16,185,129,0.3);
+    color: #34d399; border-radius: 12px; padding: 13px 22px;
+    font-weight: 700; font-size: 0.9rem; text-decoration: none; transition: all 0.25s;
+  }
+  .btn-download-cert:hover { background: rgba(16,185,129,0.25); color: #34d399; transform: translateY(-2px); }
+  .btn-try-again {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(255,255,255,0.06); border: 1.5px solid rgba(255,255,255,0.15);
+    color: rgba(255,255,255,0.7); border-radius: 12px; padding: 13px 22px;
+    font-weight: 700; font-size: 0.9rem; text-decoration: none; transition: all 0.25s;
+    cursor: pointer;
+  }
+  .btn-try-again:hover { background: rgba(255,255,255,0.1); color: #fff; }
+
+  /* ── HOW IT WORKS ── */
+  .how-section {
+    max-width: 760px; margin: 56px auto 0;
+    position: relative; z-index: 2;
+    animation: fadeUp 0.9s cubic-bezier(0.16,1,0.3,1) both; animation-delay: 0.2s;
+  }
+  .how-section h3 {
+    text-align: center; color: rgba(255,255,255,0.5);
+    font-size: 0.8rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 1px; margin-bottom: 28px;
+  }
+  .how-steps {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+  }
+  @media (max-width: 580px) { .how-steps { grid-template-columns: 1fr; } }
+  .how-step {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 16px; padding: 20px;
+    text-align: center; transition: all 0.25s;
+  }
+  .how-step:hover { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.12); }
+  .how-step-num {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: rgba(250,204,21,0.12); border: 1px solid rgba(250,204,21,0.25);
+    color: #facc15; font-weight: 900; font-size: 0.9rem;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 12px;
+  }
+  .how-step h5 { font-size: 0.88rem; font-weight: 800; color: #fff; margin-bottom: 6px; }
+  .how-step p  { font-size: 0.78rem; color: rgba(255,255,255,0.45); margin: 0; line-height: 1.5; }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp   { from { opacity:0; transform:translateY(22px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes fadeDown { from { opacity:0; transform:translateY(-14px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes pulse-green {
+    0%,100% { box-shadow: 0 0 0 0 rgba(52,211,153,0.3); }
+    50%      { box-shadow: 0 0 0 12px rgba(52,211,153,0); }
+  }
+
+  /* ── MOBILE ── */
+  @media (max-width: 576px) {
+    .search-card { padding: 28px 20px; margin: 0 4px 36px; }
+    .search-input-wrap { flex-direction: column; }
+    .search-btn { justify-content: center; }
+    .result-banner { padding: 24px 20px; flex-direction: column; }
+    .status-stamp-valid { display: none; }
+    .result-body { padding: 24px 20px; }
+    .result-actions { flex-direction: column; }
+    .btn-view-cert, .btn-download-cert, .btn-try-again { justify-content: center; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="verify-page">
+  <div class="container">
+
+    <!-- ── HERO ── -->
+    <div class="verify-hero">
+      <div class="verify-badge"><i class="fas fa-shield-check"></i> Blockchain Verified Registry</div>
+      <h1>Verify Any <span>Certificate</span></h1>
+      <p>Enter a certificate ID to instantly check if an Exposys Data Labs internship certificate is genuine and view full details.</p>
+    </div>
+
+    <!-- ── SEARCH CARD ── -->
+    <div class="search-card">
+      <div class="search-label"><i class="fas fa-fingerprint me-1"></i> Enter Certificate ID</div>
+      <form method="POST" action="{{ url_for('main.verify_search') }}" id="verifyForm">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="search-input-wrap">
+          <input type="text" name="certificate_id" id="certIdInput" class="cert-input"
+                 placeholder="e.g. EXPOSYS-CERT-123456-AB12CD"
+                 value="{{ certificate_id or '' }}"
+                 autocomplete="off" spellcheck="false" required />
+          <button type="submit" class="search-btn">
+            <i class="fas fa-search"></i> Verify Now
+          </button>
+        </div>
+      </form>
+      <div class="search-hint">
+        <i class="fas fa-info-circle" style="color:rgba(250,204,21,0.5);"></i>
+        The certificate ID is printed on your certificate and emailed to you after issuance.
+      </div>
+    </div>
+
+    <!-- ── RESULTS ── -->
+    {% if searched %}
+
+      {% if cert and cert.status == 'approved' %}
+      <!-- ✅ VALID CERTIFICATE -->
+      <div class="result-card">
+        <div class="result-banner valid">
+          <div class="result-icon-ring"><i class="fas fa-shield-check"></i></div>
+          <div class="result-text">
+            <div class="tag"><i class="fas fa-check-circle me-1"></i> Authentic &amp; Blockchain Verified</div>
+            <h2>Certificate is Genuine ✓</h2>
+            <p>This certificate has been verified and is permanently recorded on the Polygon Blockchain. It is authentic and tamper-proof.</p>
+            <div class="cert-id-pill"><i class="fas fa-fingerprint"></i> {{ cert.certificate_id }}</div>
+          </div>
+          <div class="status-stamp-valid"><i class="fas fa-check-double"></i><span>Verified</span></div>
+        </div>
+
+        <div class="result-body">
+          <!-- Certificate Details Grid -->
+          <div class="detail-grid">
+            <div class="detail-item" style="grid-column: span 2;">
+              <div class="detail-key"><i class="fas fa-user"></i> Certificate Holder</div>
+              <div class="detail-val highlight">{{ cert.student_name }}</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-key"><i class="fas fa-laptop-code"></i> Internship Domain</div>
+              <div class="detail-val">{{ cert.domain_name }}</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-key"><i class="fas fa-hourglass-half"></i> Duration</div>
+              <div class="detail-val">
+                {% if cert.start_date and cert.end_date %}
+                  {% set days = (cert.end_date - cert.start_date).days %}
+                  {% set months = (days / 30) | round | int %}
+                  {% if months < 1 %}Less than 1 Month
+                  {% elif months == 1 %}1 Month
+                  {% else %}{{ months }} Months{% endif %}
+                {% else %}—{% endif %}
+              </div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-key"><i class="fas fa-calendar-alt"></i> Internship Period</div>
+              <div class="detail-val" style="font-size:0.88rem;">
+                {% if cert.start_date %}
+                  {{ cert.start_date.strftime('%d %b %Y') }} → {{ cert.end_date.strftime('%d %b %Y') }}
+                {% else %}—{% endif %}
+              </div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-key"><i class="fas fa-stamp"></i> Issue Date</div>
+              <div class="detail-val">
+                {% if cert.issue_date %}{{ cert.issue_date.strftime('%d %b %Y') }}{% else %}—{% endif %}
+              </div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-key"><i class="fas fa-circle-check"></i> Certificate Status</div>
+              <div class="detail-val" style="color:#34d399;">✓ Approved &amp; Valid</div>
+            </div>
+          </div>
+
+          <!-- Blockchain Details -->
+          <div class="blockchain-section">
+            <div class="bc-title"><i class="fas fa-link"></i> Blockchain Registration</div>
+            {% if cert.blockchain_hash %}
+            <div class="bc-row">
+              <div class="bc-key">SHA-256 Certificate Hash</div>
+              <div class="bc-val">{{ cert.blockchain_hash }}</div>
+            </div>
+            {% endif %}
+            {% if cert.tx_hash %}
+            <div class="bc-row">
+              <div class="bc-key">Transaction Hash (Tx ID)</div>
+              <div class="bc-val">{{ cert.tx_hash }}</div>
+            </div>
+            {% endif %}
+            <div class="bc-row">
+              <div class="bc-key">Network</div>
+              <div class="bc-val" style="font-family:inherit; color:#a5b4fc;">Polygon Blockchain — Immutable Record</div>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="result-actions">
+            <a href="{{ url_for('main.verify_certificate', certificate_id=cert.certificate_id) }}"
+               target="_blank" class="btn-view-cert">
+              <i class="fas fa-external-link-alt"></i> View Full Certificate Page
+            </a>
+            <button type="button" class="btn-try-again" onclick="clearSearch()">
+              <i class="fas fa-search"></i> Verify Another
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {% elif cert %}
+      <!-- ⚠️ REVOKED / INVALID -->
+      <div class="result-card">
+        <div class="result-banner invalid">
+          <div class="result-icon-ring"><i class="fas fa-exclamation-triangle"></i></div>
+          <div class="result-text">
+            <div class="tag"><i class="fas fa-times-circle me-1"></i> Certificate Not Valid</div>
+            <h2>Certificate is NOT Valid ✗</h2>
+            <p>This certificate exists in our registry but its current status is <strong style="color:#fca5a5;">{{ cert.status | upper }}</strong>. It is not an active verified credential.</p>
+            <div class="cert-id-pill"><i class="fas fa-fingerprint"></i> {{ cert.certificate_id }}</div>
+          </div>
+        </div>
+        <div class="result-body" style="text-align:center; padding:40px 36px;">
+          <p style="color:rgba(255,255,255,0.55); font-size:0.9rem; margin-bottom:24px;">
+            If you believe this is a mistake, please contact
+            <a href="mailto:exposysdatalabs@gmail.com" style="color:#93c5fd;">exposysdatalabs@gmail.com</a>
+            with the certificate ID.
+          </p>
+          <div class="result-actions" style="justify-content:center;">
+            <button type="button" class="btn-try-again" onclick="clearSearch()">
+              <i class="fas fa-search"></i> Try Another ID
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {% else %}
+      <!-- ❌ NOT FOUND -->
+      <div class="result-card">
+        <div class="result-banner invalid">
+          <div class="result-icon-ring"><i class="fas fa-times-circle"></i></div>
+          <div class="result-text">
+            <div class="tag"><i class="fas fa-times-circle me-1"></i> Not Found</div>
+            <h2>Certificate Not Found ✗</h2>
+            <p>No certificate matching <strong style="font-family:monospace; color:#fca5a5;">{{ certificate_id }}</strong> was found in our blockchain registry. It may be invalid, forged, or the ID may have a typo.</p>
+          </div>
+        </div>
+        <div class="result-body" style="text-align:center; padding:40px 36px;">
+          <i class="fas fa-file-slash" style="font-size:3rem; color:rgba(248,113,113,0.3); margin-bottom:18px; display:block;"></i>
+          <p style="color:rgba(255,255,255,0.5); font-size:0.88rem; margin-bottom:24px; max-width:420px; margin-left:auto; margin-right:auto;">
+            Double-check the certificate ID. It should look like:<br>
+            <code style="color:#93c5fd; font-size:0.8rem;">EXPOSYS-CERT-123456-AB12CD</code>
+          </p>
+          <div class="result-actions" style="justify-content:center;">
+            <button type="button" class="btn-try-again" onclick="clearSearch()">
+              <i class="fas fa-search"></i> Try Again
+            </button>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+    {% endif %}
+
+    <!-- ── HOW IT WORKS ── -->
+    {% if not searched %}
+    <div class="how-section">
+      <h3>How Certificate Verification Works</h3>
+      <div class="how-steps">
+        <div class="how-step">
+          <div class="how-step-num">1</div>
+          <h5>Find Your ID</h5>
+          <p>Locate the certificate ID printed on your Exposys certificate or in your email.</p>
+        </div>
+        <div class="how-step">
+          <div class="how-step-num">2</div>
+          <h5>Enter &amp; Search</h5>
+          <p>Paste the ID in the search box above and click "Verify Now".</p>
+        </div>
+        <div class="how-step">
+          <div class="how-step-num">3</div>
+          <h5>Instant Result</h5>
+          <p>See full certificate details including domain, duration, and blockchain hash.</p>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  function clearSearch() {
+    document.getElementById('certIdInput').value = '';
+    document.getElementById('certIdInput').focus();
+    // Smooth scroll to search
+    document.querySelector('.search-card').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  // Auto-focus the input
+  document.addEventListener('DOMContentLoaded', function() {
+    const input = document.getElementById('certIdInput');
+    if (input && !input.value) input.focus();
+
+    // Auto-uppercase the input as user types
+    input.addEventListener('input', function() {
+      const pos = this.selectionStart;
+      this.value = this.value.toUpperCase();
+      this.setSelectionRange(pos, pos);
+    });
+  });
+</script>
+{% endblock %}

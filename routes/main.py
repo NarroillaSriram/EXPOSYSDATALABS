@@ -1,11 +1,36 @@
 from flask import Blueprint, render_template, flash, redirect, url_for, request
 from models.models import Contact, Internship, AddonPayment, Payment
-from models import db
+from models import db, csrf
 from forms import ContactForm
 from flask_login import login_required, current_user
 from models.models import Student
 
 main_bp = Blueprint('main', __name__)
+
+
+@main_bp.route('/verify', methods=['GET', 'POST'])
+@csrf.exempt
+def verify_search():
+    """Public certificate search page — enter any certificate ID to verify."""
+    cert = None
+    certificate_id = None
+    searched = False
+
+    if request.method == 'POST':
+        certificate_id = request.form.get('certificate_id', '').strip()
+        searched = True
+    elif request.args.get('id'):
+        certificate_id = request.args.get('id', '').strip()
+        searched = True
+
+    if certificate_id:
+        from models.models import Certificate
+        cert = Certificate.query.filter_by(certificate_id=certificate_id).first()
+
+    return render_template('verify_search.html',
+                           cert=cert,
+                           certificate_id=certificate_id,
+                           searched=searched)
 
 
 @main_bp.route('/verify/<certificate_id>')
