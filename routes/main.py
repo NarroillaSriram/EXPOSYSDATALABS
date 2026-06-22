@@ -16,16 +16,32 @@ def verify_search():
     certificate_id = None
     searched = False
 
+    def clean_cert_id(raw):
+        """Strip brackets, spaces, and copy-paste artifacts from certificate ID."""
+        import re
+        # Remove [ ] brackets and surrounding whitespace
+        cleaned = raw.strip()
+        cleaned = re.sub(r'^\[\s*', '', cleaned)   # remove leading [
+        cleaned = re.sub(r'\s*\]$', '', cleaned)   # remove trailing ]
+        cleaned = cleaned.strip()
+        return cleaned
+
     if request.method == 'POST':
-        certificate_id = request.form.get('certificate_id', '').strip()
+        raw = request.form.get('certificate_id', '')
+        certificate_id = clean_cert_id(raw)
         searched = True
     elif request.args.get('id'):
-        certificate_id = request.args.get('id', '').strip()
+        raw = request.args.get('id', '')
+        certificate_id = clean_cert_id(raw)
         searched = True
 
     if certificate_id:
         from models.models import Certificate
-        cert = Certificate.query.filter_by(certificate_id=certificate_id).first()
+        from sqlalchemy import func
+        # Case-insensitive search — handles UPPER/lower differences
+        cert = Certificate.query.filter(
+            func.upper(Certificate.certificate_id) == certificate_id.upper()
+        ).first()
 
     return render_template('verify_search.html',
                            cert=cert,

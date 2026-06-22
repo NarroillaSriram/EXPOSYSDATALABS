@@ -290,7 +290,7 @@
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <div class="search-input-wrap">
           <input type="text" name="certificate_id" id="certIdInput" class="cert-input"
-                 placeholder="e.g. EXPOSYS-CERT-123456-AB12CD"
+                 placeholder="e.g. EXPOSYS-CERT-123456-AB12CD34"
                  value="{{ certificate_id or '' }}"
                  autocomplete="off" spellcheck="false" required />
           <button type="submit" class="search-btn">
@@ -485,20 +485,30 @@
   function clearSearch() {
     document.getElementById('certIdInput').value = '';
     document.getElementById('certIdInput').focus();
-    // Smooth scroll to search
     document.querySelector('.search-card').scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 
-  // Auto-focus the input
   document.addEventListener('DOMContentLoaded', function() {
     const input = document.getElementById('certIdInput');
     if (input && !input.value) input.focus();
 
-    // Auto-uppercase the input as user types
+    // Auto-uppercase and strip [ ] brackets as user types
     input.addEventListener('input', function() {
       const pos = this.selectionStart;
-      this.value = this.value.toUpperCase();
+      let val = this.value.toUpperCase();
+      // Strip leading/trailing brackets and spaces
+      val = val.replace(/^\[\s*/, '').replace(/\s*\]$/, '');
+      this.value = val;
       this.setSelectionRange(pos, pos);
+    });
+
+    // Also clean on paste
+    input.addEventListener('paste', function(e) {
+      setTimeout(() => {
+        let val = this.value.toUpperCase();
+        val = val.replace(/^\[\s*/, '').replace(/\s*\]$/, '').trim();
+        this.value = val;
+      }, 10);
     });
   });
 </script>

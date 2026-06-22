@@ -177,11 +177,10 @@ def generate_certificate_pdf(
 
     Y -= p_height + 25
     
-    # ID and Date
-    c.setFont('Helvetica', 12)
+    c.setFont('Helvetica', 11)
     c.setFillColor(TEXT_SUBTLE)
-    c.drawString(CX - 100, Y, f"Unique id: [ {certificate_id} ]")
-    c.drawString(CX - 100, Y - 20, f"Issued Date: [ {_fmt(issue_date)} ]")
+    c.drawString(CX - 100, Y, f"Certificate ID:  {certificate_id}")
+    c.drawString(CX - 100, Y - 18, f"Issue Date:      {_fmt(issue_date)}")
 
     # 5. Footer (Signatures and Badge)
     FOOT_Y_LINE = 100
@@ -208,12 +207,15 @@ def generate_certificate_pdf(
     c.setFont('Helvetica', 11)
     c.drawString(SIG_R_X - c.stringWidth("Chief Operation Manager", 'Helvetica', 11)/2, FOOT_Y_LINE - 20, "Chief Operation Manager")
 
-    # Center QR Code / Badge
     if qr_code_path and os.path.exists(qr_code_path):
         QR_SIZE = 75
         QR_X = CX
         QR_Y = FOOT_Y_LINE - 30
         c.drawImage(qr_code_path, QR_X - QR_SIZE/2, QR_Y, width=QR_SIZE, height=QR_SIZE, preserveAspectRatio=True)
+        c.setFont('Helvetica', 7)
+        c.setFillColor(TEXT_SUBTLE)
+        scan_text = "Scan to Verify"
+        c.drawString(QR_X - c.stringWidth(scan_text, 'Helvetica', 7)/2, QR_Y - 10, scan_text)
 
     c.save()
     return pdf_path
