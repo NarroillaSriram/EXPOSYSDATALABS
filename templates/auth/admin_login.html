@@ -64,73 +64,7 @@
   .bg-squiggle-tr { top: 10%; right: 18%; width: 60px; transform: rotate(30deg); }
   .bg-squiggle-bl { bottom: 18%; left: 5%; width: 70px; transform: rotate(-20deg); }
 
-  /* =====================
-     OUTER BLUE BANNER CARD
-  ===================== */
-  .outer-banner {
-    width: 100%;
-    max-width: 800px;
-    min-height: 380px;
-    background: linear-gradient(135deg, #0b4f8a 0%, #0369a1 40%, #0284c7 70%, #0ea5e9 100%);
-    border-radius: 28px;
-    box-shadow: 0 30px 80px rgba(3, 105, 161, 0.45), 0 8px 24px rgba(0,0,0,0.15);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    overflow: hidden;
-    padding: 40px 32px;
-  }
 
-  /* Decorative circles inside banner */
-  .banner-deco {
-    position: absolute;
-    border-radius: 50%;
-    pointer-events: none;
-  }
-  .banner-deco-1 {
-    width: 260px; height: 260px;
-    background: rgba(255,255,255,0.06);
-    top: -60px; right: -60px;
-  }
-  .banner-deco-2 {
-    width: 180px; height: 180px;
-    background: rgba(255,255,255,0.05);
-    bottom: -60px; left: -40px;
-  }
-  .banner-deco-3 {
-    width: 100px; height: 100px;
-    background: rgba(255,255,255,0.07);
-    bottom: 20px; right: 200px;
-  }
-  .banner-deco-4 {
-    width: 60px; height: 60px;
-    background: rgba(255,255,255,0.08);
-    top: 30px; left: 40%;
-  }
-
-  /* Squiggles inside banner */
-  .banner-squiggle {
-    position: absolute;
-    pointer-events: none;
-    opacity: 0.55;
-  }
-  .banner-squiggle-left { left: 24px; top: 50%; transform: translateY(-50%); width: 90px; }
-  .banner-squiggle-right { right: 24px; top: 50%; transform: translateY(-50%) scaleX(-1); width: 90px; }
-  .banner-squiggle-top { top: 20px; left: 50%; transform: translateX(-50%) rotate(90deg); width: 70px; }
-  .banner-squiggle-bottom { bottom: 20px; left: 50%; transform: translateX(-50%) rotate(-90deg); width: 70px; }
-
-  /* Tag/lock icon on right side of banner */
-  .banner-icon-right {
-    position: absolute;
-    right: 36px;
-    top: 50%;
-    transform: translateY(-50%);
-    opacity: 0.25;
-    font-size: 5rem;
-    color: #ffffff;
-    pointer-events: none;
-  }
 
   /* =====================
      GLASSMORPHIC LOGIN CARD
@@ -380,28 +314,7 @@
     <path d="M10 10 Q30 50 50 30" stroke="#4ea8de" stroke-width="5" stroke-linecap="round" fill="none"/>
   </svg>
 
-  <!-- Outer Deep-Blue Banner -->
-  <div class="outer-banner">
-    <!-- Decorative circles inside banner -->
-    <div class="banner-deco banner-deco-1"></div>
-    <div class="banner-deco banner-deco-2"></div>
-    <div class="banner-deco banner-deco-3"></div>
-    <div class="banner-deco banner-deco-4"></div>
-
-    <!-- Squiggles inside banner -->
-    <svg class="banner-squiggle banner-squiggle-left" viewBox="0 0 80 120" fill="none">
-      <path d="M40 10 Q10 35 40 60 Q70 85 40 110" stroke="rgba(255,255,255,0.7)" stroke-width="5" stroke-linecap="round" fill="none"/>
-    </svg>
-    <svg class="banner-squiggle banner-squiggle-right" viewBox="0 0 80 120" fill="none">
-      <path d="M40 10 Q10 35 40 60 Q70 85 40 110" stroke="rgba(255,255,255,0.7)" stroke-width="5" stroke-linecap="round" fill="none"/>
-    </svg>
-
-    <!-- Lock/tag icon on far right -->
-    <div class="banner-icon-right">
-      <i class="fas fa-shield-alt"></i>
-    </div>
-
-    <!-- ===== GLASSMORPHIC LOGIN CARD ===== -->
+  <!-- ===== GLASSMORPHIC LOGIN CARD ===== -->
     <div class="glass-login-card">
 
       <!-- Logo row -->
@@ -483,9 +396,6 @@
       </p>
     </div>
     <!-- end glass-login-card -->
-
-  </div>
-  <!-- end outer-banner -->
 
 </div>
 
