@@ -169,13 +169,90 @@ def careers():
 
 @main_bp.route('/job-application', methods=['GET', 'POST'])
 def job_application():
+    import os, json
+    from werkzeug.utils import secure_filename
+    from flask import current_app
+    from models.models import JobApplication
+
     role = request.args.get('role', 'General Application')
     if request.method == 'POST':
-        # Simulate processing the application
-        flash('Your application has been submitted successfully!', 'success')
-        return redirect(url_for('main.careers'))
-    return render_template('job_application.html', role=role)
+        try:
+            # File Upload
+            resume_file = request.files.get('resume')
+            if not resume_file or resume_file.filename == '':
+                flash('Resume file is required.', 'danger')
+                return redirect(url_for('main.job_application', role=role))
+            
+            filename = secure_filename(resume_file.filename)
+            # Make sure we have a unique filename
+            import time
+            unique_filename = f"resume_{int(time.time())}_{filename}"
+            
+            # Ensure upload dir exists
+            upload_dir = os.path.join(current_app.config['UPLOAD_FOLDER'], 'resumes')
+            os.makedirs(upload_dir, exist_ok=True)
+            
+            file_path = os.path.join(upload_dir, unique_filename)
+            resume_file.save(file_path)
 
+            # Build Experience JSON
+            experiences = []
+            exp_titles = request.form.getlist('exp_title[]')
+            exp_companies = request.form.getlist('exp_company[]')
+            exp_starts = request.form.getlist('exp_start[]')
+            exp_ends = request.form.getlist('exp_end[]')
+            for i in range(len(exp_titles)):
+                if exp_titles[i] or exp_companies[i]:
+                    experiences.append({
+                        'title': exp_titles[i],
+                        'company': exp_companies[i],
+                        'start': exp_starts[i] if i < len(exp_starts) else '',
+                        'end': exp_ends[i] if i < len(exp_ends) else ''
+                    })
+            
+            # Build Education JSON
+            educations = []
+            edu_schools = request.form.getlist('edu_school[]')
+            edu_degrees = request.form.getlist('edu_degree[]')
+            edu_majors = request.form.getlist('edu_major[]')
+            for i in range(len(edu_schools)):
+                if edu_schools[i]:
+                    educations.append({
+                        'school': edu_schools[i],
+                        'degree': edu_degrees[i] if i < len(edu_degrees) else '',
+                        'major': edu_majors[i] if i < len(edu_majors) else ''
+                    })
+
+            # Create JobApplication
+            new_app = JobApplication(
+                role=request.form.get('role', role),
+                first_name=request.form.get('first_name'),
+                last_name=request.form.get('last_name'),
+                email=request.form.get('email'),
+                phone=request.form.get('phone'),
+                linkedin_url=request.form.get('linkedin'),
+                portfolio_url=request.form.get('portfolio'),
+                city=request.form.get('city'),
+                state=request.form.get('state'),
+                country=request.form.get('country'),
+                experience_json=json.dumps(experiences),
+                education_json=json.dumps(educations),
+                skills=request.form.get('skills'),
+                cover_letter=request.form.get('cover_letter'),
+                resume_filename=f"resumes/{unique_filename}"
+            )
+            
+            db.session.add(new_app)
+            db.session.commit()
+            
+            flash('Your application has been submitted successfully!', 'success')
+            return redirect(url_for('main.careers'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f'An error occurred: {str(e)}', 'danger')
+            return redirect(url_for('main.job_application', role=role))
+            
+    return render_template('job_application.html', role=role)
 
 @main_bp.route('/terms')
 def terms():

@@ -6,7 +6,7 @@ from flask import (Blueprint, render_template, flash, redirect, url_for,
                    request, session, Response, send_from_directory, abort)
 from flask_login import login_required, current_user
 from sqlalchemy import func
-from models.models import Student, Admin, Payment, Contact, Internship, AddonPayment, Certificate, ProjectSubmission
+from models.models import Student, Admin, Payment, Contact, Internship, AddonPayment, Certificate, ProjectSubmission, JobApplication
 from models import db
 
 admin_bp = Blueprint('admin', __name__)
@@ -556,3 +556,52 @@ def serve_cert_file_public(filepath):
 def submissions():
     submissions_list = ProjectSubmission.query.order_by(ProjectSubmission.created_at.desc()).all()
     return render_template('admin/submissions.html', submissions=submissions_list)
+
+@admin_bp.route('/admin/job-applications')
+@login_required
+@admin_required
+def job_applications():
+    import json
+    status_filter = request.args.get('status', '')
+    query = JobApplication.query
+    if status_filter:
+        query = query.filter_by(status=status_filter)
+    applications = query.order_by(JobApplication.created_at.desc()).all()
+    
+    # Parse JSON fields for the template
+    for app in applications:
+        app.experience = json.loads(app.experience_json) if app.experience_json else []
+        app.education = json.loads(app.education_json) if app.education_json else []
+        
+    return render_template('admin/job_applications.html', applications=applications, status_filter=status_filter)
+
+@admin_bp.route('/admin/job-applications/update/<int:app_id>', methods=['POST'])
+@login_required
+@admin_required
+def update_job_application(app_id):
+    application = JobApplication.query.get_or_404(app_id)
+    new_status = request.form.get('status')
+    if new_status in ['pending', 'reviewed', 'interviewing', 'rejected']:
+        application.status = new_status
+        db.session.commit()
+        flash(f'Application status updated to {new_status}.', 'success')
+    return redirect(url_for('admin.job_applications'))
+
+@admin_bp.route('/admin/job-applications/resume/<int:app_id>')
+@login_required
+@admin_required
+def download_resume(app_id):
+    application = JobApplication.query.get_or_404(app_id)
+    from flask import current_app
+    upload_folder = current_app.config['UPLOAD_FOLDER']
+    # The resume_filename includes 'resumes/' e.g. resumes/resume_123_file.pdf
+    filename = application.resume_filename
+    full_path = os.path.join(upload_folder, filename)
+    if not os.path.exists(full_path):
+        flash('Resume file not found on server.', 'danger')
+        return redirect(url_for('admin.job_applications'))
+        
+    directory = os.path.dirname(full_path)
+    base_name = os.path.basename(full_path)
+    return send_from_directory(directory, base_name, as_attachment=False)
+
