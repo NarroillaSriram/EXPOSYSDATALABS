@@ -52,6 +52,9 @@
       <a href="{{ url_for('admin.contacts') }}" class="{{ 'active' if request.endpoint == 'admin.contacts' }}">
         <i class="fas fa-envelope"></i> Messages
       </a>
+      <a href="{{ url_for('admin.job_applications') }}" class="{{ 'active' if request.endpoint == 'admin.job_applications' }}">
+        <i class="fas fa-users-cog"></i> Job Applications
+      </a>
       <a href="{{ url_for('admin.export_students') }}">
         <i class="fas fa-file-csv"></i> Export CSV
       </a>
