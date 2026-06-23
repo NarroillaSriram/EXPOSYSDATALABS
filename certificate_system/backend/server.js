@@ -10,7 +10,7 @@ const db = require('./db');
 const blockchain = require('./blockchainService');
 const { generateCertificatePDF } = require('./pdfGenerator');
 
-require('dotenv').config(); // Load environment variables
+require('dotenv').config({ path: path.join(__dirname, '../../.env') }); // Load environment variables from project root
 
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -384,7 +384,26 @@ app.get('/api/certificates/verify/:certificateId', async (req, res) => {
   const { certificateId } = req.params;
 
   try {
-    const result = await db.query('SELECT * FROM certificates WHERE certificate_id = $1', [certificateId]);
+    let queryStr = `
+      SELECT c.* FROM certificates c
+      LEFT JOIN students s ON c.student_id = s.id
+      WHERE c.certificate_id = $1 
+         OR s.email = $1
+    `;
+    let queryParams = [certificateId];
+
+    if (/^\d+$/.test(certificateId)) {
+      queryStr = `
+        SELECT c.* FROM certificates c
+        LEFT JOIN students s ON c.student_id = s.id
+        WHERE c.certificate_id = $1 
+           OR s.email = $1
+           OR c.student_id = $2
+      `;
+      queryParams.push(parseInt(certificateId, 10));
+    }
+
+    const result = await db.query(queryStr, queryParams);
     if (result.rows.length === 0) {
       return res.json({ verified: false, status: 'invalid', message: '❌ Invalid Certificate: Certificate ID not found' });
     }
@@ -411,6 +430,18 @@ app.get('/api/certificates/verify/:certificateId', async (req, res) => {
     let tamperProof = false;
     try {
       chainData = await blockchain.verifyCertificate(certificateId);
+      if (!chainData.exists && blockchain.isMock && dbCert.status === 'approved') {
+        // Automatically sync to mock blockchain state
+        await blockchain.registerCertificate({
+          certificateId: dbCert.certificate_id,
+          studentName: dbCert.student_name,
+          domainName: dbCert.domain_name,
+          issueDate: dbCert.issue_date,
+          certificateHash: dbCert.blockchain_hash,
+          verificationUrl: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/verify/${dbCert.certificate_id}`
+        });
+        chainData = await blockchain.verifyCertificate(certificateId);
+      }
       if (chainData.exists) {
         // Compare blockchain hash with DB hash
         tamperProof = (chainData.certificateHash === dbCert.blockchain_hash);

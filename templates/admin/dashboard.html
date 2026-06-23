@@ -276,6 +276,23 @@
     margin-top: 2px;
     line-height: 1.4;
   }
+
+  /* ── MOBILE RESPONSIVE ── */
+  @media (max-width: 576px) {
+    .admin-stat-card { padding: 18px 16px; gap: 12px; }
+    .stat-info-title { font-size: 1.5rem; }
+    .stat-info-label { font-size: 0.78rem; }
+    .stat-icon-wrap  { width: 44px; height: 44px; font-size: 1.2rem; }
+    .dashboard-card-premium { border-radius: 14px; }
+    .card-header-premium { padding: 16px 18px; }
+    .admin-table th,
+    .admin-table td { padding: 12px 14px; font-size: 0.8rem; }
+    .action-card-premium { padding: 16px; border-radius: 14px; }
+  }
+  @media (max-width: 768px) {
+    .admin-table th { font-size: 0.72rem; padding: 12px 10px; }
+    .admin-table td { padding: 12px 10px; font-size: 0.8rem; }
+  }
 </style>
 
 <div class="admin-dashboard py-2">
@@ -333,6 +350,17 @@
         <div>
           <h3 class="stat-info-title">{{ unread_contacts }}</h3>
           <p class="stat-info-label">Unread Messages</p>
+        </div>
+      </a>
+    </div>
+
+    <!-- Pending Projects -->
+    <div class="col-lg-3 col-md-6" style="animation: cardSlideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both; animation-delay: 0.18s;">
+      <a href="{{ url_for('admin.submissions') }}" class="admin-stat-card" style="background: linear-gradient(135deg, #6366f1 0%, #4338ca 100%); box-shadow: 0 10px 25px rgba(99, 102, 241, 0.25); border: 1px solid rgba(255, 255, 255, 0.12);">
+        <div class="stat-icon-wrap"><i class="fas fa-file-upload"></i></div>
+        <div>
+          <h3 class="stat-info-title">{{ pending_submissions_count }}</h3>
+          <p class="stat-info-label">Pending Projects</p>
         </div>
       </a>
     </div>
@@ -426,11 +454,88 @@
     </div>
   </div>
 
+  <!-- Recent Project Submissions Row -->
+  <div class="row g-4 mb-4">
+    <div class="col-12" style="animation: cardSlideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both; animation-delay: 0.28s;">
+      <div class="dashboard-card-premium">
+        <div class="card-header-premium">
+          <h5>
+            <div class="card-header-icon" style="background:rgba(99,102,241,0.08);color:#6366f1;">
+              <i class="fas fa-file-upload"></i>
+            </div>
+            <span>Recent Project Submissions</span>
+          </h5>
+          <a href="{{ url_for('admin.submissions') }}" style="color:var(--primary);font-size:0.82rem;font-weight:700;text-decoration:underline;">View All</a>
+        </div>
+        
+        <div class="table-responsive">
+          <table class="table admin-table mb-0">
+            <thead>
+              <tr>
+                <th>Student</th>
+                <th>Domain</th>
+                <th>Filename</th>
+                <th>Submitted On</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for s in recent_submissions %}
+              <tr>
+                <td>
+                  <div style="display:flex;align-items:center;gap:10px;">
+                    <div style="width:34px;height:34px;background:linear-gradient(135deg,#6366f1 0%,#4338ca 100%);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:0.8rem;box-shadow:0 3px 8px rgba(99,102,241,0.15);">
+                      {{ s.student.name[0].upper() }}
+                    </div>
+                    <div>
+                      <span style="font-weight:700;font-size:0.86rem;color:#0f172a;display:block;">{{ s.student.name }}</span>
+                      <span style="font-size:0.75rem;color:#64748b;">{{ s.student.email }}</span>
+                    </div>
+                  </div>
+                </td>
+                <td><span style="font-size:0.84rem;color:#334155;font-weight:600;">{{ s.domain_name }}</span></td>
+                <td><span style="font-size:0.8rem;color:#64748b;">{{ s.file_path.split('_')[-1] }}</span></td>
+                <td><span style="font-size:0.8rem;color:#64748b;font-weight:600;">{{ s.created_at.strftime('%d %b, %Y') }}</span></td>
+                <td>
+                  {% if s.status == 'approved' %}
+                    <span class="badge bg-success-subtle text-success" style="font-size:0.75rem; padding:4px 8px;">Approved</span>
+                  {% else %}
+                    <span class="badge bg-primary-subtle text-primary" style="font-size:0.75rem; padding:4px 8px;">{{ s.status | title }}</span>
+                  {% endif %}
+                </td>
+                <td>
+                  <div class="d-flex gap-2">
+                    <a href="{{ url_for('admin.serve_upload', filename='projects/' + s.file_path) }}" target="_blank" class="btn btn-sm btn-outline-primary" style="font-size:0.75rem; padding:4px 8px;">
+                      <i class="fas fa-download me-1"></i>Download
+                    </a>
+                    {% if s.status != 'approved' %}
+                    <button type="button" class="btn btn-sm btn-success" style="font-size:0.75rem; padding:4px 8px; font-weight:600;" onclick="openCertificateModal({{ s.student.id }}, '{{ s.student.name | e }}', '{{ s.domain_name | e }}', '2')">
+                      <i class="fas fa-award me-1"></i>Issue
+                    </button>
+                    {% endif %}
+                  </div>
+                </td>
+              </tr>
+              {% else %}
+              <tr>
+                <td colspan="6" class="text-center text-muted py-4" style="font-size:0.85rem;">
+                  <i class="fas fa-folder-open mb-2" style="font-size:1.5rem;opacity:0.3;"></i><br>No project submissions found.
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Quick Actions Grid -->
   <div class="row g-4 mt-1">
     {% for icon, label, subtitle, dest, color, bg in [
       ('fa-users',    'Manage Students', 'View & manage all registrations', url_for('admin.students'),        '#4f46e5', 'rgba(79,70,229,0.08)'),
-      ('fa-credit-card','Review Payments','Verify or reject UPI & Razorpay',url_for('admin.payments'),        '#10b981', 'rgba(16,185,129,0.08)'),
+      ('fa-credit-card','Review Payments','Verify or reject UPI & Instamojo',url_for('admin.payments'),        '#10b981', 'rgba(16,185,129,0.08)'),
       ('fa-envelope', 'View Messages',   'Read student enquiries',          url_for('admin.contacts'),         '#f43f5e', 'rgba(244,63,94,0.08)'),
       ('fa-file-csv', 'Export Data',     'Preview & download student CSV',  url_for('admin.export_students'),  '#f59e0b', 'rgba(245,158,11,0.08)'),
     ] %}
@@ -452,5 +557,94 @@
     {% endfor %}
   </div>
 
+ </div>
+
+<!-- Certificate Deferral & Approval Modal -->
+<div class="modal fade" id="certificateModal" tabindex="-1" aria-labelledby="certificateModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius:20px;border:none;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.2);">
+      
+      <!-- Header -->
+      <div style="background:linear-gradient(135deg,var(--primary),#1a3a8f);padding:24px 28px;color:#fff;">
+        <div style="display:flex;align-items:center;gap:14px;">
+          <div style="width:48px;height:48px;background:rgba(255,255,255,0.2);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <i class="fas fa-award" style="font-size:1.3rem;"></i>
+          </div>
+          <div>
+            <h5 id="certificateModalLabel" style="margin:0;font-weight:800;">Configure Certificate</h5>
+            <p style="margin:2px 0 0;font-size:0.82rem;color:rgba(255,255,255,0.8);">Issue the certificate to the student.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Body -->
+      <div class="modal-body" style="padding:28px;">
+        <div class="mb-3">
+          <label class="form-label" style="font-size:0.8rem; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Student</label>
+          <div id="certStudentName" style="font-weight:800; color:#111827; font-size:1.05rem;">Student Name</div>
+        </div>
+        <div class="mb-4">
+          <label class="form-label" style="font-size:0.8rem; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Internship Domain</label>
+          <div id="certDomainDisplay" style="font-weight:700; color:var(--primary); font-size:0.95rem;">Domain Name</div>
+        </div>
+        
+        <form id="approveCertForm" method="POST" style="margin:0;">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="domain_name" id="certDomainApprove">
+          
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label" style="font-size:0.8rem; font-weight:700; color:var(--text-muted);">START DATE</label>
+              <input type="date" name="start_date" id="certStartDate" class="form-control form-control-sm" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" style="font-size:0.8rem; font-weight:700; color:var(--text-muted);">END DATE</label>
+              <input type="date" name="end_date" id="certEndDate" class="form-control form-control-sm" required>
+            </div>
+            <div class="col-md-12">
+              <label class="form-label" style="font-size:0.8rem; font-weight:700; color:var(--text-muted);">DATE OF ISSUE</label>
+              <input type="date" name="issue_date" id="certIssueDate" class="form-control form-control-sm" required>
+            </div>
+          </div>
+
+          <div class="d-flex gap-2 justify-content-between mt-4">
+            <button type="submit" class="btn btn-success flex-grow-1" style="border-radius:10px; padding:10px; font-weight:700;">
+              <i class="fas fa-check-circle me-1"></i> Approve &amp; Register on Blockchain
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  function openCertificateModal(id, name, domain, duration) {
+    document.getElementById('certStudentName').textContent = name;
+    document.getElementById('certDomainDisplay').textContent = domain;
+    
+    // Setup Form Actions
+    document.getElementById('approveCertForm').action = "/admin/students/approve-certificate/" + id;
+
+    // Set Domain Value in hidden fields
+    document.getElementById('certDomainApprove').value = domain;
+
+    // Default Dates
+    const today = new Date();
+    document.getElementById('certIssueDate').value = today.toISOString().split('T')[0];
+    document.getElementById('certEndDate').value = today.toISOString().split('T')[0];
+
+    const start = new Date(today);
+    let durationMonths = 1;
+    const parsed = parseInt(duration);
+    if (!isNaN(parsed)) durationMonths = parsed;
+    start.setMonth(start.getMonth() - durationMonths);
+    document.getElementById('certStartDate').value = start.toISOString().split('T')[0];
+
+    const modal = new bootstrap.Modal(document.getElementById('certificateModal'));
+    modal.show();
+  }
+</script>
 {% endblock %}

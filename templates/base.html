@@ -38,7 +38,7 @@
   {% endif %}
 
   <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg fixed-top">
+  <nav class="navbar navbar-expand-lg fixed-top" data-bs-theme="dark">
     <div class="container">
       <a class="navbar-brand" href="{{ url_for('main.index') }}">
         <span class="brand-main">EXPOSYS</span>
@@ -70,8 +70,15 @@
           <li class="nav-item"><a class="nav-link {% if request.endpoint == 'main.careers' %}active{% endif %}" href="{{ url_for('main.careers') }}">Careers</a></li>
           <li class="nav-item"><a class="nav-link {% if request.endpoint == 'main.reviews' %}active{% endif %}" href="{{ url_for('main.reviews') }}">Endorsement</a></li>
           <li class="nav-item"><a class="nav-link {% if request.endpoint == 'main.contact' %}active{% endif %}" href="{{ url_for('main.contact') }}">Contact</a></li>
+          <li class="nav-item">
+            <a class="nav-link {% if request.endpoint in ['main.verify_search', 'main.verify_certificate'] %}active{% endif %}"
+               href="{{ url_for('main.verify_search') }}"
+               style="color:#facc15 !important; font-weight:700; display:flex; align-items:center; gap:5px;">
+              <i class="fas fa-shield-check" style="font-size:0.85rem;"></i> Verify Certificate
+            </a>
+          </li>
         </ul>
-        <div class="d-flex gap-2 align-items-center">
+        <div class="d-flex flex-column flex-lg-row gap-2 align-items-center mt-3 mt-lg-0">
           {% if current_user.is_authenticated %}
           {% if current_user.__class__.__name__ == 'Student' %}
             {% if has_payment %}
@@ -131,6 +138,7 @@
             <li><a href="{{ url_for('main.internships') }}">Internships</a></li>
             <li><a href="{{ url_for('auth.register') }}">Register</a></li>
             <li><a href="{{ url_for('main.contact') }}">Contact</a></li>
+            <li><a href="{{ url_for('main.verify_search') }}" style="color:#facc15;"><i class="fas fa-shield-check me-1"></i>Verify Certificate</a></li>
           </ul>
         </div>
         <div class="col-lg-3 col-md-4">

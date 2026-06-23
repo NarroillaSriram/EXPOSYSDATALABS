@@ -2,11 +2,10 @@ from datetime import datetime
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import db
-
+from sqlalchemy.orm import synonym
 
 class Student(UserMixin, db.Model):
     __tablename__ = 'students'
-
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     branch = db.Column(db.String(100), nullable=True)
@@ -34,10 +33,8 @@ class Student(UserMixin, db.Model):
     def get_id(self):
         return f"student_{self.id}"
 
-
 class Admin(UserMixin, db.Model):
     __tablename__ = 'admins'
-
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
@@ -54,10 +51,8 @@ class Admin(UserMixin, db.Model):
     def get_id(self):
         return f"admin_{self.id}"
 
-
 class Internship(db.Model):
     __tablename__ = 'internships'
-
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(150), nullable=False)
     domain = db.Column(db.String(100), nullable=False)
@@ -67,10 +62,8 @@ class Internship(db.Model):
     is_active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-
 class Payment(db.Model):
     __tablename__ = 'payments'
-
     id = db.Column(db.Integer, primary_key=True)
     student_id = db.Column(db.Integer, db.ForeignKey('students.id'), nullable=False)
     amount = db.Column(db.Float, nullable=False)
@@ -81,10 +74,8 @@ class Payment(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-
 class Contact(db.Model):
     __tablename__ = 'contacts'
-
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(120), nullable=False)
@@ -94,10 +85,8 @@ class Contact(db.Model):
     is_read = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-
 class AddonPayment(db.Model):
     __tablename__ = 'addon_payments'
-
     id = db.Column(db.Integer, primary_key=True)
     student_id = db.Column(db.Integer, db.ForeignKey('students.id'), nullable=False)
     domain = db.Column(db.String(100), nullable=False)
@@ -110,10 +99,8 @@ class AddonPayment(db.Model):
 
     student = db.relationship('Student', backref=db.backref('addon_payments', lazy=True, cascade="all, delete-orphan"))
 
-
 class Certificate(db.Model):
     __tablename__ = 'certificates'
-
     id = db.Column(db.Integer, primary_key=True)
     certificate_id = db.Column(db.String(100), unique=True, nullable=False)
     student_id = db.Column(db.Integer, db.ForeignKey('students.id'), nullable=True)
@@ -132,4 +119,16 @@ class Certificate(db.Model):
 
     student = db.relationship('Student', backref=db.backref('certificates', lazy=True, cascade="all, delete-orphan"))
 
+class ProjectSubmission(db.Model):
+    __tablename__ = 'project_submissions'
+    id = db.Column(db.Integer, primary_key=True)
+    student_id = db.Column(db.Integer, db.ForeignKey('students.id'), nullable=False)
+    # Map attribute 'domain_name' to actual DB column 'domain'
+    domain_name = db.Column('domain', db.String(100), nullable=False)
+    # Provide synonym 'domain' for ORM queries
+    domain = synonym('domain_name')
+    file_path = db.Column('filename', db.String(255), nullable=False)
+    status = db.Column(db.String(20), default='submitted')  # submitted, approved, rejected
+    created_at = db.Column('submitted_at', db.DateTime, default=datetime.utcnow)
 
+    student = db.relationship('Student', backref=db.backref('submissions', lazy=True, cascade="all, delete-orphan"))

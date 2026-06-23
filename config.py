@@ -35,7 +35,13 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
     # Engine options dynamic based on database engine
-    if _is_mysql:
+    if "tidbcloud" in os.environ.get('DB_HOST', ''):
+        SQLALCHEMY_ENGINE_OPTIONS = {
+            'connect_args': {
+                'ssl': {'ssl_verify_cert': True, 'ssl_verify_identity': True}
+            }
+        }
+    elif _is_mysql:
         SQLALCHEMY_ENGINE_OPTIONS = {
             'pool_pre_ping': True,
             'pool_recycle': 280,
