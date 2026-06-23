@@ -118,6 +118,16 @@ def careers():
     return render_template('careers.html')
 
 
+@main_bp.route('/job-application', methods=['GET', 'POST'])
+def job_application():
+    role = request.args.get('role', 'General Application')
+    if request.method == 'POST':
+        # Simulate processing the application
+        flash('Your application has been submitted successfully!', 'success')
+        return redirect(url_for('main.careers'))
+    return render_template('job_application.html', role=role)
+
+
 @main_bp.route('/terms')
 def terms():
     return render_template('terms.html')
