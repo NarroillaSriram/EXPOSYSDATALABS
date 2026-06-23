@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS students (
     tenth_percentage FLOAT NOT NULL,
     twelfth_percentage FLOAT NOT NULL,
     ug VARCHAR(100),
+    ug_percentage FLOAT,
     pg VARCHAR(100),
     location VARCHAR(100) NOT NULL,
     internship_domain VARCHAR(100) NOT NULL,

@@ -15,6 +15,7 @@ class Student(UserMixin, db.Model):
     tenth_percentage = db.Column(db.Float, nullable=True)
     twelfth_percentage = db.Column(db.Float, nullable=True)
     ug = db.Column(db.String(100), nullable=True)
+    ug_percentage = db.Column(db.Float, nullable=True)
     pg = db.Column(db.String(100), nullable=True)
     location = db.Column(db.String(100), nullable=True)
     internship_domain = db.Column(db.String(100), nullable=True)

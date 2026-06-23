@@ -135,6 +135,7 @@
           <th>10th %</th>
           <th>12th %</th>
           <th>UG</th>
+          <th>UG %</th>
           <th>PG</th>
           <th>Registered</th>
         </tr>
@@ -177,6 +178,7 @@
           <td>{{ s.tenth_percentage or '—' }}</td>
           <td>{{ s.twelfth_percentage or '—' }}</td>
           <td>{{ s.ug or '—' }}</td>
+          <td>{{ s.ug_percentage or '—' }}</td>
           <td>{{ s.pg or '—' }}</td>
           <td style="white-space:nowrap;">{{ s.created_at.strftime('%d %b %Y') }}</td>
         </tr>

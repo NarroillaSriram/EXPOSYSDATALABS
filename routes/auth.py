@@ -33,19 +33,27 @@ def register():
     if request.method == 'GET' and request.args.get('domain'):
         form.internship_domain.data = request.args.get('domain')
     if form.validate_on_submit():
+        if form.branch.data == 'Other' and not form.other_branch.data:
+            flash('Please specify your other branch name.', 'danger')
+            return render_template('auth/register.html', form=form)
+            
         existing = Student.query.filter_by(email=form.email.data).first()
         if existing:
             flash('Email already registered. Please login.', 'danger')
             return redirect(url_for('auth.login'))
+            
+        branch_value = form.other_branch.data if form.branch.data == 'Other' else form.branch.data
+        
         student = Student(
             name=form.name.data,
-            branch=form.branch.data,
+            branch=branch_value,
             email=form.email.data,
             college=form.college.data,
             phone=form.phone.data,
             tenth_percentage=form.tenth_percentage.data,
             twelfth_percentage=form.twelfth_percentage.data,
             ug=form.ug.data,
+            ug_percentage=form.ug_percentage.data,
             pg=form.pg.data,
             location=form.location.data,
             internship_domain=form.internship_domain.data,

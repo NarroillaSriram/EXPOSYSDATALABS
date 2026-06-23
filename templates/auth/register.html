@@ -84,6 +84,11 @@
                   {{ form.branch(class="form-select is-invalid" if form.branch.errors else "form-select") }}
                   {% for e in form.branch.errors %}<div class="text-danger small mt-1"><i class="fas fa-exclamation-circle me-1"></i>{{ e }}</div>{% endfor %}
                 </div>
+                <div class="col-md-6" id="other-branch-container" style="display: none;">
+                  <label class="form-label">{{ form.other_branch.label.text }} <span class="text-danger">*</span></label>
+                  {{ form.other_branch(class="form-control is-invalid" if form.other_branch.errors else "form-control", placeholder="Enter your branch name") }}
+                  {% for e in form.other_branch.errors %}<div class="text-danger small mt-1"><i class="fas fa-exclamation-circle me-1"></i>{{ e }}</div>{% endfor %}
+                </div>
                 <div class="col-md-6">
                   <label class="form-label">{{ form.tenth_percentage.label.text }} <span
                       class="text-danger">*</span></label>
@@ -99,9 +104,14 @@
                   {% for e in form.twelfth_percentage.errors %}<div class="text-danger small mt-1"><i class="fas fa-exclamation-circle me-1"></i>{{ e }}</div>{% endfor %}
                 </div>
                 <div class="col-md-6">
-                  <label class="form-label">{{ form.ug.label.text }}</label>
-                  {{ form.ug(class="form-control is-invalid" if form.ug.errors else "form-control", placeholder="e.g. B.Tech CSE (Optional)") }}
+                  <label class="form-label">{{ form.ug.label.text }} <span class="text-danger">*</span></label>
+                  {{ form.ug(class="form-control is-invalid" if form.ug.errors else "form-control", placeholder="e.g. B.Tech CSE") }}
                   {% for e in form.ug.errors %}<div class="text-danger small mt-1"><i class="fas fa-exclamation-circle me-1"></i>{{ e }}</div>{% endfor %}
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">{{ form.ug_percentage.label.text }} <span class="text-danger">*</span></label>
+                  {{ form.ug_percentage(class="form-control is-invalid" if form.ug_percentage.errors else "form-control", placeholder="e.g. 78.5", type="number", step="any", min="0", max="100") }}
+                  {% for e in form.ug_percentage.errors %}<div class="text-danger small mt-1"><i class="fas fa-exclamation-circle me-1"></i>{{ e }}</div>{% endfor %}
                 </div>
                 <div class="col-md-6">
                   <label class="form-label">{{ form.pg.label.text }}</label>
@@ -185,7 +195,23 @@
 {% block extra_js %}
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-    const lettersOnlyFields = ['#name', '#college', '#ug', '#pg'];
+    const branchSelect = document.querySelector('#branch');
+    const otherBranchContainer = document.querySelector('#other-branch-container');
+    
+    function toggleOtherBranch() {
+      if (branchSelect && branchSelect.value === 'Other') {
+        otherBranchContainer.style.display = 'block';
+      } else if (otherBranchContainer) {
+        otherBranchContainer.style.display = 'none';
+      }
+    }
+    
+    if (branchSelect) {
+      branchSelect.addEventListener('change', toggleOtherBranch);
+      toggleOtherBranch(); // Initial check
+    }
+
+    const lettersOnlyFields = ['#name', '#college', '#ug', '#pg', '#other_branch'];
 
     lettersOnlyFields.forEach(selector => {
       const input = document.querySelector(selector);
@@ -194,15 +220,21 @@
           if (/[0-9]/.test(e.key)) {
             e.preventDefault();
           }
-          if (e.key === ' ') {
-            if (input.value.length === 0 || input.value.endsWith(' ')) {
+          if (input.value.length === 0) {
+            if (!/^[a-zA-Z]$/.test(e.key)) {
+              e.preventDefault();
+            }
+          } else if (e.key === ' ') {
+            if (input.value.endsWith(' ')) {
               e.preventDefault();
             }
           }
         });
         input.addEventListener('input', function (e) {
           let val = input.value.replace(/[0-9]/g, '');
-          val = val.replace(/^\s+/, '');
+          if (val.length > 0 && !/^[a-zA-Z]/.test(val)) {
+            val = val.substring(1); // Remove first character if not a letter
+          }
           val = val.replace(/\s{2,}/g, ' ');
           input.value = val;
         });

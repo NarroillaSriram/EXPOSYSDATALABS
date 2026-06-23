@@ -118,7 +118,7 @@ def download_csv():
     text_wrapper = _io.TextIOWrapper(output, encoding='utf-8-sig', newline='')
     writer = csv.writer(text_wrapper)
     writer.writerow(['ID', 'Name', 'Branch', 'Email', 'College', 'Phone',
-                     '10th%', '12th%', 'UG', 'PG', 'Location', 'Domain', 'Duration', 'Registered'])
+                     '10th%', '12th%', 'UG', 'UG%', 'PG', 'Location', 'Domain', 'Duration', 'Registered'])
     for s in students_list:
         all_domains = [s.internship_domain] if s.internship_domain else []
         for addon in s.addon_payments:
@@ -128,7 +128,7 @@ def download_csv():
 
         writer.writerow([s.id, s.name, s.branch or '', s.email, s.college or '',
                          s.phone or '', s.tenth_percentage or '', s.twelfth_percentage or '',
-                         s.ug or '', s.pg or '', s.location or '',
+                         s.ug or '', s.ug_percentage or '', s.pg or '', s.location or '',
                          domains_str, s.duration or '',
                          s.created_at.strftime('%Y-%m-%d')])
     text_wrapper.flush()

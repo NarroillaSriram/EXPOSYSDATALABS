@@ -31,6 +31,8 @@ with app.app_context():
         conn.execute(text("ALTER TABLE students ALTER COLUMN internship_domain DROP NOT NULL;") )
         conn.execute(text("ALTER TABLE students ALTER COLUMN duration TYPE VARCHAR(50);") )
         conn.execute(text("ALTER TABLE students ALTER COLUMN duration DROP NOT NULL;") )
+        # Add ug_percentage column to students if not exists
+        conn.execute(text("ALTER TABLE students ADD COLUMN IF NOT EXISTS ug_percentage FLOAT;"))
         # Add missing column to project_submissions if not exists
         conn.execute(text("ALTER TABLE project_submissions ADD COLUMN IF NOT EXISTS domain_name VARCHAR(100) NOT NULL DEFAULT 'unknown';"))
         print("Database schema successfully altered.")

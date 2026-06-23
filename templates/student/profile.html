@@ -53,7 +53,8 @@
           {% for label, value in [
             ('College', student.college), ('Branch', student.branch),
             ('10th %', student.tenth_percentage), ('12th %', student.twelfth_percentage),
-            ('UG', student.ug or 'N/A'), ('PG', student.pg or 'N/A'),
+            ('UG', student.ug or 'N/A'), ('UG %', student.ug_percentage or 'N/A'),
+            ('PG', student.pg or 'N/A'),
           ] %}
           <div class="col-md-6">
             <div style="background:var(--light);border-radius:10px;padding:12px;">

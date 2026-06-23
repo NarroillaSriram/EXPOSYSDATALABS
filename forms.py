@@ -77,6 +77,11 @@ class RegistrationForm(FlaskForm):
         Regexp(r'^[a-zA-Z]+( [a-zA-Z]+)*$', message='Name must contain only letters and single spaces between words (no leading/trailing or multiple spaces).')
     ])
     branch = SelectField('Branch', choices=BRANCHES, validators=[DataRequired(), validate_not_empty])
+    other_branch = StringField('Other Branch Name', validators=[
+        Optional(), 
+        Length(max=100),
+        Regexp(r'^[a-zA-Z][a-zA-Z\s]*$', message='Must start with a letter and contain only letters and spaces.')
+    ])
     email = StringField('Email', validators=[DataRequired(), Email()])
     college = StringField('College Name', validators=[
         DataRequired(), 
@@ -93,12 +98,16 @@ class RegistrationForm(FlaskForm):
     twelfth_percentage = FloatField('12th Percentage', validators=[
         DataRequired(), NumberRange(min=0, max=100, message='Enter a valid percentage between 0 and 100')
     ])
-    ug = StringField('UG Degree (if applicable)', validators=[
-        Optional(), 
+    ug = StringField('UG Degree', validators=[
+        DataRequired(), 
         Length(max=100),
         Regexp(r'^[a-zA-Z]+( [a-zA-Z]+)*$', message='UG Degree must contain only letters and a single space between words.')
     ])
-    pg = StringField('PG Degree (if applicable)', validators=[
+    ug_percentage = FloatField('UG Percentage', validators=[
+        DataRequired(),
+        NumberRange(min=0, max=100, message='Enter a valid percentage between 0 and 100')
+    ])
+    pg = StringField('PG Degree (optional)', validators=[
         Optional(), 
         Length(max=100),
         Regexp(r'^[a-zA-Z]+( [a-zA-Z]+)*$', message='PG Degree must contain only letters and a single space between words.')
