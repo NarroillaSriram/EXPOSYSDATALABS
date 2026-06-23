@@ -73,7 +73,7 @@
           <li class="nav-item">
             <a class="nav-link {% if request.endpoint in ['main.verify_search', 'main.verify_certificate'] %}active{% endif %}"
                href="{{ url_for('main.verify_search') }}"
-               style="font-weight:700; display:flex; align-items:center; gap:5px;">
+               style="font-weight:700; display:flex; align-items:center; gap:5px; white-space:nowrap;">
               <i class="fas fa-shield-check" style="font-size:0.85rem;"></i> Verify Certificate
             </a>
           </li>

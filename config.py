@@ -12,7 +12,7 @@ class Config:
     _db_url = os.environ.get('DATABASE_URL', '')
     _db_port = os.environ.get('DB_PORT', '3306')
     _db_type = os.environ.get('DB_TYPE', '')
-    _is_mysql = (_db_port == '3306' or _db_type == 'mysql') and not _db_url
+    _is_mysql = (_db_port in ['3306', '4000'] or _db_type == 'mysql' or 'tidbcloud' in os.environ.get('DB_HOST', '')) and not _db_url
 
     if _db_url:
         # Neon/Supabase provide postgres:// — SQLAlchemy needs postgresql://
