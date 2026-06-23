@@ -299,81 +299,46 @@
       </div>
     </div>
 
-    <!-- What you get -->
-    <div style="margin-bottom:24px;">
-      <div style="font-weight:700;color:var(--primary);font-size:0.85rem;margin-bottom:12px;">What you'll get:</div>
-      {% for icon, text in [
-        ('fa-unlock', 'Full access to ' + domain + ' internship content'),
-        ('fa-tasks', 'Real-world internship tasks and projects'),
-        ('fa-graduation-cap', 'Learning outcomes and study materials'),
-        ('fa-certificate', 'Additional certificate on completion'),
-      ] %}
-      <div class="feature-row">
-        <div class="feature-icon"><i class="fas {{ icon }}"></i></div>
-        <span style="color:#374151;">{{ text }}</span>
-        <i class="fas fa-check-circle ms-auto" style="color:#10b981;"></i>
-      </div>
-      {% endfor %}
-    </div>
-
     <!-- Payment Actions -->
-    <div class="pay-tabs" role="tablist">
-      <a href="https://www.instamojo.com/@Exposysdatalabs/" target="_blank" class="pay-tab" style="text-decoration:none; background:linear-gradient(135deg,#0a2463,#1a3a8f); color:#fff;" onclick="alert('Opening Instamojo.\\n\\nPlease complete the payment there, then return here to upload your screenshot in the Scan & Pay section below.');">
+    <div style="margin-bottom: 30px;">
+      <a href="https://www.instamojo.com/@Exposysdatalabs/" target="_blank" class="rzp-btn" style="text-decoration:none; display:flex; align-items:center; justify-content:center; gap:10px; background:linear-gradient(135deg,#0a2463,#1a3a8f); color:#fff; padding:15px; border-radius:12px; font-weight:700; font-size:1.1rem; width:100%; transition:all 0.3s ease; box-shadow:0 10px 30px rgba(10,36,99,0.15);" onclick="alert('Opening Instamojo.\\n\\nPlease complete the payment there, then return here to upload your screenshot below.');">
         <i class="fas fa-external-link-alt"></i> Pay via Instamojo
       </a>
-      <div class="pay-tab active" style="pointer-events:none; background:#f8f9ff; color:#6b7280;">
-        <i class="fas fa-qrcode"></i> Scan &amp; Pay
-      </div>
     </div>
 
-    <!-- Scan & Pay Content -->
-    <div id="pane-qr" class="pay-tab-pane active">
-      <div class="qr-outer-wrap">
-        <!-- PhonePe branded dark card with real QR -->
-        <div class="phonepe-card">
-          <div class="pe-logo-row">
-            <div class="pe-logo-circle">पे</div>
-            <span class="pe-brand-name">PhonePe</span>
-          </div>
-          <div class="pe-accepted-badge">✦ Scan &amp; Pay ✦</div>
-          <div class="qr-frame">
-            <img src="{{ url_for('static', filename='images/phonepe_qr.png') }}"
-                 alt="PhonePe QR Code — Scan to Pay ₹{{ amount }}"
-                 id="realQrImg">
-          </div>
-          <div class="pe-name-tag">NARROLLA SRIRAM</div>
+    <!-- ─────────────────────────────────────────────────
+         Upload Screenshot Section
+    ──────────────────────────────────────────────────── -->
+    <div style="display:flex; flex-direction:column; align-items:center;">
+      <!-- I've Paid — Submit Transaction -->
+      <div class="paid-form-wrap" id="paidFormWrap" style="max-width:400px;">
+        <div class="paid-form-title">
+          <i class="fas fa-receipt" style="color:#6c3fc5;"></i>
+          Upload Payment Screenshot
+          <span class="paid-badge">Required</span>
         </div>
+        <p style="font-size:0.78rem;color:#6b7280;margin:0;line-height:1.5;">
+          After completing the payment via Instamojo, enter your transaction ID and upload the payment screenshot for quick verification.
+        </p>
 
-        <!-- I've Paid — Submit Transaction -->
-        <div class="paid-form-wrap" id="paidFormWrap">
-          <div class="paid-form-title">
-            <i class="fas fa-receipt" style="color:#6c3fc5;"></i>
-            Paid via UPI?
-            <span class="paid-badge">Submit Proof</span>
-          </div>
-          <p style="font-size:0.78rem;color:#6b7280;margin:0;line-height:1.5;">
-            After scanning &amp; paying, enter your UPI transaction ID and upload the payment screenshot for quick verification.
-          </p>
+        <input type="text" id="upiTxnId" class="paid-input"
+               placeholder="Transaction ID (e.g. MOJO123456789)"
+               maxlength="30">
 
-          <input type="text" id="upiTxnId" class="paid-input"
-                 placeholder="UPI Transaction ID (e.g. 512345678901)"
-                 maxlength="30">
+        <label class="file-upload-label" for="paymentScreenshot" id="fileLabel">
+          <i class="fas fa-cloud-upload-alt"></i>
+          <span>Tap to upload payment screenshot</span>
+          <span class="file-name" id="fileNameDisplay"></span>
+        </label>
+        <input type="file" id="paymentScreenshot" accept="image/*">
 
-          <label class="file-upload-label" for="paymentScreenshot" id="fileLabel">
-            <i class="fas fa-cloud-upload-alt"></i>
-            <span>Tap to upload payment screenshot</span>
-            <span class="file-name" id="fileNameDisplay"></span>
-          </label>
-          <input type="file" id="paymentScreenshot" accept="image/*">
-
-          <button class="submit-upi-btn" id="submitUpiBtn" onclick="submitUpiAddonPayment()">
-            <i class="fas fa-paper-plane"></i> Submit for Verification
-          </button>
-          <p style="font-size:0.72rem;color:#9ca3af;text-align:center;margin:0;">
-            ⏱ Verification typically takes 2–24 hours. You'll get access once confirmed.
-          </p>
-        </div>
-      </div><!-- /.qr-outer-wrap -->
+        <button class="submit-upi-btn" id="submitUpiBtn" onclick="submitUpiAddonPayment()">
+          <i class="fas fa-paper-plane"></i> Submit for Verification
+        </button>
+        <p style="font-size:0.72rem;color:#9ca3af;text-align:center;margin:0;">
+          ⏱ Verification typically takes 2–24 hours. You'll get access once confirmed.
+        </p>
+      </div>
     </div>
 
     <!-- Loading -->
