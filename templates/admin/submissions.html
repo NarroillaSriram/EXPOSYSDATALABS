@@ -1,0 +1,150 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Project Submissions - Admin{% endblock %}
+{% block page_title %}Student Project Submissions{% endblock %}
+
+{% block content %}
+<div class="data-table">
+  <div class="data-table-header flex-wrap gap-3">
+    <h5><i class="fas fa-file-upload me-2" style="color:var(--secondary);"></i>Submitted Projects</h5>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-hover mb-0">
+      <thead>
+        <tr>
+          <th>S.No</th>
+          <th>Student</th>
+          <th>Domain</th>
+          <th>Submitted On</th>
+          <th>Status</th>
+          <th style="min-width:180px;">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for s in submissions %}
+        <tr>
+          <td style="font-size:0.85rem;color:var(--text-muted);">{{ loop.index }}</td>
+          <td>
+            <div style="font-weight:700;font-size:0.88rem;">{{ s.student.name }}</div>
+            <div style="font-size:0.78rem;color:var(--text-muted);">{{ s.student.email }}</div>
+          </td>
+          <td>
+            <span style="font-weight:600;font-size:0.88rem;color:var(--primary);">{{ s.domain_name }}</span>
+          </td>
+          <td style="font-size:0.82rem;">{{ s.created_at.strftime('%B %d, %Y') }}</td>
+          <td>
+            <span class="badge bg-primary-subtle text-primary" style="font-size:0.75rem; padding:4px 8px;">{{ s.status | title }}</span>
+          </td>
+          <td>
+            <div class="d-flex gap-2">
+                <a href="{{ url_for('admin.serve_upload', filename='projects/' + s.file_path) }}" target="_blank" class="btn btn-sm btn-outline-primary" style="font-size: 0.78rem; padding: 4px 8px;">
+                  <i class="fas fa-download me-1"></i>Download
+                </a>
+                <button type="button" class="btn btn-sm btn-success" style="font-weight:600;" onclick="openCertificateModal({{ s.student.id }}, '{{ s.student.name | e }}', '{{ s.domain_name | e }}', '2')">
+                  <i class="fas fa-award me-1"></i>Issue Certificate
+                </button>
+            </div>
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="6" class="text-center text-muted py-5">
+            <i class="fas fa-folder-open" style="font-size:2.5rem; color:var(--text-muted);"></i>
+            <p class="mt-2">No project submissions found.</p>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Certificate Deferral & Approval Modal -->
+<div class="modal fade" id="certificateModal" tabindex="-1" aria-labelledby="certificateModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius:20px;border:none;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.2);">
+      
+      <!-- Header -->
+      <div style="background:linear-gradient(135deg,var(--primary),#1a3a8f);padding:24px 28px;color:#fff;">
+        <div style="display:flex;align-items:center;gap:14px;">
+          <div style="width:48px;height:48px;background:rgba(255,255,255,0.2);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <i class="fas fa-award" style="font-size:1.3rem;"></i>
+          </div>
+          <div>
+            <h5 id="certificateModalLabel" style="margin:0;font-weight:800;">Configure Certificate</h5>
+            <p style="margin:2px 0 0;font-size:0.82rem;color:rgba(255,255,255,0.8);">Issue the certificate to the student.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Body -->
+      <div class="modal-body" style="padding:28px;">
+        <div class="mb-3">
+          <label class="form-label" style="font-size:0.8rem; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Student</label>
+          <div id="certStudentName" style="font-weight:800; color:#111827; font-size:1.05rem;">Student Name</div>
+        </div>
+        <div class="mb-4">
+          <label class="form-label" style="font-size:0.8rem; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Internship Domain</label>
+          <div id="certDomainDisplay" style="font-weight:700; color:var(--primary); font-size:0.95rem;">Domain Name</div>
+        </div>
+        
+        <form id="approveCertForm" method="POST" style="margin:0;">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="domain_name" id="certDomainApprove">
+          
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label" style="font-size:0.8rem; font-weight:700; color:var(--text-muted);">START DATE</label>
+              <input type="date" name="start_date" id="certStartDate" class="form-control form-control-sm" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" style="font-size:0.8rem; font-weight:700; color:var(--text-muted);">END DATE</label>
+              <input type="date" name="end_date" id="certEndDate" class="form-control form-control-sm" required>
+            </div>
+            <div class="col-md-12">
+              <label class="form-label" style="font-size:0.8rem; font-weight:700; color:var(--text-muted);">DATE OF ISSUE</label>
+              <input type="date" name="issue_date" id="certIssueDate" class="form-control form-control-sm" required>
+            </div>
+          </div>
+
+          <div class="d-flex gap-2 justify-content-between mt-4">
+            <button type="submit" class="btn btn-success flex-grow-1" style="border-radius:10px; padding:10px; font-weight:700;">
+              <i class="fas fa-check-circle me-1"></i> Approve &amp; Register on Blockchain
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  function openCertificateModal(id, name, domain, duration) {
+    document.getElementById('certStudentName').textContent = name;
+    document.getElementById('certDomainDisplay').textContent = domain;
+    
+    // Setup Form Actions
+    document.getElementById('approveCertForm').action = "/admin/students/approve-certificate/" + id;
+
+    // Set Domain Value in hidden fields
+    document.getElementById('certDomainApprove').value = domain;
+
+    // Default Dates
+    const today = new Date();
+    document.getElementById('certIssueDate').value = today.toISOString().split('T')[0];
+    document.getElementById('certEndDate').value = today.toISOString().split('T')[0];
+
+    const start = new Date(today);
+    let durationMonths = 1;
+    const parsed = parseInt(duration);
+    if (!isNaN(parsed)) durationMonths = parsed;
+    start.setMonth(start.getMonth() - durationMonths);
+    document.getElementById('certStartDate').value = start.toISOString().split('T')[0];
+
+    const modal = new bootstrap.Modal(document.getElementById('certificateModal'));
+    modal.show();
+  }
+</script>
+{% endblock %}

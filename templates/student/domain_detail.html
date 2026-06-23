@@ -485,6 +485,44 @@
 
   </div>
 
+  <!-- Submit Project Section -->
+  <div class="mb-5">
+    <div class="d-flex align-items-center gap-2 mb-3">
+      <div style="width:36px;height:36px;border-radius:10px;background:rgba(16,185,129,0.1);color:#10b981;display:flex;align-items:center;justify-content:center;">
+        <i class="fas fa-upload"></i>
+      </div>
+      <h5 class="heading-font m-0" style="font-weight:800;color:#0f172a;">Submit Project</h5>
+    </div>
+    
+    <div style="background:#f8fafc;border:1px dashed #cbd5e1;border-radius:16px;padding:40px 20px;text-align:center;">
+      {% if submission %}
+      <div class="d-flex flex-column align-items-center">
+        <div style="width:64px;height:64px;border-radius:50%;background:#dcfce7;color:#16a34a;display:flex;align-items:center;justify-content:center;font-size:2rem;margin-bottom:15px;">
+          <i class="fas fa-check-circle"></i>
+        </div>
+        <h5 style="font-weight:700;color:#0f172a;margin-bottom:8px;">Project Submitted Successfully!</h5>
+        <p style="color:#64748b;margin-bottom:0;">Your file <strong>{{ submission.file_path.split('_')[-1] }}</strong> has been received and is under review.</p>
+        <p style="font-size:0.85rem;color:#94a3b8;margin-top:5px;">Submitted on: {{ submission.created_at.strftime('%B %d, %Y') }}</p>
+      </div>
+      {% else %}
+      <form action="{{ url_for('student.submit_project', domain=domain) }}" method="POST" enctype="multipart/form-data" class="d-flex flex-column align-items-center">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <i class="fas fa-cloud-upload-alt mb-3" style="font-size:2.5rem;color:#4f46e5;"></i>
+        <h6 style="font-weight:700;color:#0f172a;margin-bottom:8px;">Upload your completed project</h6>
+        <p style="font-size:0.85rem;color:#64748b;margin-bottom:20px;">Max file size: 5MB (ZIP, PDF, DOCX, etc.)</p>
+        
+        <div class="mb-4 w-100" style="max-width:400px;">
+          <input type="file" class="form-control" name="project_file" required style="background:#ffffff;border:1px solid #e2e8f0;border-radius:8px;padding:10px 12px;font-size:0.9rem;box-shadow:0 2px 4px rgba(0,0,0,0.02);">
+        </div>
+        
+        <button type="submit" class="btn" style="background:#6366f1;color:#ffffff;font-weight:700;padding:14px 0;width:100%;max-width:500px;border-radius:12px;box-shadow:0 8px 20px rgba(99, 102, 241, 0.25);transition:all 0.3s ease;">
+          Submit Project
+        </button>
+      </form>
+      {% endif %}
+    </div>
+  </div>
+
   <!-- Connected Roadmap Section -->
   <div class="premium-card mb-4">
     <div class="card-header-premium">

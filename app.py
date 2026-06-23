@@ -57,6 +57,9 @@ def create_app():
 
     with app.app_context():
         db.create_all()
+        # Legacy column addition removed; domain is mapped via model to 'domain' column.
+        # No extra schema changes are needed here.
+
         seed_data()
 
     return app
