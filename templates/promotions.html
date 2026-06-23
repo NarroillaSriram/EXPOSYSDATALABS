@@ -18,15 +18,15 @@
     </div>
     <div class="row g-4 mb-5">
       {% for badge, title, desc, price, original in [
-        ('HOT', 'Early Bird Offer', 'Register before the 15th of every month and get priority mentor assignment and fast-track certificate delivery.', '₹999', '₹999'),
-        ('NEW', 'Refer & Earn', 'Refer a friend and both of you get ₹100 off on your next program enrollment. No limit on referrals!', '₹999', '₹999'),
-        ('BEST', 'Group Enrollment', 'Enroll as a group of 3 or more students from the same college and get special group pricing.', '₹999', '₹999'),
+        ('HOT', 'Early Bird Offer', 'Register before the 15th of every month and get priority mentor assignment and fast-track certificate delivery.', '₹799', '₹999'),
+        ('NEW', 'Refer & Earn', 'Refer a friend and both of you get ₹100 off on your next program enrollment. No limit on referrals!', '₹899', '₹999'),
+        ('BEST', 'Group Enrollment', 'Enroll as a group of 3 students for ₹799/student, or a group of 4 (maximum discount) for ₹699/student.', '₹799 / ₹699', '₹999'),
       ] %}
       <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="{{ loop.index * 150 }}">
         <div style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:var(--card-shadow);position:relative;">
           <div style="position:absolute;top:15px;right:15px;background:var(--secondary);color:#fff;padding:4px 12px;border-radius:20px;font-size:0.75rem;font-weight:800;">{{ badge }}</div>
           <div style="background:var(--gradient);padding:30px;text-align:center;">
-            <div style="font-size:2rem;font-weight:900;color:var(--accent);">{{ price }}</div>
+            <div style="font-size:1.8rem;font-weight:900;color:var(--accent);">{{ price }}</div>
             <div style="color:rgba(255,255,255,0.6);text-decoration:line-through;font-size:0.9rem;">{{ original }}</div>
           </div>
           <div style="padding:25px;">
