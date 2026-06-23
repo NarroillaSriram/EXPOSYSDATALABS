@@ -1,415 +1,676 @@
 {% extends "base.html" %}
-{% block title %}Admin Login — Exposys Data Labs{% endblock %}
+{% block title %}Admin Portal — Exposys Data Labs{% endblock %}
 
 {% block extra_css %}
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Syne:wght@700;800&family=Inter:wght@400;500;600;700&display=swap');
 
-  /* Hide navbar & footer for dedicated login experience */
-  nav.navbar, footer.footer, #progressBar, #preloader { display: none !important; }
-  body { overflow: hidden; }
+/* ── KILL GLOBAL CHROME ── */
+body { margin:0; padding:0; overflow:hidden; background:#020815; }
+nav.navbar, footer.footer, #progressBar, #preloader { display:none !important; }
 
-  /* ── Page wrapper ── */
-  .al-page {
-    font-family: 'Inter', sans-serif;
-    width: 100vw;
-    height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #f0f4ff;
-    background-image:
-      radial-gradient(circle at 20% 30%, rgba(37, 99, 235, 0.08) 0%, transparent 55%),
-      radial-gradient(circle at 80% 70%, rgba(99, 102, 241, 0.07) 0%, transparent 55%);
-    position: relative;
-  }
+/* ── FULL CANVAS WRAPPER ── */
+.cmd-root {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  font-family: 'Inter', sans-serif;
+  background: radial-gradient(ellipse 120% 80% at 50% 0%,   #0c1a35 0%,
+                              #020815 55%);
+}
 
-  /* Subtle grid texture */
-  .al-page::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-image:
-      linear-gradient(rgba(0,0,50,0.04) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0,0,50,0.04) 1px, transparent 1px);
-    background-size: 40px 40px;
-    pointer-events: none;
-  }
+/* ── HEX GRID SVG BACKGROUND ── */
+.hex-grid {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.18;
+  pointer-events: none;
+}
 
-  /* ── Card ── */
-  .al-card {
-    background: #ffffff;
-    border-radius: 20px;
-    box-shadow:
-      0 1px 3px rgba(0,0,0,0.06),
-      0 8px 32px rgba(37, 99, 235, 0.1),
-      0 32px 64px rgba(0,0,0,0.08);
-    padding: 48px 44px 40px;
-    width: 100%;
-    max-width: 420px;
-    position: relative;
-    z-index: 1;
-    animation: card-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
-  }
+/* ── SCANLINE OVERLAY ── */
+.cmd-root::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.04) 2px,
+    rgba(0,0,0,0.04) 4px
+  );
+  pointer-events: none;
+  z-index: 1;
+}
 
-  @keyframes card-in {
-    from { opacity: 0; transform: translateY(18px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
+/* ── AMBIENT ORBS ── */
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  pointer-events: none;
+}
+.orb-1 {
+  width: 420px; height: 420px;
+  background: radial-gradient(circle, rgba(0,212,255,0.14), transparent 70%);
+  top: -120px; left: -80px;
+  animation: drift1 12s ease-in-out infinite alternate;
+}
+.orb-2 {
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(123,47,255,0.12), transparent 70%);
+  bottom: -140px; right: -100px;
+  animation: drift2 15s ease-in-out infinite alternate;
+}
+.orb-3 {
+  width: 280px; height: 280px;
+  background: radial-gradient(circle, rgba(0,255,160,0.07), transparent 70%);
+  top: 60%; left: 30%;
+  animation: drift1 18s ease-in-out infinite alternate-reverse;
+}
+@keyframes drift1 { 0%{transform:translate(0,0)} 100%{transform:translate(40px,30px)} }
+@keyframes drift2 { 0%{transform:translate(0,0)} 100%{transform:translate(-40px,-25px)} }
 
-  /* Top accent stripe */
-  .al-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, #2563eb, #6366f1, #2563eb);
-    background-size: 200% auto;
-    border-radius: 20px 20px 0 0;
-    animation: stripe-move 4s linear infinite;
-  }
+/* ── CARD PERSPECTIVE WRAPPER ── */
+.card-perspective {
+  perspective: 1400px;
+  position: relative;
+  z-index: 10;
+}
 
-  @keyframes stripe-move {
-    from { background-position: 0% center; }
-    to   { background-position: 200% center; }
-  }
+/* ── MAIN CARD ── */
+.cmd-card {
+  width: 440px;
+  background: rgba(8, 18, 40, 0.82);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  border-radius: 24px;
+  padding: 48px 44px 40px;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.1s linear;
+  box-shadow:
+    0 0 0 1px rgba(0,212,255,0.12),
+    0 32px 80px rgba(0,0,0,0.6),
+    0 0 80px rgba(0,212,255,0.04) inset;
+}
 
-  /* ── Header ── */
-  .al-header {
-    text-align: center;
-    margin-bottom: 36px;
-  }
+/* Rotating gradient border */
+.cmd-card::before {
+  content: '';
+  position: absolute;
+  inset: -1.5px;
+  border-radius: 25px;
+  background: conic-gradient(
+    from var(--angle, 0deg),
+    #00d4ff 0%,
+    #7b2fff 25%,
+    #00ffa3 50%,
+    #7b2fff 75%,
+    #00d4ff 100%
+  );
+  z-index: -1;
+  animation: spin-border 5s linear infinite;
+  opacity: 0.7;
+}
+.cmd-card::after {
+  content: '';
+  position: absolute;
+  inset: 1px;
+  border-radius: 23.5px;
+  background: rgba(8,18,40,0.95);
+  z-index: -1;
+}
+@property --angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+@keyframes spin-border {
+  to { --angle: 360deg; }
+}
 
-  .al-icon-wrap {
-    width: 60px;
-    height: 60px;
-    background: linear-gradient(135deg, #2563eb 0%, #6366f1 100%);
-    border-radius: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 20px;
-    box-shadow: 0 6px 20px rgba(37,99,235,0.3);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-  }
+/* ── TOP META BAR ── */
+.meta-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 36px;
+}
+.meta-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: #00d4ff;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+.status-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(0,255,160,0.08);
+  border: 1px solid rgba(0,255,160,0.2);
+  border-radius: 100px;
+  padding: 4px 10px;
+}
+.status-dot {
+  width: 6px; height: 6px;
+  background: #00ffa3;
+  border-radius: 50%;
+  box-shadow: 0 0 6px #00ffa3;
+  animation: blink 2.4s ease-in-out infinite;
+}
+.status-pill span {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6rem;
+  color: #00ffa3;
+  letter-spacing: 1px;
+  font-weight: 600;
+}
+@keyframes blink {
+  0%,100%{opacity:1} 50%{opacity:0.3}
+}
 
-  .al-icon-wrap:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 28px rgba(37,99,235,0.4);
-  }
+/* ── LOGO SECTION ── */
+.logo-section {
+  text-align: center;
+  margin-bottom: 32px;
+}
+.logo-rings {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 18px;
+}
+.ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1.5px solid;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+}
+.ring-1 {
+  width: 80px; height: 80px;
+  border-color: rgba(0,212,255,0.2);
+  animation: spin-cw 10s linear infinite;
+}
+.ring-2 {
+  width: 60px; height: 60px;
+  border-color: rgba(123,47,255,0.3);
+  animation: spin-ccw 7s linear infinite;
+}
+.ring-3 {
+  width: 40px; height: 40px;
+  border-color: rgba(0,255,163,0.2);
+  animation: spin-cw 5s linear infinite;
+}
+@keyframes spin-cw  { to { transform: translate(-50%,-50%) rotate(360deg);  } }
+@keyframes spin-ccw { to { transform: translate(-50%,-50%) rotate(-360deg); } }
 
-  .al-icon-wrap i {
-    color: #fff;
-    font-size: 1.5rem;
-  }
+.logo-core {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+  width: 36px; height: 36px;
+  background: linear-gradient(135deg, #00d4ff, #7b2fff);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 20px rgba(0,212,255,0.35), 0 0 40px rgba(123,47,255,0.2);
+  z-index: 2;
+}
+.logo-core i { color:#fff; font-size:1rem; }
 
-  .al-title {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #0f172a;
-    margin: 0 0 6px;
-    letter-spacing: -0.3px;
-  }
+.cmd-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.7rem;
+  font-weight: 800;
+  color: #f0f8ff;
+  margin: 0 0 6px;
+  letter-spacing: -0.5px;
+}
+.cmd-title span {
+  background: linear-gradient(90deg, #00d4ff, #7b2fff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.cmd-sub {
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.3);
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 1px;
+}
 
-  .al-subtitle {
-    font-size: 0.875rem;
-    color: #64748b;
-    font-weight: 400;
-    margin: 0;
-  }
+/* ── FLASH MESSAGES ── */
+.flash-msg {
+  border-radius: 10px;
+  padding: 9px 14px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid;
+  font-family: 'JetBrains Mono', monospace;
+}
+.flash-danger  { background:rgba(255,50,50,0.08); border-color:rgba(255,50,50,0.25); color:#ff8080; }
+.flash-success { background:rgba(0,255,160,0.07); border-color:rgba(0,255,160,0.2);  color:#80ffcc; }
+.flash-warning { background:rgba(255,200,50,0.07); border-color:rgba(255,200,50,0.2); color:#ffe080; }
 
-  /* ── Flash alerts ── */
-  .al-alert {
-    border-radius: 10px;
-    padding: 10px 14px;
-    font-size: 0.83rem;
-    font-weight: 500;
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    gap: 9px;
-    animation: card-in 0.3s ease both;
-  }
+/* ── FORM FIELDS ── */
+.f-group { margin-bottom: 20px; }
+.f-label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: rgba(0,212,255,0.55);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-bottom: 9px;
+}
+.f-label i { font-size: 0.65rem; }
+.f-wrap { position: relative; }
 
-  .al-alert.danger  { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
-  .al-alert.success { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
-  .al-alert.warning { background: #fffbeb; color: #d97706; border: 1px solid #fde68a; }
+.cmd-input {
+  width: 100%;
+  height: 50px;
+  padding: 0 50px 0 0;
+  background: transparent !important;
+  border: none !important;
+  border-bottom: 1.5px solid rgba(255,255,255,0.1) !important;
+  border-radius: 0 !important;
+  color: #e8f4ff !important;
+  font-size: 0.92rem !important;
+  font-weight: 500 !important;
+  font-family: 'Inter', sans-serif;
+  transition: border-color 0.3s ease !important;
+  box-shadow: none !important;
+  outline: none !important;
+  caret-color: #00d4ff;
+}
+.cmd-input::placeholder { color: rgba(255,255,255,0.18) !important; font-weight:400 !important; }
+.cmd-input:focus {
+  border-bottom-color: #00d4ff !important;
+  box-shadow: 0 1px 0 0 rgba(0,212,255,0.4) !important;
+}
+.cmd-input.is-invalid { border-bottom-color: rgba(255,80,80,0.7) !important; }
 
-  /* ── Fields ── */
-  .al-field {
-    margin-bottom: 18px;
-  }
+/* Underline glow on focus */
+.f-wrap::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0;
+  width: 0; height: 1px;
+  background: linear-gradient(90deg, #00d4ff, #7b2fff);
+  transition: width 0.4s cubic-bezier(0.4,0,0.2,1);
+}
+.f-wrap:focus-within::after { width: 100%; }
 
-  .al-label {
-    display: block;
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: #374151;
-    margin-bottom: 7px;
-    letter-spacing: 0.1px;
-  }
+/* Autofill override */
+.cmd-input:-webkit-autofill,
+.cmd-input:-webkit-autofill:hover,
+.cmd-input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 100px #020815 inset !important;
+  -webkit-text-fill-color: #e8f4ff !important;
+  caret-color: #00d4ff;
+}
 
-  .al-input-wrap {
-    position: relative;
-  }
+.f-pw-toggle {
+  position: absolute;
+  right: 0; top: 50%;
+  transform: translateY(-50%);
+  background: none; border: none;
+  color: rgba(255,255,255,0.2);
+  cursor: pointer; font-size: 0.9rem;
+  padding: 4px; transition: color 0.3s;
+  z-index: 3;
+}
+.f-pw-toggle:hover { color: #00d4ff; }
 
-  .al-input-icon {
-    position: absolute;
-    left: 14px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #9ca3af;
-    font-size: 0.85rem;
-    pointer-events: none;
-    transition: color 0.2s;
-    z-index: 1;
-  }
+.f-error {
+  font-size: 0.75rem;
+  color: #ff7070;
+  margin-top: 5px;
+  font-family: 'JetBrains Mono', monospace;
+  display: flex; align-items: center; gap: 5px;
+}
 
-  .al-input {
-    width: 100%;
-    height: 48px;
-    padding: 0 42px 0 40px;
-    border: 1.5px solid #e2e8f0;
-    border-radius: 10px;
-    background: #f8fafc;
-    color: #0f172a;
-    font-size: 0.9rem;
-    font-weight: 500;
-    font-family: 'Inter', sans-serif;
-    transition: all 0.2s ease;
-    outline: none;
-    box-sizing: border-box;
-  }
+/* ── SUBMIT BUTTON ── */
+.btn-cmd {
+  width: 100%;
+  height: 52px;
+  border: none;
+  border-radius: 14px;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  margin-top: 8px;
+  font-family: 'Syne', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: #fff;
+  background: linear-gradient(135deg, #0080cc 0%, #7b2fff 100%);
+  box-shadow: 0 6px 28px rgba(0,128,255,0.3), 0 0 0 1px rgba(0,212,255,0.15);
+  transition: all 0.35s cubic-bezier(0.34,1.56,0.64,1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
 
-  .al-input::placeholder { color: #c0c7d0; font-weight: 400; }
+/* Shimmer sweep */
+.btn-cmd::before {
+  content: '';
+  position: absolute;
+  top: 0; left: -120%;
+  width: 80%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
+  transform: skewX(-20deg);
+  transition: none;
+}
+.btn-cmd:hover::before {
+  left: 140%;
+  transition: left 0.7s ease;
+}
+.btn-cmd:hover {
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: 0 12px 36px rgba(0,128,255,0.4), 0 0 0 1px rgba(0,212,255,0.3);
+}
+.btn-cmd:active { transform: scale(0.99); }
+.btn-cmd-inner { position:relative; z-index:1; display:flex; align-items:center; gap:10px; }
 
-  .al-input:focus {
-    border-color: #2563eb;
-    background: #fff;
-    box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
-  }
+/* ── BACK LINK ── */
+.back-link-cmd {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  margin-top: 26px;
+  font-size: 0.78rem;
+  font-family: 'JetBrains Mono', monospace;
+  color: rgba(255,255,255,0.2);
+  text-decoration: none;
+  letter-spacing: 0.5px;
+  transition: color 0.3s;
+}
+.back-link-cmd:hover { color: #00d4ff; }
+.back-link-cmd i { transition: transform 0.3s; }
+.back-link-cmd:hover i { transform: translateX(-4px); }
 
-  .al-input:focus + .al-input-icon { color: #2563eb; }
+/* ── BOTTOM SECURITY STRIP ── */
+.security-strip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 26px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+.sec-chip {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6rem;
+  color: rgba(255,255,255,0.18);
+  letter-spacing: 1px;
+}
+.sec-chip i { color: rgba(0,212,255,0.4); }
 
-  .al-input.is-invalid {
-    border-color: #ef4444;
-    background: #fff;
-  }
+/* ── FLOATING CORNER LABEL ── */
+.corner-label {
+  position: fixed;
+  bottom: 24px;
+  left: 28px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.62rem;
+  color: rgba(255,255,255,0.12);
+  letter-spacing: 1.5px;
+  z-index: 20;
+  user-select: none;
+}
+.corner-label span { color: rgba(0,212,255,0.3); }
 
-  /* Fix autofill bg */
-  .al-input:-webkit-autofill,
-  .al-input:-webkit-autofill:focus {
-    -webkit-box-shadow: 0 0 0 100px #f8fafc inset !important;
-    -webkit-text-fill-color: #0f172a !important;
-    border-color: #2563eb !important;
-  }
+/* ── ANIMATIONS ── */
+.card-perspective { animation: rise 0.9s cubic-bezier(0.22,1,0.36,1) both; }
+@keyframes rise {
+  from { opacity:0; transform: scale(0.88) translateY(30px); }
+  to   { opacity:1; transform: scale(1) translateY(0); }
+}
 
-  .al-pw-btn {
-    position: absolute;
-    right: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    color: #9ca3af;
-    cursor: pointer;
-    padding: 4px;
-    font-size: 0.85rem;
-    display: flex;
-    align-items: center;
-    transition: color 0.2s;
-    z-index: 2;
-  }
-
-  .al-pw-btn:hover { color: #2563eb; }
-
-  .al-field-error {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 0.76rem;
-    color: #ef4444;
-    margin-top: 5px;
-    font-weight: 500;
-  }
-
-  /* ── Submit button ── */
-  .al-btn {
-    width: 100%;
-    height: 48px;
-    border: none;
-    border-radius: 10px;
-    background: linear-gradient(135deg, #2563eb 0%, #6366f1 100%);
-    color: #fff;
-    font-size: 0.92rem;
-    font-weight: 600;
-    font-family: 'Inter', sans-serif;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 9px;
-    transition: all 0.25s ease;
-    box-shadow: 0 4px 14px rgba(37,99,235,0.3);
-    margin-top: 6px;
-    letter-spacing: 0.2px;
-  }
-
-  .al-btn:hover {
-    box-shadow: 0 6px 20px rgba(37,99,235,0.4);
-    transform: translateY(-1px);
-    filter: brightness(1.05);
-  }
-
-  .al-btn:active { transform: translateY(0); filter: brightness(0.98); }
-
-  /* ── Back link ── */
-  .al-back {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 7px;
-    margin-top: 24px;
-    color: #94a3b8;
-    font-size: 0.82rem;
-    font-weight: 500;
-    text-decoration: none;
-    transition: color 0.2s;
-  }
-
-  .al-back:hover { color: #2563eb; }
-  .al-back i { transition: transform 0.2s; }
-  .al-back:hover i { transform: translateX(-3px); }
-
-  /* ── Security note ── */
-  .al-secure {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    margin-top: 20px;
-    padding-top: 18px;
-    border-top: 1px solid #f1f5f9;
-    font-size: 0.72rem;
-    color: #94a3b8;
-    font-weight: 500;
-    letter-spacing: 0.3px;
-  }
-
-  .al-secure i { color: #22c55e; font-size: 0.72rem; }
-
-  /* Responsive */
-  @media (max-width: 480px) {
-    body { overflow: auto !important; }
-    .al-card { margin: 20px; padding: 36px 24px 28px; border-radius: 16px; }
-    .al-page { align-items: flex-start; padding-top: 40px; }
-  }
+/* ── RESPONSIVE ── */
+@media(max-width:520px){
+  body { overflow:auto!important; }
+  .cmd-root { align-items:flex-start; padding:20px 0 40px; height:auto; min-height:100vh; }
+  .cmd-card { width:calc(100vw - 40px); padding:36px 28px 32px; border-radius:20px; }
+  .corner-label { display:none; }
+}
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="al-page">
-  <div class="al-card">
+<div class="cmd-root" id="cmdRoot">
 
-    <!-- Header -->
-    <div class="al-header">
-      <div class="al-icon-wrap">
-        <i class="fas fa-shield-alt"></i>
+  <!-- HEX SVG GRID -->
+  <svg class="hex-grid" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <pattern id="hex" width="56" height="97" patternUnits="userSpaceOnUse">
+        <polygon points="28,1 55,15.5 55,46.5 28,62 1,46.5 1,15.5"
+                 fill="none" stroke="#00d4ff" stroke-width="0.6"/>
+        <polygon points="28,50 55,64.5 55,95.5 28,111 1,95.5 1,64.5"
+                 fill="none" stroke="#00d4ff" stroke-width="0.6"/>
+      </pattern>
+    </defs>
+    <rect width="100%" height="100%" fill="url(#hex)"/>
+  </svg>
+
+  <!-- ORBS -->
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <!-- CARD -->
+  <div class="card-perspective" id="cardPerspective">
+    <div class="cmd-card" id="cmdCard">
+
+      <!-- TOP META BAR -->
+      <div class="meta-bar">
+        <span class="meta-tag">EDL // ADMIN</span>
+        <div class="status-pill">
+          <div class="status-dot"></div>
+          <span>SYSTEM ONLINE</span>
+        </div>
       </div>
-      <h1 class="al-title">Admin Portal</h1>
-      <p class="al-subtitle">Exposys Data Labs Administration</p>
-    </div>
 
-    <!-- Flash messages -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        {% for category, message in messages %}
-          <div class="al-alert {{ 'danger' if category in ['error','danger'] else category }}">
-            <i class="fas fa-{% if category == 'success' %}check-circle{% elif category == 'warning' %}exclamation-triangle{% else %}times-circle{% endif %}"></i>
-            {{ message }}
+      <!-- LOGO -->
+      <div class="logo-section">
+        <div class="logo-rings">
+          <div class="ring ring-1"></div>
+          <div class="ring ring-2"></div>
+          <div class="ring ring-3"></div>
+          <div class="logo-core"><i class="fas fa-shield-alt"></i></div>
+        </div>
+        <h1 class="cmd-title">Admin <span>Portal</span></h1>
+        <p class="cmd-sub">EXPOSYS DATA LABS · SECURE ACCESS</p>
+      </div>
+
+      <!-- FLASH MESSAGES -->
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="flash-msg flash-{{ 'danger' if category in ['error','danger'] else category }}">
+              <i class="fas fa-{% if category == 'success' %}check-circle{% elif category == 'warning' %}exclamation-triangle{% else %}times-circle{% endif %}"></i>
+              {{ message }}
+            </div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      <!-- FORM -->
+      <form method="POST" action="{{ url_for('auth.admin_login') }}" novalidate>
+        {{ form.hidden_tag() }}
+
+        <!-- Email -->
+        <div class="f-group">
+          <label class="f-label"><i class="fas fa-at"></i> Identifier</label>
+          <div class="f-wrap">
+            {{ form.email(
+                class="cmd-input" + (" is-invalid" if form.email.errors else ""),
+                placeholder="admin@exposysdata.com",
+                id="cmd-email",
+                autocomplete="email"
+            ) }}
           </div>
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
-
-    <!-- Form -->
-    <form method="POST" action="{{ url_for('auth.admin_login') }}" novalidate>
-      {{ form.hidden_tag() }}
-
-      <!-- Email -->
-      <div class="al-field">
-        <label class="al-label" for="admin-email">{{ form.email.label.text }}</label>
-        <div class="al-input-wrap">
-          {{ form.email(
-              class="al-input" + (" is-invalid" if form.email.errors else ""),
-              placeholder="admin@exposysdata.com",
-              id="admin-email",
-              autocomplete="email"
-          ) }}
-          <i class="fas fa-envelope al-input-icon"></i>
+          {% for e in form.email.errors %}
+            <div class="f-error"><i class="fas fa-exclamation-circle"></i>{{ e }}</div>
+          {% endfor %}
         </div>
-        {% for e in form.email.errors %}
-          <div class="al-field-error"><i class="fas fa-exclamation-circle"></i>{{ e }}</div>
-        {% endfor %}
+
+        <!-- Password -->
+        <div class="f-group">
+          <label class="f-label"><i class="fas fa-key"></i> Passkey</label>
+          <div class="f-wrap">
+            {{ form.password(
+                class="cmd-input" + (" is-invalid" if form.password.errors else ""),
+                placeholder="••••••••••••",
+                id="cmd-password",
+                autocomplete="current-password"
+            ) }}
+            <button type="button" class="f-pw-toggle password-toggle-btn"
+                    data-pw-target="#cmd-password" aria-label="Toggle visibility">
+              <i class="fas fa-eye-slash"></i>
+            </button>
+          </div>
+          {% for e in form.password.errors %}
+            <div class="f-error"><i class="fas fa-exclamation-circle"></i>{{ e }}</div>
+          {% endfor %}
+        </div>
+
+        <!-- Submit -->
+        <button type="submit" class="btn-cmd" id="submitBtn">
+          <div class="btn-cmd-inner">
+            <i class="fas fa-terminal" id="btnIcon"></i>
+            <span id="btnText">Authenticate</span>
+          </div>
+        </button>
+      </form>
+
+      <!-- Back -->
+      <a href="{{ url_for('main.index') }}" class="back-link-cmd">
+        <i class="fas fa-arrow-left"></i> return to website
+      </a>
+
+      <!-- Security Strip -->
+      <div class="security-strip">
+        <div class="sec-chip"><i class="fas fa-lock"></i> SSL/TLS 256</div>
+        <div class="sec-chip"><i class="fas fa-shield-alt"></i> RESTRICTED</div>
+        <div class="sec-chip"><i class="fas fa-eye-slash"></i> ENCRYPTED</div>
       </div>
 
-      <!-- Password -->
-      <div class="al-field">
-        <label class="al-label" for="admin-password">{{ form.password.label.text }}</label>
-        <div class="al-input-wrap">
-          {{ form.password(
-              class="al-input" + (" is-invalid" if form.password.errors else ""),
-              placeholder="Enter your password",
-              id="admin-password",
-              autocomplete="current-password"
-          ) }}
-          <i class="fas fa-lock al-input-icon"></i>
-          <button type="button" class="al-pw-btn password-toggle-btn" data-pw-target="#admin-password" aria-label="Toggle password">
-            <i class="fas fa-eye-slash"></i>
-          </button>
-        </div>
-        {% for e in form.password.errors %}
-          <div class="al-field-error"><i class="fas fa-exclamation-circle"></i>{{ e }}</div>
-        {% endfor %}
-      </div>
+    </div><!-- /cmd-card -->
+  </div><!-- /card-perspective -->
 
-      <!-- Submit -->
-      <button type="submit" class="al-btn" id="al-submit">
-        <i class="fas fa-sign-in-alt"></i> Sign In to Admin
-      </button>
-    </form>
-
-    <!-- Back link -->
-    <a href="{{ url_for('main.index') }}" class="al-back">
-      <i class="fas fa-arrow-left"></i> Back to website
-    </a>
-
-    <!-- Security note -->
-    <div class="al-secure">
-      <i class="fas fa-lock"></i> Secure &amp; encrypted connection
-    </div>
+  <!-- CORNER LABEL -->
+  <div class="corner-label">
+    SYS_ID: <span>EDL-ADMIN-2026</span> &nbsp;|&nbsp; v3.1.0
   </div>
-</div>
+
+</div><!-- /cmd-root -->
 {% endblock %}
 
 {% block extra_js %}
 <script>
-  // Auto-focus email field
-  const ef = document.getElementById('admin-email');
-  if (ef) setTimeout(() => ef.focus(), 300);
+/* ── 3D TILT EFFECT ── */
+(function(){
+  const root  = document.getElementById('cmdRoot');
+  const card  = document.getElementById('cmdCard');
+  if(!root || !card) return;
+  const MAX = 12;
 
-  // Loading state on submit
-  const form = document.querySelector('form');
-  const btn  = document.getElementById('al-submit');
-  if (form && btn) {
-    form.addEventListener('submit', function() {
-      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in…';
-      btn.disabled = true;
-      setTimeout(() => {
-        btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Sign In to Admin';
-        btn.disabled = false;
-      }, 6000);
-    });
+  root.addEventListener('mousemove', function(e){
+    const rect = root.getBoundingClientRect();
+    const cx = rect.left + rect.width  / 2;
+    const cy = rect.top  + rect.height / 2;
+    const dx = (e.clientX - cx) / (rect.width  / 2);
+    const dy = (e.clientY - cy) / (rect.height / 2);
+    const rotX = -dy * MAX;
+    const rotY =  dx * MAX;
+    card.style.transform =
+      `rotateX(${rotX}deg) rotateY(${rotY}deg) translateZ(10px)`;
+  });
+
+  root.addEventListener('mouseleave', function(){
+    card.style.transform = 'rotateX(0deg) rotateY(0deg) translateZ(0)';
+    card.style.transition = 'transform 0.6s cubic-bezier(0.34,1.56,0.64,1)';
+    setTimeout(()=>{ card.style.transition = 'transform 0.1s linear'; }, 700);
+  });
+})();
+
+/* ── SUBMIT LOADING STATE ── */
+(function(){
+  const btn  = document.getElementById('submitBtn');
+  const icon = document.getElementById('btnIcon');
+  const txt  = document.getElementById('btnText');
+  if(!btn) return;
+
+  btn.addEventListener('click', function(){
+    if(btn.dataset.loading) return;
+    btn.dataset.loading = '1';
+    icon.className = 'fas fa-circle-notch fa-spin';
+    txt.textContent = 'Verifying…';
+    btn.style.opacity = '0.85';
+    btn.style.pointerEvents = 'none';
+    setTimeout(()=>{
+      delete btn.dataset.loading;
+      icon.className = 'fas fa-terminal';
+      txt.textContent = 'Authenticate';
+      btn.style.opacity = '1';
+      btn.style.pointerEvents = 'auto';
+    }, 7000);
+  });
+})();
+
+/* ── TYPEWRITER EFFECT on placeholder ── */
+(function(){
+  const field = document.getElementById('cmd-email');
+  if(!field || field.value) return;
+  const texts = ['admin@exposysdata.com', 'your.email@domain.com'];
+  let ti = 0, ci = 0, deleting = false;
+
+  function type(){
+    const current = texts[ti];
+    if(!deleting){
+      field.setAttribute('placeholder', current.slice(0, ++ci));
+      if(ci === current.length){ deleting = true; setTimeout(type, 1800); return; }
+    } else {
+      field.setAttribute('placeholder', current.slice(0, --ci));
+      if(ci === 0){ deleting = false; ti = (ti+1) % texts.length; }
+    }
+    setTimeout(type, deleting ? 40 : 90);
   }
+  setTimeout(type, 600);
+})();
+
+/* ── AUTO-FOCUS ── */
+setTimeout(()=>{
+  const f = document.getElementById('cmd-email');
+  if(f) f.focus();
+}, 500);
 </script>
 {% endblock %}
