@@ -13,7 +13,7 @@ from domain_content import get_domain_content
 
 student_bp = Blueprint('student', __name__)
 
-PAYMENT_AMOUNT = 1  # ₹1 for testing (change to 999 for production)
+PAYMENT_AMOUNT = 999  # ₹999 for production
 
 
 def get_razorpay_client():

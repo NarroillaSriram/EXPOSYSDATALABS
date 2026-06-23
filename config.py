@@ -10,33 +10,55 @@ class Config:
     # Cloud DB: set DATABASE_URL in .env (e.g. from Neon/Supabase)
     # Local DB: set individual DB_* variables
     _db_url = os.environ.get('DATABASE_URL', '')
+    _db_port = os.environ.get('DB_PORT', '3306')
+    _db_type = os.environ.get('DB_TYPE', '')
+    _is_mysql = (_db_port == '3306' or _db_type == 'mysql') and not _db_url
+
     if _db_url:
         # Neon/Supabase provide postgres:// — SQLAlchemy needs postgresql://
         SQLALCHEMY_DATABASE_URI = _db_url.replace('postgres://', 'postgresql://', 1)
     else:
-        SQLALCHEMY_DATABASE_URI = (
-            f"postgresql+psycopg2://{os.environ.get('DB_USERNAME','postgres')}:"
-            f"{os.environ.get('DB_PASSWORD','password')}@"
-            f"{os.environ.get('DB_HOST','localhost')}:"
-            f"{os.environ.get('DB_PORT','5432')}/"
-            f"{os.environ.get('DB_NAME','exposys_db')}"
-        )
+        import urllib.parse
+        db_user = os.environ.get('DB_USERNAME', 'root')
+        db_pass = os.environ.get('DB_PASSWORD', 'root')
+        db_host = os.environ.get('DB_HOST', 'localhost')
+        db_port = _db_port
+        db_name = os.environ.get('DB_NAME', 'exposys_db')
+        
+        db_pass_encoded = urllib.parse.quote_plus(db_pass)
+        
+        if _is_mysql:
+            SQLALCHEMY_DATABASE_URI = f"mysql+pymysql://{db_user}:{db_pass_encoded}@{db_host}:{db_port}/{db_name}"
+        else:
+            SQLALCHEMY_DATABASE_URI = f"postgresql+psycopg2://{db_user}:{db_pass_encoded}@{db_host}:{db_port}/{db_name}"
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    # Fix Neon/cloud DB idle connection drops
-    SQLALCHEMY_ENGINE_OPTIONS = {
-        'pool_pre_ping': True,       # Test connection before using — auto-reconnects if dropped
-        'pool_recycle': 280,         # Recycle connections every 4.5 min (Neon drops after 5 min idle)
-        'pool_size': 5,
-        'max_overflow': 2,
-        'connect_args': {
-            'connect_timeout': 10,
-            'keepalives': 1,
-            'keepalives_idle': 30,
-            'keepalives_interval': 10,
-            'keepalives_count': 5,
+    
+    # Engine options dynamic based on database engine
+    if _is_mysql:
+        SQLALCHEMY_ENGINE_OPTIONS = {
+            'pool_pre_ping': True,
+            'pool_recycle': 280,
+            'pool_size': 5,
+            'max_overflow': 2,
+            'connect_args': {
+                'connect_timeout': 10
+            }
         }
-    }
+    else:
+        SQLALCHEMY_ENGINE_OPTIONS = {
+            'pool_pre_ping': True,       # Test connection before using — auto-reconnects if dropped
+            'pool_recycle': 280,         # Recycle connections every 4.5 min (Neon drops after 5 min idle)
+            'pool_size': 5,
+            'max_overflow': 2,
+            'connect_args': {
+                'connect_timeout': 10,
+                'keepalives': 1,
+                'keepalives_idle': 30,
+                'keepalives_interval': 10,
+                'keepalives_count': 5,
+            }
+        }
 
     UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'uploads')
     MAX_CONTENT_LENGTH = 5 * 1024 * 1024  # 5MB
