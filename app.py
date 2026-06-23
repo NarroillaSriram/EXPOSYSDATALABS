@@ -59,6 +59,12 @@ def create_app():
         db.create_all()
         # Legacy column addition removed; domain is mapped via model to 'domain' column.
         # No extra schema changes are needed here.
+        try:
+            from sqlalchemy import text
+            db.session.execute(text("ALTER TABLE students ADD COLUMN IF NOT EXISTS ug_percentage FLOAT;"))
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
 
         seed_data()
 
