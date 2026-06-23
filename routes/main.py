@@ -234,7 +234,7 @@ def job_application():
                 portfolio_url=request.form.get('portfolio'),
                 city=request.form.get('city'),
                 state=request.form.get('state'),
-                country=request.form.get('country'),
+                country=request.form.get('other_country') if request.form.get('country') == 'Other' else request.form.get('country'),
                 experience_json=json.dumps(experiences),
                 education_json=json.dumps(educations),
                 skills=request.form.get('skills'),

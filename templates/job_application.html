@@ -322,6 +322,12 @@
                 <label for="country">Country *</label>
               </div>
             </div>
+            <div class="col-md-4" id="other-country-container" style="display: none;">
+              <div class="form-floating">
+                <input type="text" class="form-control" id="other_country" name="other_country" placeholder="Enter country name">
+                <label for="other_country">Other Country *</label>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -743,6 +749,55 @@ document.addEventListener('DOMContentLoaded', function() {
     btnSubmit.querySelector('span').innerText = 'Submitting...';
     // Let the form submit naturally
   });
+
+  // Other Country Logic
+  const countrySelect = document.getElementById('country');
+  const otherCountryContainer = document.getElementById('other-country-container');
+  const otherCountryInput = document.getElementById('other_country');
+
+  function toggleOtherCountry() {
+    if (countrySelect && countrySelect.value === 'Other') {
+      otherCountryContainer.style.display = 'block';
+      if (otherCountryInput) otherCountryInput.required = true;
+    } else {
+      if (otherCountryContainer) otherCountryContainer.style.display = 'none';
+      if (otherCountryInput) {
+        otherCountryInput.required = false;
+        otherCountryInput.value = '';
+      }
+    }
+  }
+
+  if (countrySelect) {
+    countrySelect.addEventListener('change', toggleOtherCountry);
+    toggleOtherCountry(); // Initial check
+  }
+
+  if (otherCountryInput) {
+    otherCountryInput.addEventListener('keypress', function (e) {
+      if (/[0-9]/.test(e.key)) {
+        e.preventDefault();
+      }
+      if (this.value.length === 0) {
+        if (!/^[a-zA-Z]$/.test(e.key)) {
+          e.preventDefault();
+        }
+      } else if (e.key === ' ') {
+        if (this.value.endsWith(' ')) {
+          e.preventDefault();
+        }
+      }
+    });
+
+    otherCountryInput.addEventListener('input', function (e) {
+      let val = this.value.replace(/[0-9]/g, '');
+      if (val.length > 0 && !/^[a-zA-Z]/.test(val)) {
+        val = val.substring(1); // Remove first character if not a letter
+      }
+      val = val.replace(/\s{2,}/g, ' ');
+      this.value = val;
+    });
+  }
 
 });
 </script>
