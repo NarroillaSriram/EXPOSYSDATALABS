@@ -3,7 +3,7 @@ from models.models import Contact, Internship, AddonPayment, Payment
 from models import db, csrf
 from forms import ContactForm
 from flask_login import login_required, current_user
-from models.models import Student
+from models.models import Student, JobApplication
 
 main_bp = Blueprint('main', __name__)
 
@@ -168,11 +168,11 @@ def careers():
 
 
 @main_bp.route('/job-application', methods=['GET', 'POST'])
+@csrf.exempt
 def job_application():
-    import os, json
+    import os, json, time
     from werkzeug.utils import secure_filename
     from flask import current_app
-    from models.models import JobApplication
 
     role = request.args.get('role', 'General Application')
     if request.method == 'POST':
