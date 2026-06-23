@@ -427,114 +427,56 @@
       </div>
     </div>
 
-    <!-- What you get -->
-    <div style="margin-bottom:24px;">
-      <div style="font-weight:700;color:var(--primary);font-size:0.85rem;margin-bottom:12px;">What's included:</div>
-      {% for icon, text in [
-        ('fa-certificate', 'Industry-recognized Internship Certificate'),
-        ('fa-file-alt', 'Letter of Recommendation (LOR)'),
-        ('fa-user-tie', 'Expert Mentorship Sessions'),
-        ('fa-project-diagram', 'Live Project Experience'),
-        ('fa-headset', '24/7 Support Access'),
-      ] %}
-      <div class="feature-row">
-        <div class="feature-icon"><i class="fas {{ icon }}"></i></div>
-        <span style="color:#374151;">{{ text }}</span>
-        <i class="fas fa-check-circle ms-auto" style="color:#10b981;"></i>
-      </div>
-      {% endfor %}
-    </div>
-
-    <!-- Payment Method Tabs -->
-    <div class="pay-tabs" role="tablist">
-      <button id="tab-online" class="pay-tab active" onclick="switchTab('online')" role="tab" aria-selected="true">
-        <i class="fas fa-credit-card"></i> Pay Online
-      </button>
-      <button id="tab-qr" class="pay-tab" onclick="switchTab('qr')" role="tab" aria-selected="false">
-        <i class="fas fa-qrcode"></i> Scan &amp; Pay
-      </button>
+    <!-- Payment Actions -->
+    <div style="margin-bottom: 30px;">
+      <a href="https://www.instamojo.com/@Exposysdatalabs/" target="_blank" class="rzp-btn" style="text-decoration:none; display:flex; align-items:center; justify-content:center; gap:10px; background:linear-gradient(135deg,#0a2463,#1a3a8f); color:#fff; padding:15px; border-radius:12px; font-weight:700; font-size:1.1rem; width:100%; transition:all 0.3s ease; box-shadow:0 10px 30px rgba(10,36,99,0.15);" onclick="alert('Opening Instamojo.\\n\\nPlease complete the payment there, then return here to upload your screenshot below.');">
+        <i class="fas fa-external-link-alt"></i> Pay via Instamojo
+      </a>
     </div>
 
     <!-- ─────────────────────────────────────────────────
-         Tab: Razorpay Online
+         Upload Screenshot Section
     ──────────────────────────────────────────────────── -->
-    <div id="pane-online" class="pay-tab-pane active">
-      <div id="paymentSection">
-        <button id="payBtn" class="rzp-btn" onclick="startPayment()">
-          <i class="fas fa-lock me-1"></i>
-          Pay ₹{{ amount }} Securely
+    <div style="display:flex; flex-direction:column; align-items:center;">
+      <!-- I've Paid — Submit Transaction -->
+      {% if existing and existing.status == 'pending' %}
+      <!-- Already submitted, pending verification -->
+      <div class="pending-banner" style="width:100%;max-width:400px;">
+        <i class="fas fa-clock"></i>
+        <strong>Payment under review</strong>
+        <p>Your payment screenshot was submitted (Txn: <strong>{{ existing.transaction_id }}</strong>).<br>
+        Admin will verify within 24 hours. Check back soon!</p>
+      </div>
+      {% else %}
+      <div class="paid-form-wrap" id="paidFormWrap" style="max-width:400px;">
+        <div class="paid-form-title">
+          <i class="fas fa-receipt" style="color:#6c3fc5;"></i>
+          Upload Payment Screenshot
+          <span class="paid-badge">Required</span>
+        </div>
+        <p style="font-size:0.78rem;color:#6b7280;margin:0;line-height:1.5;">
+          After completing the payment via Instamojo, enter your transaction ID and upload the payment screenshot for quick verification.
+        </p>
+
+        <input type="text" id="upiTxnId" class="paid-input"
+               placeholder="Transaction ID (e.g. MOJO123456789)"
+               maxlength="30">
+
+        <label class="file-upload-label" for="paymentScreenshot" id="fileLabel">
+          <i class="fas fa-cloud-upload-alt"></i>
+          <span>Tap to upload payment screenshot</span>
+          <span class="file-name" id="fileNameDisplay"></span>
+        </label>
+        <input type="file" id="paymentScreenshot" accept="image/*">
+
+        <button class="submit-upi-btn" id="submitUpiBtn" onclick="submitUpiPayment()">
+          <i class="fas fa-paper-plane"></i> Submit for Verification
         </button>
-        <div class="secure-badge">
-          <img src="https://razorpay.com/favicon.ico" width="14" height="14" alt="Razorpay">
-          Secured by Razorpay &nbsp;·&nbsp;
-          <i class="fas fa-shield-alt" style="color:#10b981;"></i>
-          256-bit SSL Encryption
-        </div>
+        <p style="font-size:0.72rem;color:#9ca3af;text-align:center;margin:0;">
+          ⏱ Verification typically takes 2–24 hours. You'll get access once confirmed.
+        </p>
       </div>
-    </div>
-
-    <!-- ─────────────────────────────────────────────────
-         Tab: Real PhonePe QR Scanner
-    ──────────────────────────────────────────────────── -->
-    <div id="pane-qr" class="pay-tab-pane">
-      <div class="qr-outer-wrap">
-
-        <!-- PhonePe branded dark card with real QR -->
-        <div class="phonepe-card">
-          <div class="pe-logo-row">
-            <div class="pe-logo-circle">पे</div>
-            <span class="pe-brand-name">PhonePe</span>
-          </div>
-          <div class="pe-accepted-badge">✦ Scan &amp; Pay ✦</div>
-          <div class="qr-frame">
-            <img src="{{ url_for('static', filename='images/phonepe_qr.png') }}"
-                 alt="PhonePe QR Code — Scan to Pay ₹{{ amount }}"
-                 id="realQrImg">
-          </div>
-          <div class="pe-name-tag">NARROLLA SRIRAM</div>
-        </div>
-
-        <!-- I've Paid — Submit Transaction -->
-        {% if existing and existing.status == 'pending' %}
-        <!-- Already submitted, pending verification -->
-        <div class="pending-banner" style="width:100%;max-width:360px;">
-          <i class="fas fa-clock"></i>
-          <strong>Payment under review</strong>
-          <p>Your payment screenshot was submitted (Txn: <strong>{{ existing.transaction_id }}</strong>).<br>
-          Admin will verify within 24 hours. Check back soon!</p>
-        </div>
-        {% else %}
-        <div class="paid-form-wrap" id="paidFormWrap">
-          <div class="paid-form-title">
-            <i class="fas fa-receipt" style="color:#6c3fc5;"></i>
-            Paid via UPI?
-            <span class="paid-badge">Submit Proof</span>
-          </div>
-          <p style="font-size:0.78rem;color:#6b7280;margin:0;line-height:1.5;">
-            After scanning &amp; paying, enter your UPI transaction ID and upload the payment screenshot for quick verification.
-          </p>
-
-          <input type="text" id="upiTxnId" class="paid-input"
-                 placeholder="UPI Transaction ID (e.g. 512345678901)"
-                 maxlength="30">
-
-          <label class="file-upload-label" for="paymentScreenshot" id="fileLabel">
-            <i class="fas fa-cloud-upload-alt"></i>
-            <span>Tap to upload payment screenshot</span>
-            <span class="file-name" id="fileNameDisplay"></span>
-          </label>
-          <input type="file" id="paymentScreenshot" accept="image/*">
-
-          <button class="submit-upi-btn" id="submitUpiBtn" onclick="submitUpiPayment()">
-            <i class="fas fa-paper-plane"></i> Submit for Verification
-          </button>
-          <p style="font-size:0.72rem;color:#9ca3af;text-align:center;margin:0;">
-            ⏱ Verification typically takes 2–24 hours. You'll get access once confirmed.
-          </p>
-        </div>
-        {% endif %}
-
-      </div><!-- /.qr-outer-wrap -->
+      {% endif %}
     </div>
 
     <!-- Loading State (Razorpay only) -->
@@ -556,79 +498,12 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<!-- Removed Razorpay checkout JS -->
 <script>
   const RAZORPAY_KEY = "{{ razorpay_key }}";
 
-  /* ─────────────────────── Razorpay ─────────────────────── */
-  async function startPayment() {
-    const btn = document.getElementById('payBtn');
-    btn.disabled = true;
-    btn.innerHTML = '<i class="fas fa-circle-notch fa-spin me-2"></i>Creating order...';
-
-    try {
-      const res = await fetch("{{ url_for('student.create_order') }}", {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRFToken': getCookie('csrf_token')
-        },
-        body: JSON.stringify({})
-      });
-      const order = await res.json();
-
-      if (order.error) { showError(order.error); resetBtn(); return; }
-
-      const options = {
-        key: RAZORPAY_KEY,
-        amount: order.amount,
-        currency: order.currency,
-        name: 'Exposys Data Labs',
-        description: 'Internship Registration Fee',
-        image: '/static/images/logo.png',
-        order_id: order.order_id,
-        prefill: { name: order.name, email: order.email },
-        theme: { color: '#0a2463' },
-        modal: { ondismiss: function() { resetBtn(); } },
-        handler: async function(response) {
-          document.getElementById('paymentSection').style.display = 'none';
-          document.getElementById('loadingSection').style.display = 'block';
-
-          const verifyRes = await fetch("{{ url_for('student.verify_payment') }}", {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              razorpay_order_id:  response.razorpay_order_id,
-              razorpay_payment_id: response.razorpay_payment_id,
-              razorpay_signature: response.razorpay_signature,
-            })
-          });
-          const result = await verifyRes.json();
-
-          if (result.success) {
-            document.getElementById('loadingSection').style.display = 'none';
-            document.getElementById('successSection').style.display = 'block';
-            setTimeout(() => { window.location.href = result.redirect; }, 1500);
-          } else {
-            showError(result.error || 'Payment verification failed. Please contact support.');
-            document.getElementById('loadingSection').style.display = 'none';
-            document.getElementById('paymentSection').style.display = 'block';
-            resetBtn();
-          }
-        }
-      };
-
-      const rzp = new Razorpay(options);
-      rzp.on('payment.failed', function(response) {
-        showError('Payment failed: ' + response.error.description);
-        resetBtn();
-      });
-      rzp.open();
-    } catch (err) {
-      showError('Something went wrong. Please try again.');
-      resetBtn();
-    }
-  }
+  /* ─────────────────────── Instamojo Placeholder ─────────────────────── */
+  // startPayment is no longer needed since it's a direct anchor link
 
   function resetBtn() {
     const btn = document.getElementById('payBtn');
@@ -653,17 +528,7 @@
     return '';
   }
 
-  /* ─────────────────────── Tabs ─────────────────────────── */
-  function switchTab(tab) {
-    document.querySelectorAll('.pay-tab').forEach(btn => {
-      btn.classList.remove('active');
-      btn.setAttribute('aria-selected', 'false');
-    });
-    document.getElementById('tab-' + tab).classList.add('active');
-    document.getElementById('tab-' + tab).setAttribute('aria-selected', 'true');
-    document.querySelectorAll('.pay-tab-pane').forEach(pane => pane.classList.remove('active'));
-    document.getElementById('pane-' + tab).classList.add('active');
-  }
+
 
   /* ─────────────────────── Copy UPI ─────────────────────── */
   function copyUPI() {

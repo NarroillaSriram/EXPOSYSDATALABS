@@ -66,7 +66,7 @@
               </span>
             </div>
           </div>
-          <a href="{{ url_for('auth.register') }}" class="btn-primary-custom" style="padding:8px 20px;font-size:0.88rem;">
+          <a href="{{ url_for('main.job_application', role=title) }}" class="btn-primary-custom" style="padding:8px 20px;font-size:0.88rem;">
             <i class="fas fa-paper-plane me-2"></i>Apply Now
           </a>
         </div>
@@ -74,14 +74,7 @@
       {% endfor %}
     </div>
 
-    <!-- Apply CTA -->
-    <div style="background:var(--gradient);border-radius:20px;padding:40px;text-align:center;" data-aos="zoom-in" data-aos-duration="1000">
-      <h4 style="color:#fff;font-weight:800;margin-bottom:10px;">Don't See Your Role?</h4>
-      <p style="color:rgba(255,255,255,0.8);margin-bottom:20px;">Send us your resume and we'll reach out when a suitable position opens up.</p>
-      <a href="mailto:hr@exposysdata.com?subject=General%20Application%20-%20Exposys%20Data%20Labs" class="btn-primary-custom" style="background:#fff;color:var(--primary);">
-        <i class="fas fa-envelope me-2"></i>Send Your Resume
-      </a>
-    </div>
+
 
   </div>
 </section>

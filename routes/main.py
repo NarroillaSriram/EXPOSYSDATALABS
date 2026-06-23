@@ -1,11 +1,60 @@
 from flask import Blueprint, render_template, flash, redirect, url_for, request
 from models.models import Contact, Internship, AddonPayment, Payment
-from models import db
+from models import db, csrf
 from forms import ContactForm
 from flask_login import login_required, current_user
 from models.models import Student
 
 main_bp = Blueprint('main', __name__)
+
+
+@main_bp.route('/verify', methods=['GET', 'POST'])
+@csrf.exempt
+def verify_search():
+    """Public certificate search page — enter any certificate ID to verify."""
+    cert = None
+    certificate_id = None
+    searched = False
+
+    def clean_cert_id(raw):
+        """Strip brackets, spaces, and copy-paste artifacts from certificate ID."""
+        import re
+        # Remove [ ] brackets and surrounding whitespace
+        cleaned = raw.strip()
+        cleaned = re.sub(r'^\[\s*', '', cleaned)   # remove leading [
+        cleaned = re.sub(r'\s*\]$', '', cleaned)   # remove trailing ]
+        cleaned = cleaned.strip()
+        return cleaned
+
+    if request.method == 'POST':
+        raw = request.form.get('certificate_id', '')
+        certificate_id = clean_cert_id(raw)
+        searched = True
+    elif request.args.get('id'):
+        raw = request.args.get('id', '')
+        certificate_id = clean_cert_id(raw)
+        searched = True
+
+    if certificate_id:
+        from models.models import Certificate
+        from sqlalchemy import func
+        # Case-insensitive search — handles UPPER/lower differences
+        cert = Certificate.query.filter(
+            func.upper(Certificate.certificate_id) == certificate_id.upper()
+        ).first()
+
+    return render_template('verify_search.html',
+                           cert=cert,
+                           certificate_id=certificate_id,
+                           searched=searched)
+
+
+@main_bp.route('/verify/<certificate_id>')
+def verify_certificate(certificate_id):
+    """Public certificate verification page — no login required."""
+    from models.models import Certificate
+    cert = Certificate.query.filter_by(certificate_id=certificate_id).first()
+    return render_template('verify_certificate.html', cert=cert, certificate_id=certificate_id)
 
 
 
@@ -116,6 +165,16 @@ def design():
 @main_bp.route('/careers')
 def careers():
     return render_template('careers.html')
+
+
+@main_bp.route('/job-application', methods=['GET', 'POST'])
+def job_application():
+    role = request.args.get('role', 'General Application')
+    if request.method == 'POST':
+        # Simulate processing the application
+        flash('Your application has been submitted successfully!', 'success')
+        return redirect(url_for('main.careers'))
+    return render_template('job_application.html', role=role)
 
 
 @main_bp.route('/terms')

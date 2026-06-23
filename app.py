@@ -64,7 +64,6 @@ def create_app():
 
     return app
 
-
 def seed_data():
     from models.models import Admin, Internship
 
