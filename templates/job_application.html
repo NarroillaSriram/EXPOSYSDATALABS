@@ -1,0 +1,749 @@
+{% extends "base.html" %}
+{% block title %}Application for {{ role }} - Exposys Data Labs{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* Custom modern form styles */
+  .job-app-header {
+    padding-top: 100px;
+    padding-bottom: 60px;
+    background: linear-gradient(135deg, var(--primary, #0a2463) 0%, #1e3c72 100%);
+    position: relative;
+    overflow: hidden;
+  }
+  .job-app-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 30px;
+    background: #f8f9fa;
+    border-radius: 30px 30px 0 0;
+  }
+  .form-container {
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.05);
+    padding: 40px;
+    margin-top: -40px;
+    position: relative;
+    z-index: 10;
+  }
+
+  /* Progress Tracker */
+  .steps-container {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    margin-bottom: 40px;
+  }
+  .steps-container::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    width: 100%;
+    height: 4px;
+    background: #e9ecef;
+    z-index: 1;
+    border-radius: 2px;
+  }
+  .progress-line {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    height: 4px;
+    background: var(--primary, #0a2463);
+    z-index: 2;
+    transition: width 0.4s ease;
+    border-radius: 2px;
+    width: 0%;
+  }
+  .step-indicator {
+    width: 40px;
+    height: 40px;
+    background: #fff;
+    border: 4px solid #e9ecef;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: #adb5bd;
+    z-index: 3;
+    transition: all 0.4s ease;
+    position: relative;
+  }
+  .step-indicator.active {
+    border-color: var(--primary, #0a2463);
+    color: var(--primary, #0a2463);
+    box-shadow: 0 0 0 4px rgba(10, 36, 99, 0.1);
+  }
+  .step-indicator.completed {
+    background: var(--primary, #0a2463);
+    border-color: var(--primary, #0a2463);
+    color: #fff;
+  }
+  .step-label {
+    position: absolute;
+    top: 50px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #6c757d;
+    white-space: nowrap;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  @media (max-width: 768px) {
+    .step-label { display: none; }
+  }
+
+  /* Form Elements */
+  .form-floating > .form-control,
+  .form-floating > .form-select {
+    border-radius: 12px;
+    border: 1px solid #dee2e6;
+    transition: border-color 0.3s, box-shadow 0.3s;
+  }
+  .form-floating > .form-control:focus,
+  .form-floating > .form-select:focus {
+    border-color: var(--primary, #0a2463);
+    box-shadow: 0 0 0 0.25rem rgba(10, 36, 99, 0.1);
+  }
+  .form-label-custom {
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 0.5rem;
+    display: block;
+  }
+  
+  /* Drag and Drop Zone */
+  .file-upload-wrapper {
+    border: 2px dashed #cbd5e1;
+    border-radius: 16px;
+    padding: 40px 20px;
+    text-align: center;
+    background: #f8fafc;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+  }
+  .file-upload-wrapper:hover, .file-upload-wrapper.dragover {
+    border-color: var(--primary, #0a2463);
+    background: #f1f5f9;
+  }
+  .file-upload-wrapper i {
+    font-size: 3rem;
+    color: #94a3b8;
+    margin-bottom: 15px;
+  }
+  .file-upload-wrapper input[type="file"] {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    opacity: 0; cursor: pointer;
+  }
+
+  /* Dynamic Sections */
+  .dynamic-section {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    position: relative;
+  }
+  .remove-section {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    color: #ef4444;
+    cursor: pointer;
+    background: rgba(239, 68, 68, 0.1);
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+  .remove-section:hover {
+    background: #ef4444;
+    color: white;
+  }
+
+  /* Form Step Panels */
+  .form-step {
+    display: none;
+    animation: fadeIn 0.5s;
+  }
+  .form-step.active {
+    display: block;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Buttons */
+  .btn-next, .btn-submit {
+    background: var(--primary, #0a2463);
+    color: #fff;
+    border-radius: 10px;
+    padding: 12px 30px;
+    font-weight: 600;
+    transition: all 0.3s;
+    border: none;
+  }
+  .btn-next:hover, .btn-submit:hover {
+    background: #081b4b;
+    transform: translateY(-2px);
+    color: white;
+  }
+  .btn-prev {
+    border-radius: 10px;
+    padding: 12px 30px;
+    font-weight: 600;
+  }
+
+  /* Loading Spinner */
+  .spinner-border {
+    width: 1.2rem;
+    height: 1.2rem;
+    margin-left: 8px;
+    display: none;
+  }
+  .btn-submit.loading .spinner-border {
+    display: inline-block;
+  }
+  .btn-submit.loading span {
+    opacity: 0.8;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="job-app-header">
+  <div class="container text-center text-white" data-aos="fade-up">
+    <h1 style="font-weight: 800; font-size: 2.5rem;">Application</h1>
+    <p style="opacity: 0.9; font-size: 1.1rem;">Applying for: <strong>{{ role }}</strong></p>
+  </div>
+</div>
+
+<section style="background: #f8f9fa; padding-bottom: 80px;">
+  <div class="container">
+    <div class="form-container">
+      
+      <!-- Progress Indicator -->
+      <div class="steps-container">
+        <div class="progress-line" id="progressLine"></div>
+        <div class="step-indicator active" id="indicator-1">
+          1<span class="step-label">Basic Info</span>
+        </div>
+        <div class="step-indicator" id="indicator-2">
+          2<span class="step-label">Experience</span>
+        </div>
+        <div class="step-indicator" id="indicator-3">
+          3<span class="step-label">Documents</span>
+        </div>
+        <div class="step-indicator" id="indicator-4">
+          4<span class="step-label">Review</span>
+        </div>
+      </div>
+
+      <form id="jobApplicationForm" action="{{ url_for('main.job_application') }}" method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() if csrf_token else '' }}"/>
+        <input type="hidden" name="role" value="{{ role }}">
+
+        <!-- STEP 1: Basic Info -->
+        <div class="form-step active" id="step-1">
+          <h4 class="mb-4" style="color: var(--primary, #0a2463); font-weight: 700;">1. Personal Information</h4>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="form-floating">
+                <input type="text" class="form-control" id="firstName" name="first_name" placeholder="John" required>
+                <label for="firstName">First Name *</label>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-floating">
+                <input type="text" class="form-control" id="lastName" name="last_name" placeholder="Doe" required>
+                <label for="lastName">Last Name *</label>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-floating">
+                <input type="email" class="form-control" id="email" name="email" placeholder="name@example.com" required>
+                <label for="email">Email Address *</label>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-floating">
+                <input type="tel" class="form-control" id="phone" name="phone" placeholder="+1 234 567 8900" required>
+                <label for="phone">Phone Number *</label>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-floating">
+                <input type="url" class="form-control" id="linkedin" name="linkedin" placeholder="https://linkedin.com/in/...">
+                <label for="linkedin">LinkedIn Profile (Optional)</label>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-floating">
+                <input type="url" class="form-control" id="portfolio" name="portfolio" placeholder="https://...">
+                <label for="portfolio">Portfolio / Website (Optional)</label>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-floating">
+                <input type="text" class="form-control" id="city" name="city" placeholder="City" required>
+                <label for="city">City *</label>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-floating">
+                <input type="text" class="form-control" id="state" name="state" placeholder="State">
+                <label for="state">State/Province</label>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-floating">
+                <select class="form-select" id="country" name="country" required>
+                  <option value="" selected disabled>Select Country</option>
+                  <option value="India">India</option>
+                  <option value="United States">United States</option>
+                  <option value="United Kingdom">United Kingdom</option>
+                  <option value="Canada">Canada</option>
+                  <option value="Other">Other</option>
+                </select>
+                <label for="country">Country *</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 2: Experience & Education -->
+        <div class="form-step" id="step-2">
+          <h4 class="mb-4" style="color: var(--primary, #0a2463); font-weight: 700;">2. Experience & Education</h4>
+          
+          <div class="mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <span class="form-label-custom mb-0">Work Experience</span>
+              <button type="button" class="btn btn-sm btn-outline-primary rounded-pill" id="addExperience">
+                <i class="fas fa-plus me-1"></i> Add Experience
+              </button>
+            </div>
+            <div id="experienceContainer">
+              <!-- Initial empty state or one block -->
+              <div class="dynamic-section" data-index="0">
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <div class="form-floating">
+                      <input type="text" class="form-control" name="exp_title[]" placeholder="Job Title">
+                      <label>Job Title</label>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-floating">
+                      <input type="text" class="form-control" name="exp_company[]" placeholder="Company Name">
+                      <label>Company Name</label>
+                    </div>
+                  </div>
+                  <div class="col-6">
+                    <div class="form-floating">
+                      <input type="month" class="form-control" name="exp_start[]">
+                      <label>Start Date</label>
+                    </div>
+                  </div>
+                  <div class="col-6">
+                    <div class="form-floating">
+                      <input type="month" class="form-control" name="exp_end[]">
+                      <label>End Date</label>
+                    </div>
+                  </div>
+                  <div class="col-12">
+                    <div class="form-check mb-2">
+                      <input class="form-check-input" type="checkbox" name="exp_current[]" id="expCurrent0">
+                      <label class="form-check-label text-muted" for="expCurrent0" style="font-size:0.85rem;">
+                        I currently work here
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-2">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <span class="form-label-custom mb-0">Education</span>
+              <button type="button" class="btn btn-sm btn-outline-primary rounded-pill" id="addEducation">
+                <i class="fas fa-plus me-1"></i> Add Education
+              </button>
+            </div>
+            <div id="educationContainer">
+              <div class="dynamic-section" data-index="0">
+                <div class="row g-3">
+                  <div class="col-md-12">
+                    <div class="form-floating">
+                      <input type="text" class="form-control" name="edu_school[]" placeholder="School/University" required>
+                      <label>School / University *</label>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-floating">
+                      <input type="text" class="form-control" name="edu_degree[]" placeholder="Degree">
+                      <label>Degree (e.g., B.Tech)</label>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-floating">
+                      <input type="text" class="form-control" name="edu_major[]" placeholder="Field of Study">
+                      <label>Field of Study</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-4">
+             <span class="form-label-custom">Key Skills (Comma separated)</span>
+             <textarea class="form-control" name="skills" rows="2" style="border-radius:12px;" placeholder="e.g. Python, React, Data Analysis, Leadership"></textarea>
+          </div>
+        </div>
+
+        <!-- STEP 3: Documents & Questions -->
+        <div class="form-step" id="step-3">
+          <h4 class="mb-4" style="color: var(--primary, #0a2463); font-weight: 700;">3. Documents & Details</h4>
+          
+          <div class="mb-4">
+            <span class="form-label-custom">Upload Resume / CV *</span>
+            <div class="file-upload-wrapper" id="resumeUploadWrapper">
+              <i class="fas fa-cloud-upload-alt"></i>
+              <h5 style="font-weight: 600; color: #334155; margin-bottom: 5px;">Drag & Drop your resume here</h5>
+              <p style="color: #64748b; font-size: 0.9rem; margin-bottom: 0;">or click to browse from your computer</p>
+              <p style="color: #94a3b8; font-size: 0.8rem; margin-top: 10px;">Supported formats: PDF, DOCX (Max 5MB)</p>
+              <input type="file" id="resume" name="resume" accept=".pdf,.doc,.docx" required>
+            </div>
+            <div id="fileInfo" class="mt-2 text-success" style="display:none; font-weight: 600; font-size:0.9rem;">
+              <i class="fas fa-check-circle me-1"></i> <span id="fileName"></span>
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <div class="form-floating">
+              <textarea class="form-control" id="coverLetter" name="cover_letter" placeholder="Cover Letter" style="height: 120px; border-radius:12px;"></textarea>
+              <label for="coverLetter">Cover Letter (Optional)</label>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <span class="form-label-custom">Screening Questions</span>
+            <div class="form-check mt-2">
+              <input class="form-check-input" type="checkbox" name="authorized" id="authorized" required>
+              <label class="form-check-label" for="authorized">
+                I am legally authorized to work in the country where this job is located. *
+              </label>
+            </div>
+            <div class="form-check mt-2">
+              <input class="form-check-input" type="checkbox" name="sponsorship" id="sponsorship">
+              <label class="form-check-label" for="sponsorship">
+                I will now or in the future require sponsorship for employment visa status.
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 4: Review -->
+        <div class="form-step" id="step-4">
+          <h4 class="mb-4" style="color: var(--primary, #0a2463); font-weight: 700;">4. Review Application</h4>
+          
+          <div class="alert alert-info border-0" style="background: #e0f2fe; color: #0369a1; border-radius:12px;">
+            <i class="fas fa-info-circle me-2"></i> Please review your information before submitting. You can go back to edit any section.
+          </div>
+
+          <div class="card border-0 bg-light mb-4" style="border-radius:16px;">
+            <div class="card-body p-4">
+              <div class="row mb-3">
+                <div class="col-sm-4 text-muted" style="font-weight:600; font-size:0.9rem;">Full Name</div>
+                <div class="col-sm-8 fw-bold" id="reviewName">-</div>
+              </div>
+              <div class="row mb-3">
+                <div class="col-sm-4 text-muted" style="font-weight:600; font-size:0.9rem;">Email</div>
+                <div class="col-sm-8 fw-bold" id="reviewEmail">-</div>
+              </div>
+              <div class="row mb-3">
+                <div class="col-sm-4 text-muted" style="font-weight:600; font-size:0.9rem;">Phone</div>
+                <div class="col-sm-8 fw-bold" id="reviewPhone">-</div>
+              </div>
+              <div class="row">
+                <div class="col-sm-4 text-muted" style="font-weight:600; font-size:0.9rem;">Resume Attached</div>
+                <div class="col-sm-8 fw-bold" id="reviewFile"><span class="text-danger">No file selected</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-check mb-4">
+            <input class="form-check-input" type="checkbox" name="agree" id="agree" required>
+            <label class="form-check-label text-muted" for="agree" style="font-size:0.9rem;">
+              By submitting this application, I certify that all information provided is true and accurate. I acknowledge that any false statement may disqualify me from employment. *
+            </label>
+          </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="d-flex justify-content-between mt-5 pt-3" style="border-top: 1px solid #e9ecef;">
+          <button type="button" class="btn btn-outline-secondary btn-prev" id="btnPrev" style="display:none;">
+            <i class="fas fa-arrow-left me-2"></i>Back
+          </button>
+          <div class="ms-auto">
+            <button type="button" class="btn btn-next" id="btnNext">
+              Next Step<i class="fas fa-arrow-right ms-2"></i>
+            </button>
+            <button type="submit" class="btn btn-submit" id="btnSubmit" style="display:none;">
+              <span>Submit Application</span>
+              <div class="spinner-border text-light" role="status"></div>
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.getElementById('jobApplicationForm');
+  const steps = document.querySelectorAll('.form-step');
+  const indicators = document.querySelectorAll('.step-indicator');
+  const progressLine = document.getElementById('progressLine');
+  const btnNext = document.getElementById('btnNext');
+  const btnPrev = document.getElementById('btnPrev');
+  const btnSubmit = document.getElementById('btnSubmit');
+  
+  let currentStep = 0;
+
+  function updateUI() {
+    // Update steps visibility
+    steps.forEach((step, index) => {
+      step.classList.toggle('active', index === currentStep);
+    });
+
+    // Update indicators
+    indicators.forEach((indicator, index) => {
+      if (index < currentStep) {
+        indicator.classList.add('completed', 'active');
+        indicator.innerHTML = '<i class="fas fa-check"></i><span class="step-label">' + indicator.querySelector('.step-label').innerText + '</span>';
+      } else if (index === currentStep) {
+        indicator.classList.add('active');
+        indicator.classList.remove('completed');
+        indicator.innerHTML = (index + 1) + '<span class="step-label">' + indicator.querySelector('.step-label').innerText + '</span>';
+      } else {
+        indicator.classList.remove('active', 'completed');
+        indicator.innerHTML = (index + 1) + '<span class="step-label">' + indicator.querySelector('.step-label').innerText + '</span>';
+      }
+    });
+
+    // Update progress line
+    const progressPercentage = (currentStep / (steps.length - 1)) * 100;
+    progressLine.style.width = progressPercentage + '%';
+
+    // Update buttons
+    btnPrev.style.display = currentStep > 0 ? 'inline-block' : 'none';
+    
+    if (currentStep === steps.length - 1) {
+      btnNext.style.display = 'none';
+      btnSubmit.style.display = 'inline-flex';
+      btnSubmit.style.alignItems = 'center';
+      populateReview();
+    } else {
+      btnNext.style.display = 'inline-block';
+      btnSubmit.style.display = 'none';
+    }
+    
+    // Scroll to top of form smoothly
+    if(currentStep > 0) {
+       document.querySelector('.form-container').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
+  function validateStep() {
+    const currentStepEl = steps[currentStep];
+    const inputs = currentStepEl.querySelectorAll('input[required], select[required]');
+    let isValid = true;
+    
+    inputs.forEach(input => {
+      if (!input.value.trim() || (input.type === 'checkbox' && !input.checked)) {
+        isValid = false;
+        input.classList.add('is-invalid');
+      } else {
+        input.classList.remove('is-invalid');
+      }
+    });
+    
+    if (!isValid) {
+      // Create or show a toast/alert or simply let the browser show validation on the first invalid field
+      // Trigger native HTML5 validation message
+      form.reportValidity();
+    }
+    return isValid;
+  }
+
+  btnNext.addEventListener('click', () => {
+    if (validateStep()) {
+      currentStep++;
+      updateUI();
+    }
+  });
+
+  btnPrev.addEventListener('click', () => {
+    currentStep--;
+    updateUI();
+  });
+
+  // Populate Review Step
+  function populateReview() {
+    document.getElementById('reviewName').innerText = 
+      (document.getElementById('firstName').value + ' ' + document.getElementById('lastName').value) || '-';
+    document.getElementById('reviewEmail').innerText = document.getElementById('email').value || '-';
+    document.getElementById('reviewPhone').innerText = document.getElementById('phone').value || '-';
+    
+    const fileInput = document.getElementById('resume');
+    if (fileInput.files.length > 0) {
+      document.getElementById('reviewFile').innerHTML = `<span class="text-success"><i class="fas fa-file-pdf me-1"></i>${fileInput.files[0].name}</span>`;
+    }
+  }
+
+  // File Upload Drag & Drop
+  const fileWrapper = document.getElementById('resumeUploadWrapper');
+  const fileInput = document.getElementById('resume');
+  const fileInfo = document.getElementById('fileInfo');
+  const fileName = document.getElementById('fileName');
+
+  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+    fileWrapper.addEventListener(eventName, preventDefaults, false);
+  });
+
+  function preventDefaults(e) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+
+  ['dragenter', 'dragover'].forEach(eventName => {
+    fileWrapper.addEventListener(eventName, () => fileWrapper.classList.add('dragover'), false);
+  });
+
+  ['dragleave', 'drop'].forEach(eventName => {
+    fileWrapper.addEventListener(eventName, () => fileWrapper.classList.remove('dragover'), false);
+  });
+
+  fileWrapper.addEventListener('drop', (e) => {
+    let dt = e.dataTransfer;
+    let files = dt.files;
+    fileInput.files = files;
+    updateFileName();
+  });
+
+  fileInput.addEventListener('change', updateFileName);
+
+  function updateFileName() {
+    if (fileInput.files.length > 0) {
+      fileName.innerText = fileInput.files[0].name;
+      fileInfo.style.display = 'block';
+      fileInput.classList.remove('is-invalid');
+    }
+  }
+
+  // Dynamic Fields for Experience
+  let expIndex = 1;
+  document.getElementById('addExperience').addEventListener('click', () => {
+    const container = document.getElementById('experienceContainer');
+    const html = `
+      <div class="dynamic-section" data-index="${expIndex}">
+        <div class="remove-section" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></div>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <div class="form-floating">
+              <input type="text" class="form-control" name="exp_title[]" placeholder="Job Title">
+              <label>Job Title</label>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-floating">
+              <input type="text" class="form-control" name="exp_company[]" placeholder="Company Name">
+              <label>Company Name</label>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="form-floating">
+              <input type="month" class="form-control" name="exp_start[]">
+              <label>Start Date</label>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="form-floating">
+              <input type="month" class="form-control" name="exp_end[]">
+              <label>End Date</label>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    container.insertAdjacentHTML('beforeend', html);
+    expIndex++;
+  });
+
+  // Dynamic Fields for Education
+  let eduIndex = 1;
+  document.getElementById('addEducation').addEventListener('click', () => {
+    const container = document.getElementById('educationContainer');
+    const html = `
+      <div class="dynamic-section" data-index="${eduIndex}">
+        <div class="remove-section" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></div>
+        <div class="row g-3">
+          <div class="col-md-12">
+            <div class="form-floating">
+              <input type="text" class="form-control" name="edu_school[]" placeholder="School/University" required>
+              <label>School / University *</label>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-floating">
+              <input type="text" class="form-control" name="edu_degree[]" placeholder="Degree">
+              <label>Degree (e.g., B.Tech)</label>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-floating">
+              <input type="text" class="form-control" name="edu_major[]" placeholder="Field of Study">
+              <label>Field of Study</label>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    container.insertAdjacentHTML('beforeend', html);
+    eduIndex++;
+  });
+
+  // Handle Form Submit
+  form.addEventListener('submit', function(e) {
+    if(!form.checkValidity()) {
+      e.preventDefault();
+      return;
+    }
+    btnSubmit.classList.add('loading');
+    btnSubmit.disabled = true;
+    btnSubmit.querySelector('span').innerText = 'Submitting...';
+    // Let the form submit naturally
+  });
+
+});
+</script>
+{% endblock %}
