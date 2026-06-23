@@ -15,7 +15,7 @@ admin_bp = Blueprint('admin', __name__)
 def admin_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
-        if not session.get('is_admin') or not isinstance(current_user, Admin):
+        if not session.get('is_admin') or not isinstance(current_user._get_current_object(), Admin):
             flash('Admin access required.', 'danger')
             return redirect(url_for('auth.admin_login'))
         return f(*args, **kwargs)
