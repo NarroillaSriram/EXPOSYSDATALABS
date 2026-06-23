@@ -3,417 +3,308 @@
 
 {% block extra_css %}
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+  /* Import Google Fonts - Plus Jakarta Sans */
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
-  /* =====================
-     PAGE WRAPPER
-  ===================== */
-  .admin-page-wrapper {
-    min-height: 100vh;
+  /* Global variables for this specific page */
+  :root {
+    --admin-bg-start: #0a2463;  /* Deep Navy */
+    --admin-bg-end: #0d111e;    /* Midnight Blue */
+    --admin-card-bg: rgba(255, 255, 255, 0.95);
+    --admin-card-border: rgba(255, 255, 255, 0.5);
+    --admin-input-bg: #ffffff;
+    --admin-input-border: #e2e8f0;
+    --admin-text-primary: #1a202c;
+    --admin-text-secondary: #4a5568;
+    --admin-accent-primary: #0a2463;
+    --admin-accent-secondary: #e84545;
+  }
+
+  /* Apply modern typography */
+  .auth-wrapper {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+  }
+
+  /* Glowing Orbs matching student login portal */
+  .glowing-orb-1 {
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    background: rgba(232, 69, 69, 0.15);
+    filter: blur(100px);
+    border-radius: 50%;
+    top: 10%;
+    left: 10%;
+    pointer-events: none;
+  }
+
+  .glowing-orb-2 {
+    position: absolute;
+    width: 400px;
+    height: 400px;
+    background: rgba(10, 36, 99, 0.4);
+    filter: blur(120px);
+    border-radius: 50%;
+    bottom: 10%;
+    right: 10%;
+    pointer-events: none;
+  }
+
+  /* Glassmorphism Card styling matching Student Login */
+  .auth-card-custom {
+    background: var(--admin-card-bg) !important;
+    border: 1px solid var(--admin-card-border) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border-radius: 24px !important;
+    box-shadow: 0 20px 50px rgba(10, 36, 99, 0.15) !important;
+    padding: 45px 40px !important;
+    width: 100%;
+    max-width: 460px;
+    z-index: 5;
+    transition: all 0.4s ease;
+  }
+
+  .auth-card-custom:hover {
+    box-shadow: 0 25px 60px rgba(10, 36, 99, 0.22) !important;
+  }
+
+  /* Shield Container */
+  .logo-shield-container {
+    width: 65px;
+    height: 65px;
+    background: var(--admin-accent-primary) !important;
+    border-radius: 16px !important;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 80px 20px 40px;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    background-color: #7ec8f5;
-    background-image:
-      radial-gradient(ellipse 80% 60% at 0% 0%, #a8d8f8 0%, transparent 60%),
-      radial-gradient(ellipse 70% 70% at 100% 100%, #5baee0 0%, transparent 60%),
-      radial-gradient(ellipse 50% 50% at 50% 50%, #7ec8f5 0%, #6ab8ee 100%);
-    position: relative;
-    overflow: hidden;
+    margin: 0 auto 20px;
+    box-shadow: 0 8px 16px rgba(10, 36, 99, 0.2);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  /* =====================
-     BACKGROUND ORGANIC SHAPES
-  ===================== */
-  .bg-shape {
+  .auth-card-custom:hover .logo-shield-container {
+    transform: translateY(-3px) rotate(5deg);
+  }
+
+  .logo-shield-container i {
+    font-size: 1.8rem !important;
+    color: #ffffff !important;
+  }
+
+  /* Inputs & Input Groups */
+  .input-group-custom, .password-field-container {
+    position: relative;
+    width: 100%;
+  }
+
+  .input-group-custom i, .password-field-container i.fa-key {
     position: absolute;
-    border-radius: 50%;
-    opacity: 0.35;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #a0aec0;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    z-index: 5;
     pointer-events: none;
   }
 
-  .bg-shape-1 {
-    width: 340px; height: 340px;
-    background: #4ea8de;
-    bottom: -80px; left: -80px;
-    opacity: 0.45;
-  }
-  .bg-shape-2 {
-    width: 220px; height: 220px;
-    background: #90caf9;
-    top: 30px; right: -50px;
-    opacity: 0.5;
-  }
-  .bg-shape-3 {
-    width: 120px; height: 120px;
-    background: #b3d9f8;
-    top: 55%; right: 12%;
-    opacity: 0.6;
-  }
-
-  /* Squiggly organic line shapes using SVG */
-  .bg-squiggle {
-    position: absolute;
-    pointer-events: none;
-    opacity: 0.5;
-  }
-  .bg-squiggle-tl { top: 3%; left: 3%; width: 120px; }
-  .bg-squiggle-br { bottom: 6%; right: 4%; width: 100px; transform: rotate(180deg); }
-  .bg-squiggle-tr { top: 10%; right: 18%; width: 60px; transform: rotate(30deg); }
-  .bg-squiggle-bl { bottom: 18%; left: 5%; width: 70px; transform: rotate(-20deg); }
-
-
-
-  /* =====================
-     GLASSMORPHIC LOGIN CARD
-  ===================== */
-  .glass-login-card {
-    background: rgba(255, 255, 255, 0.14);
-    backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
-    border: 1.5px solid rgba(255, 255, 255, 0.3);
-    border-radius: 20px;
-    padding: 36px 32px 28px;
-    width: 100%;
-    max-width: 340px;
-    position: relative;
-    z-index: 10;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.15);
-  }
-
-  /* Logo / Shield icon */
-  .card-logo-wrap {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 6px;
-  }
-  .card-logo-icon {
-    width: 38px; height: 38px;
-    background: rgba(255,255,255,0.22);
-    border-radius: 10px;
-    display: flex; align-items: center; justify-content: center;
-    color: #fff;
-    font-size: 1.1rem;
-  }
-  .card-logo-text {
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: rgba(255,255,255,0.8);
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-  }
-
-  .card-title {
-    font-size: 2rem;
-    font-weight: 800;
-    color: #ffffff;
-    letter-spacing: -0.5px;
-    margin-bottom: 18px;
-    line-height: 1.1;
-  }
-
-  /* Input Labels */
-  .glass-label {
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: rgba(255,255,255,0.85);
-    margin-bottom: 5px;
-    display: block;
-    letter-spacing: 0.3px;
-  }
-
-  /* Input Fields */
-  .glass-input-wrap {
-    position: relative;
-    margin-bottom: 12px;
-  }
-  .glass-input {
-    width: 100%;
-    height: 42px;
-    background: #ffffff !important;
-    border: 1.5px solid rgba(255,255,255,0.9) !important;
-    border-radius: 10px !important;
-    padding: 0 38px 0 14px !important;
-    font-size: 0.9rem !important;
-    color: #1e3a5f !important;
+  .form-control-custom {
+    padding-left: 45px !important;
+    border-radius: 12px !important;
+    height: 50px !important;
+    background: var(--admin-input-bg) !important;
+    border: 1.5px solid var(--admin-input-border) !important;
+    color: var(--admin-text-primary) !important;
     font-weight: 500 !important;
-    outline: none !important;
+    font-size: 0.95rem !important;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
     box-shadow: none !important;
-    transition: border-color 0.25s ease, box-shadow 0.25s ease !important;
-    font-family: 'Inter', sans-serif !important;
   }
-  .glass-input::placeholder {
+
+  .form-control-custom::placeholder {
     color: #a0aec0 !important;
     font-weight: 400 !important;
   }
-  .glass-input:focus {
-    border-color: #38bdf8 !important;
-    box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.25) !important;
+
+  /* Input focus states */
+  .form-control-custom:focus {
     background: #ffffff !important;
-  }
-  .glass-input:-webkit-autofill,
-  .glass-input:-webkit-autofill:hover,
-  .glass-input:-webkit-autofill:focus {
-    -webkit-box-shadow: 0 0 0 1000px #ffffff inset !important;
-    -webkit-text-fill-color: #1e3a5f !important;
-    border: 1.5px solid rgba(255,255,255,0.9) !important;
+    border-color: var(--admin-accent-primary) !important;
+    box-shadow: 0 0 0 4px rgba(10, 36, 99, 0.1) !important;
   }
 
-  /* Password toggle */
-  .glass-pw-toggle {
+  .form-control-custom:focus ~ i,
+  .form-control-custom:focus + i {
+    color: var(--admin-accent-primary) !important;
+  }
+
+  /* Password Toggle Button */
+  .password-toggle-btn {
     position: absolute;
-    right: 10px;
+    right: 12px;
     top: 50%;
     transform: translateY(-50%);
     background: transparent;
     border: none;
-    color: #94a3b8;
+    color: #a0aec0;
     cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    padding: 4px;
-    font-size: 0.95rem;
-    transition: color 0.2s;
-    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding: 0 10px;
+    z-index: 10;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
   }
-  .glass-pw-toggle:hover { color: #0369a1; }
 
-  /* Forgot password */
-  .forgot-link {
-    display: block;
-    text-align: right;
-    font-size: 0.75rem;
-    color: rgba(255,255,255,0.75);
-    text-decoration: none;
-    margin-top: -6px;
-    margin-bottom: 16px;
-    transition: color 0.2s;
+  .password-toggle-btn:hover {
+    color: var(--admin-accent-primary) !important;
   }
-  .forgot-link:hover { color: #ffffff; }
 
-  /* Sign In Button */
-  .btn-sign-in {
-    width: 100%;
-    height: 44px;
-    background: #0b1e3d;
-    color: #ffffff;
-    border: none;
-    border-radius: 10px;
-    font-size: 0.95rem;
-    font-weight: 700;
+  /* Form labels */
+  .form-label-custom {
+    font-weight: 600 !important;
+    font-size: 0.85rem !important;
+    color: var(--admin-text-secondary) !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    margin-bottom: 8px !important;
+    display: inline-block;
+  }
+
+  /* Primary Button (Navy blue gradient matching student portal) */
+  .btn-primary-custom {
+    height: 50px !important;
+    border-radius: 12px !important;
+    font-weight: 700 !important;
+    font-size: 1rem !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 10px !important;
+    border: none !important;
+    background: linear-gradient(135deg, var(--admin-accent-primary) 0%, #1e3a8a 100%) !important;
+    color: #ffffff !important;
+    box-shadow: 0 10px 20px rgba(10, 36, 99, 0.2) !important;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
     cursor: pointer;
-    display: flex; align-items: center; justify-content: center; gap: 8px;
-    letter-spacing: 0.3px;
-    box-shadow: 0 6px 20px rgba(11, 30, 61, 0.5);
-    transition: all 0.3s cubic-bezier(0.16,1,0.3,1);
-    font-family: 'Inter', sans-serif;
-    margin-bottom: 14px;
-  }
-  .btn-sign-in:hover {
-    background: #0f2a55;
-    transform: translateY(-2px);
-    box-shadow: 0 10px 28px rgba(11, 30, 61, 0.6);
-  }
-  .btn-sign-in:active { transform: translateY(0); }
-
-  /* Divider */
-  .or-divider {
-    display: flex; align-items: center; gap: 10px;
-    margin-bottom: 12px;
-  }
-  .or-divider::before, .or-divider::after {
-    content: ''; flex: 1;
-    height: 1px; background: rgba(255,255,255,0.25);
-  }
-  .or-divider span {
-    font-size: 0.75rem; color: rgba(255,255,255,0.65); white-space: nowrap;
   }
 
-  /* Social Icons Row */
-  .social-icons-row {
-    display: flex; align-items: center; justify-content: center; gap: 14px;
-    margin-bottom: 16px;
-  }
-  .social-btn {
-    width: 40px; height: 40px;
-    border-radius: 10px;
-    border: 1.5px solid rgba(255,255,255,0.3);
-    background: rgba(255,255,255,0.12);
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer;
-    transition: all 0.25s ease;
-    text-decoration: none;
-    color: #ffffff;
-    font-size: 1rem;
-  }
-  .social-btn:hover {
-    background: rgba(255,255,255,0.22);
-    border-color: rgba(255,255,255,0.5);
-    transform: translateY(-2px);
-    color: #ffffff;
+  .btn-primary-custom:hover {
+    background: linear-gradient(135deg, #0a2463 0%, #111827 100%) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 12px 24px rgba(10, 36, 99, 0.3) !important;
   }
 
-  /* Register / back footer text */
-  .card-footer-text {
-    text-align: center;
-    font-size: 0.78rem;
-    color: rgba(255,255,255,0.6);
-    margin-bottom: 0;
-  }
-  .card-footer-text a {
-    color: #ffffff;
-    font-weight: 700;
-    text-decoration: underline;
-    text-underline-offset: 2px;
-    transition: opacity 0.2s;
-  }
-  .card-footer-text a:hover { opacity: 0.8; }
-
-  /* Error messages */
-  .field-error {
-    font-size: 0.78rem;
-    color: #fca5a5;
-    margin-top: 4px;
-    display: flex; align-items: center; gap: 4px;
+  .btn-primary-custom:active {
+    transform: translateY(0) !important;
   }
 
-  /* Flash alert within card */
-  .glass-alert {
-    border-radius: 10px;
-    font-size: 0.82rem;
-    padding: 10px 14px;
-    margin-bottom: 14px;
-    border: none;
-    font-weight: 500;
-    display: flex; align-items: center; gap: 8px;
+  /* Back to website link */
+  .back-link {
+    color: var(--admin-text-secondary) !important;
+    font-size: 0.88rem !important;
+    text-decoration: none !important;
+    font-weight: 600 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    transition: all 0.3s ease !important;
+  }
+
+  .back-link i {
+    transition: transform 0.3s ease !important;
+  }
+
+  .back-link:hover {
+    color: var(--admin-accent-secondary) !important;
+  }
+
+  .back-link:hover i {
+    transform: translateX(-4px) !important;
+  }
+
+  /* Alert message improvements */
+  .local-alerts .alert {
+    border-radius: 12px !important;
+    font-weight: 500 !important;
   }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="admin-page-wrapper">
+<div class="auth-wrapper" style="padding: 100px 20px 60px; min-height: 100vh; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle at 10% 20%, var(--admin-bg-start) 0%, var(--admin-bg-end) 90%); position: relative; overflow: hidden;">
+  <!-- Ambient glowing accents -->
+  <div class="glowing-orb-1"></div>
+  <div class="glowing-orb-2"></div>
 
-  <!-- Background organic blobs -->
-  <div class="bg-shape bg-shape-1"></div>
-  <div class="bg-shape bg-shape-2"></div>
-  <div class="bg-shape bg-shape-3"></div>
-
-  <!-- Squiggly decorative SVGs (background) -->
-  <svg class="bg-squiggle bg-squiggle-tl" viewBox="0 0 80 80" fill="none">
-    <path d="M10 70 Q20 20 40 40 Q60 60 70 10" stroke="#1d6fa4" stroke-width="6" stroke-linecap="round" fill="none"/>
-  </svg>
-  <svg class="bg-squiggle bg-squiggle-br" viewBox="0 0 80 80" fill="none">
-    <path d="M10 70 Q20 20 40 40 Q60 60 70 10" stroke="#1d6fa4" stroke-width="6" stroke-linecap="round" fill="none"/>
-  </svg>
-  <svg class="bg-squiggle bg-squiggle-tr" viewBox="0 0 60 60" fill="none">
-    <path d="M10 50 Q30 10 50 30" stroke="#4ea8de" stroke-width="5" stroke-linecap="round" fill="none"/>
-  </svg>
-  <svg class="bg-squiggle bg-squiggle-bl" viewBox="0 0 60 60" fill="none">
-    <path d="M10 10 Q30 50 50 30" stroke="#4ea8de" stroke-width="5" stroke-linecap="round" fill="none"/>
-  </svg>
-
-  <!-- ===== GLASSMORPHIC LOGIN CARD ===== -->
-    <div class="glass-login-card">
-
-      <!-- Logo row -->
-      <div class="card-logo-wrap">
-        <div class="card-logo-icon">
-          <i class="fas fa-shield-alt"></i>
-        </div>
-        <span class="card-logo-text">Exposys Data Labs</span>
+  <div class="auth-card-custom" data-aos="zoom-in" data-aos-duration="800">
+    <div class="auth-logo text-center mb-4">
+      <div class="logo-shield-container">
+        <i class="fas fa-shield-alt"></i>
       </div>
+      <h2 style="font-weight: 800; font-size: 2.1rem; letter-spacing: -0.5px; margin-bottom: 5px; color: var(--admin-text-primary);">
+        <span style="color: var(--admin-accent-primary);">Admin</span> <span style="background: linear-gradient(135deg, var(--admin-accent-secondary) 0%, #ff6b6b 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Portal</span>
+      </h2>
+      <p style="color: var(--admin-text-secondary); font-size: 0.95rem; font-weight: 500;">Exposys Data Labs Administration</p>
+    </div>
 
-      <div class="card-title">Login</div>
-
-      <!-- Flash messages -->
-      {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
+    <!-- Local alerts block inside the card -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="local-alerts mb-3">
           {% for category, message in messages %}
-            <div class="glass-alert alert alert-{{ 'danger' if category in ['error','danger'] else category }}">
-              <i class="fas fa-{% if category == 'success' %}check-circle{% else %}exclamation-circle{% endif %}"></i>
+            <div class="alert alert-{{ 'danger' if category == 'error' or category == 'danger' else category }} alert-dismissible fade show py-2 px-3 small border-0 shadow-sm" role="alert">
+              <i class="fas fa-{% if category == 'success' %}check-circle{% else %}exclamation-circle{% endif %} me-2"></i>
               {{ message }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" style="padding: 0.85rem 1rem; font-size: 0.75rem;"></button>
             </div>
           {% endfor %}
-        {% endif %}
-      {% endwith %}
-
-      <form method="POST" action="{{ url_for('auth.admin_login') }}" novalidate>
-        {{ form.hidden_tag() }}
-
-        <!-- Email -->
-        <div class="mb-1">
-          <label class="glass-label">{{ form.email.label.text }}</label>
-          <div class="glass-input-wrap">
-            {{ form.email(class="glass-input " + ("is-invalid" if form.email.errors else ""), placeholder="office@example.com") }}
-          </div>
-          {% for e in form.email.errors %}
-            <div class="field-error"><i class="fas fa-exclamation-circle"></i>{{ e }}</div>
-          {% endfor %}
         </div>
+      {% endif %}
+    {% endwith %}
 
-        <!-- Password -->
-        <div class="mb-1">
-          <label class="glass-label">{{ form.password.label.text }}</label>
-          <div class="glass-input-wrap">
-            {{ form.password(class="glass-input " + ("is-invalid" if form.password.errors else ""), placeholder="Password", id="admin_password", style="padding-right: 42px !important;") }}
-            <button type="button" class="glass-pw-toggle" data-pw-target="#admin_password" aria-label="Toggle password">
-              <i class="fas fa-eye-slash"></i>
-            </button>
-          </div>
-          {% for e in form.password.errors %}
-            <div class="field-error"><i class="fas fa-exclamation-circle"></i>{{ e }}</div>
-          {% endfor %}
+    <form method="POST" action="{{ url_for('auth.admin_login') }}" novalidate>
+      {{ form.hidden_tag() }}
+      
+      <div class="mb-3">
+        <label class="form-label-custom">{{ form.email.label.text }}</label>
+        <div class="input-group-custom">
+          <i class="fas fa-user-shield"></i>
+          {{ form.email(class="form-control form-control-custom is-invalid" if form.email.errors else "form-control form-control-custom", placeholder="Admin email") }}
         </div>
-
-        <!-- Forgot Password -->
-        <a href="#" class="forgot-link">Forgot Password?</a>
-
-        <!-- Submit -->
-        <button type="submit" class="btn-sign-in">
-          <i class="fas fa-lock-open"></i> Sign in
-        </button>
-      </form>
-
-      <!-- Or continue with -->
-      <div class="or-divider"><span>or continue with</span></div>
-
-      <div class="social-icons-row">
-        <a href="#" class="social-btn" title="Google" aria-label="Continue with Google">
-          <i class="fab fa-google"></i>
-        </a>
-        <a href="#" class="social-btn" title="GitHub" aria-label="Continue with GitHub">
-          <i class="fab fa-github"></i>
-        </a>
-        <a href="#" class="social-btn" title="Microsoft" aria-label="Continue with Microsoft">
-          <i class="fab fa-microsoft"></i>
-        </a>
+        {% for e in form.email.errors %}
+          <div class="text-danger small mt-1 font-medium" style="font-size: 0.82rem;"><i class="fas fa-exclamation-circle me-1"></i>{{ e }}</div>
+        {% endfor %}
       </div>
 
-      <p class="card-footer-text">
-        Don't have an account? <a href="{{ url_for('main.index') }}">Go Back</a>
-      </p>
+      <div class="mb-4">
+        <label class="form-label-custom">{{ form.password.label.text }}</label>
+        <div class="password-field-container">
+          <i class="fas fa-key"></i>
+          {{ form.password(class="form-control form-control-custom is-invalid" if form.password.errors else "form-control form-control-custom", placeholder="Admin password", id="password") }}
+          <button type="button" class="password-toggle-btn" data-pw-target="#password" aria-label="Toggle Password Visibility">
+            <i class="fas fa-eye-slash"></i>
+          </button>
+        </div>
+        {% for e in form.password.errors %}
+          <div class="text-danger small mt-1 font-medium" style="font-size: 0.82rem;"><i class="fas fa-exclamation-circle me-1"></i>{{ e }}</div>
+        {% endfor %}
+      </div>
+
+      <button type="submit" class="btn-primary-custom w-100 mb-3">
+        <i class="fas fa-lock-open"></i> Authenticate
+      </button>
+    </form>
+
+    <div class="text-center mt-4">
+      <a href="{{ url_for('main.index') }}" class="back-link">
+        <i class="fas fa-arrow-left"></i> Back to Website
+      </a>
     </div>
-    <!-- end glass-login-card -->
-
+  </div>
 </div>
-
-<script>
-  // Password toggle
-  document.querySelectorAll('.glass-pw-toggle').forEach(function(btn) {
-    btn.addEventListener('click', function() {
-      var target = document.querySelector(btn.getAttribute('data-pw-target'));
-      var icon = btn.querySelector('i');
-      if (!target) return;
-      if (target.type === 'password') {
-        target.type = 'text';
-        icon.classList.replace('fa-eye-slash', 'fa-eye');
-      } else {
-        target.type = 'password';
-        icon.classList.replace('fa-eye', 'fa-eye-slash');
-      }
-    });
-  });
-</script>
 {% endblock %}
