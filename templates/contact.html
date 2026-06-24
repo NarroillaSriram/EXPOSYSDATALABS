@@ -160,7 +160,11 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
     phoneInput.addEventListener('input', function(e) {
-      phoneInput.value = phoneInput.value.replace(/[^0-9]/g, '');
+      let val = phoneInput.value.replace(/[^0-9]/g, '');
+      if (val.length > 10) {
+        val = val.substring(0, 10);
+      }
+      phoneInput.value = val;
     });
   }
 });

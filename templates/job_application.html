@@ -281,7 +281,7 @@
             </div>
             <div class="col-md-6">
               <div class="form-floating">
-                <input type="tel" class="form-control" id="phone" name="phone" placeholder="+1 234 567 8900" required>
+                <input type="tel" class="form-control" id="phone" name="phone" placeholder="10-digit phone number" maxlength="10" required>
                 <label for="phone">Phone Number *</label>
               </div>
             </div>
@@ -796,6 +796,64 @@ document.addEventListener('DOMContentLoaded', function() {
       }
       val = val.replace(/\s{2,}/g, ' ');
       this.value = val;
+    });
+  }
+
+  // Common validation logic for names and locations
+  const lettersOnlyFields = ['#firstName', '#lastName', '#city', '#state'];
+  lettersOnlyFields.forEach(selector => {
+    const input = document.querySelector(selector);
+    if (input) {
+      input.addEventListener('keypress', function (e) {
+        if (!/[a-zA-Z\s]/.test(e.key)) {
+          e.preventDefault();
+        }
+        if (e.key === ' ') {
+          if (input.value.length === 0 || input.value.endsWith(' ')) {
+            e.preventDefault();
+          }
+        }
+      });
+      input.addEventListener('input', function (e) {
+        let val = input.value.replace(/[^a-zA-Z\s]/g, '');
+        val = val.replace(/^\s+/, '');
+        val = val.replace(/\s{2,}/g, ' ');
+        input.value = val;
+      });
+    }
+  });
+
+  // Email validation: First character must be an alphabet
+  const emailInput = document.querySelector('#email');
+  if (emailInput) {
+    emailInput.addEventListener('keypress', function(e) {
+      if (emailInput.value.length === 0) {
+        if (!/[a-zA-Z]/.test(e.key)) {
+          e.preventDefault();
+        }
+      }
+    });
+    emailInput.addEventListener('input', function(e) {
+      if (emailInput.value.length > 0 && !/[a-zA-Z]/.test(emailInput.value[0])) {
+        emailInput.value = emailInput.value.replace(/^[^a-zA-Z]+/, '');
+      }
+    });
+  }
+
+  // Phone validation: Digits only and max 10 digits
+  const phoneInput = document.querySelector('#phone');
+  if (phoneInput) {
+    phoneInput.addEventListener('keypress', function(e) {
+      if (!/[0-9]/.test(e.key)) {
+        e.preventDefault();
+      }
+    });
+    phoneInput.addEventListener('input', function(e) {
+      let val = phoneInput.value.replace(/[^0-9]/g, '');
+      if (val.length > 10) {
+        val = val.substring(0, 10);
+      }
+      phoneInput.value = val;
     });
   }
 

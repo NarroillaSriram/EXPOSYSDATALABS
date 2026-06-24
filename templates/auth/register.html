@@ -257,6 +257,22 @@
         }
       });
     }
+
+    const phoneInput = document.querySelector('#phone');
+    if (phoneInput) {
+      phoneInput.addEventListener('keypress', function(e) {
+        if (!/[0-9]/.test(e.key)) {
+          e.preventDefault();
+        }
+      });
+      phoneInput.addEventListener('input', function(e) {
+        let val = phoneInput.value.replace(/[^0-9]/g, '');
+        if (val.length > 10) {
+          val = val.substring(0, 10);
+        }
+        phoneInput.value = val;
+      });
+    }
   });
 </script>
 {% endblock %}
