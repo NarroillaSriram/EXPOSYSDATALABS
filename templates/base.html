@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700;800&display=swap" />
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=1.5" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=1.8" />
   {% block extra_css %}{% endblock %}
   <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css">
 </head>
@@ -112,8 +112,8 @@
   <!-- Footer -->
   <footer class="footer">
     <div class="container">
-      <div class="row g-4">
-        <div class="col-lg-4">
+      <div class="custom-footer-grid g-4">
+        <div class="footer-grid-item footer-brand-item">
           <div class="footer-brand">Exposys <span>Data</span> Labs</div>
           <p class="footer-desc">Empowering students with industry-relevant internships and training programs. Build
             your career with us.</p>
@@ -130,7 +130,7 @@
                 class="fab fa-youtube"></i></a>
           </div>
         </div>
-        <div class="col-lg-2 col-md-4">
+        <div class="footer-grid-item">
           <h6>Quick Links</h6>
           <ul class="footer-links">
             <li><a href="{{ url_for('main.index') }}">Home</a></li>
@@ -141,7 +141,7 @@
             <li><a href="{{ url_for('main.verify_search') }}"><i class="fas fa-shield-check me-1"></i>Verify Certificate</a></li>
           </ul>
         </div>
-        <div class="col-lg-3 col-md-4">
+        <div class="footer-grid-item">
           <h6>Internship Domains</h6>
           <ul class="footer-links">
             <li><a href="{{ url_for('main.internships') }}">Frontend Developer</a></li>
@@ -151,7 +151,7 @@
             <li><a href="{{ url_for('main.internships') }}">Digital Marketing</a></li>
           </ul>
         </div>
-        <div class="col-lg-3 col-md-4">
+        <div class="footer-grid-item">
           <h6>Contact Info</h6>
           <ul class="footer-links">
             <li><i class="fas fa-envelope me-2" style="color:var(--secondary)"></i><a
