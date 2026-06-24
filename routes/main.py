@@ -152,9 +152,6 @@ def research():
     return render_template('research.html')
 
 
-@main_bp.route('/promotions')
-def promotions():
-    return render_template('promotions.html')
 
 
 @main_bp.route('/design')
