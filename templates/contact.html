@@ -109,12 +109,14 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   const nameInput = document.querySelector('#name');
+  const emailInput = document.querySelector('#email');
   const phoneInput = document.querySelector('#phone');
 
   // 1. Name Input: Only accept alphabets and spaces, blocking leading/consecutive spaces
   if (nameInput) {
     nameInput.addEventListener('keypress', function(e) {
-      if (/[0-9]/.test(e.key)) {
+      // Only allow alphabets and spaces
+      if (!/[a-zA-Z\s]/.test(e.key)) {
         e.preventDefault();
       }
       if (e.key === ' ') {
@@ -125,14 +127,32 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
     nameInput.addEventListener('input', function(e) {
-      let val = nameInput.value.replace(/[0-9]/g, '');
+      // Remove any character that is not an alphabet or space
+      let val = nameInput.value.replace(/[^a-zA-Z\s]/g, '');
       val = val.replace(/^\s+/, '');       // Strip leading space
       val = val.replace(/\s{2,}/g, ' ');   // Collapse multiple spaces into one
       nameInput.value = val;
     });
   }
 
-  // 2. Phone Input: Only accept digits (0-9)
+  // 2. Email Input: First character must be an alphabet
+  if (emailInput) {
+    emailInput.addEventListener('keypress', function(e) {
+      if (emailInput.value.length === 0) {
+        if (!/[a-zA-Z]/.test(e.key)) {
+          e.preventDefault();
+        }
+      }
+    });
+    emailInput.addEventListener('input', function(e) {
+      if (emailInput.value.length > 0 && !/[a-zA-Z]/.test(emailInput.value[0])) {
+        // Strip non-alphabets from the start of the string
+        emailInput.value = emailInput.value.replace(/^[^a-zA-Z]+/, '');
+      }
+    });
+  }
+
+  // 3. Phone Input: Only accept digits (0-9)
   if (phoneInput) {
     phoneInput.addEventListener('keypress', function(e) {
       if (!/[0-9]/.test(e.key)) {
@@ -140,7 +160,11 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
     phoneInput.addEventListener('input', function(e) {
-      phoneInput.value = phoneInput.value.replace(/[^0-9]/g, '');
+      let val = phoneInput.value.replace(/[^0-9]/g, '');
+      if (val.length > 10) {
+        val = val.substring(0, 10);
+      }
+      phoneInput.value = val;
     });
   }
 });

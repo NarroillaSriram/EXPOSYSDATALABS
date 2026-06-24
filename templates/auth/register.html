@@ -217,7 +217,7 @@
       const input = document.querySelector(selector);
       if (input) {
         input.addEventListener('keypress', function (e) {
-          if (/[0-9]/.test(e.key)) {
+          if (!/[a-zA-Z\s]/.test(e.key)) {
             e.preventDefault();
           }
           if (input.value.length === 0) {
@@ -231,15 +231,48 @@
           }
         });
         input.addEventListener('input', function (e) {
-          let val = input.value.replace(/[0-9]/g, '');
+          let val = input.value.replace(/[^a-zA-Z\s]/g, '');
           if (val.length > 0 && !/^[a-zA-Z]/.test(val)) {
-            val = val.substring(1); // Remove first character if not a letter
+            val = val.replace(/^[^a-zA-Z]+/, ''); // Remove non-letters from start
           }
           val = val.replace(/\s{2,}/g, ' ');
           input.value = val;
         });
       }
     });
+
+    const emailInput = document.querySelector('#email');
+    if (emailInput) {
+      emailInput.addEventListener('keypress', function(e) {
+        if (emailInput.value.length === 0) {
+          if (!/[a-zA-Z]/.test(e.key)) {
+            e.preventDefault();
+          }
+        }
+      });
+      emailInput.addEventListener('input', function(e) {
+        if (emailInput.value.length > 0 && !/[a-zA-Z]/.test(emailInput.value[0])) {
+          // Strip non-alphabets from the start of the string
+          emailInput.value = emailInput.value.replace(/^[^a-zA-Z]+/, '');
+        }
+      });
+    }
+
+    const phoneInput = document.querySelector('#phone');
+    if (phoneInput) {
+      phoneInput.addEventListener('keypress', function(e) {
+        if (!/[0-9]/.test(e.key)) {
+          e.preventDefault();
+        }
+      });
+      phoneInput.addEventListener('input', function(e) {
+        let val = phoneInput.value.replace(/[^0-9]/g, '');
+        if (val.length > 10) {
+          val = val.substring(0, 10);
+        }
+        phoneInput.value = val;
+      });
+    }
   });
 </script>
 {% endblock %}
