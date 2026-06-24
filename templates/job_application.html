@@ -221,6 +221,11 @@
   .btn-submit.loading span {
     opacity: 0.8;
   }
+
+  /* Remove default lines/placeholders in date/month inputs when empty and not focused */
+  input[type="month"]:not(.has-value):not(:focus)::-webkit-datetime-edit {
+    color: transparent;
+  }
 </style>
 {% endblock %}
 
@@ -401,14 +406,14 @@
                   </div>
                   <div class="col-md-6">
                     <div class="form-floating">
-                      <input type="text" class="form-control" name="edu_degree[]" placeholder="Degree">
-                      <label>Degree (e.g., B.Tech)</label>
+                      <input type="text" class="form-control" name="edu_degree[]" placeholder="Degree" required>
+                      <label>Degree (e.g., B.Tech) *</label>
                     </div>
                   </div>
                   <div class="col-md-6">
                     <div class="form-floating">
-                      <input type="text" class="form-control" name="edu_major[]" placeholder="Field of Study">
-                      <label>Field of Study</label>
+                      <input type="text" class="form-control" name="edu_major[]" placeholder="Field of Study" required>
+                      <label>Field of Study *</label>
                     </div>
                   </div>
                 </div>
@@ -703,6 +708,7 @@ document.addEventListener('DOMContentLoaded', function() {
     `;
     container.insertAdjacentHTML('beforeend', html);
     expIndex++;
+    handleMonthInputs();
   });
 
   // Dynamic Fields for Education
@@ -721,14 +727,14 @@ document.addEventListener('DOMContentLoaded', function() {
           </div>
           <div class="col-md-6">
             <div class="form-floating">
-              <input type="text" class="form-control" name="edu_degree[]" placeholder="Degree">
-              <label>Degree (e.g., B.Tech)</label>
+              <input type="text" class="form-control" name="edu_degree[]" placeholder="Degree" required>
+              <label>Degree (e.g., B.Tech) *</label>
             </div>
           </div>
           <div class="col-md-6">
             <div class="form-floating">
-              <input type="text" class="form-control" name="edu_major[]" placeholder="Field of Study">
-              <label>Field of Study</label>
+              <input type="text" class="form-control" name="edu_major[]" placeholder="Field of Study" required>
+              <label>Field of Study *</label>
             </div>
           </div>
         </div>
@@ -856,6 +862,29 @@ document.addEventListener('DOMContentLoaded', function() {
       phoneInput.value = val;
     });
   }
+
+  // Handle month inputs showing placeholder lines
+  function handleMonthInputs() {
+    const monthInputs = document.querySelectorAll('input[type="month"]');
+    monthInputs.forEach(input => {
+      const updateClass = () => {
+        if (input.value) {
+          input.classList.add('has-value');
+        } else {
+          input.classList.remove('has-value');
+        }
+      };
+      input.removeEventListener('input', updateClass);
+      input.removeEventListener('change', updateClass);
+      
+      input.addEventListener('input', updateClass);
+      input.addEventListener('change', updateClass);
+      updateClass();
+    });
+  }
+  
+  // Initial check on load
+  handleMonthInputs();
 
 });
 </script>
