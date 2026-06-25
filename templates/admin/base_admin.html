@@ -43,6 +43,9 @@
       <a href="{{ url_for('admin.certificates') }}" class="{{ 'active' if request.endpoint == 'admin.certificates' }}">
         <i class="fas fa-award"></i> Certificates
       </a>
+      <a href="{{ url_for('main.verify_search') }}" class="{{ 'active' if request.endpoint in ['main.verify_search', 'main.verify_certificate'] }}">
+        <i class="fas fa-shield-check"></i> Verify Certificate
+      </a>
       <a href="{{ url_for('admin.payments') }}" class="{{ 'active' if request.endpoint == 'admin.payments' }}">
         <i class="fas fa-credit-card"></i> Payments
       </a>

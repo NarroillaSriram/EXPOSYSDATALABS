@@ -41,6 +41,9 @@
       <a href="{{ url_for('student.certificates') }}" class="{{ 'active' if request.endpoint == 'student.certificates' }}">
         <i class="fas fa-certificate"></i> Certificates
       </a>
+      <a href="{{ url_for('main.verify_search') }}" class="{{ 'active' if request.endpoint in ['main.verify_search', 'main.verify_certificate'] }}">
+        <i class="fas fa-shield-check"></i> Verify Certificate
+      </a>
       <a href="{{ url_for('student.profile') }}" class="{{ 'active' if request.endpoint == 'student.profile' }}">
         <i class="fas fa-user"></i> My Profile
       </a>
@@ -65,6 +68,9 @@
       </a>
       <a href="{{ url_for('main.contact') }}">
         <i class="fas fa-envelope"></i> Support
+      </a>
+      <a href="{{ url_for('main.verify_search') }}" class="{{ 'active' if request.endpoint in ['main.verify_search', 'main.verify_certificate'] }}">
+        <i class="fas fa-shield-check"></i> Verify Certificate
       </a>
       {% endif %}
 
