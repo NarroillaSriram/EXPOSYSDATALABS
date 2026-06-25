@@ -586,21 +586,21 @@ document.addEventListener('DOMContentLoaded', function() {
 
   function validateStep() {
     const currentStepEl = steps[currentStep];
-    const inputs = currentStepEl.querySelectorAll('input[required], select[required]');
+    const inputs = currentStepEl.querySelectorAll('input, select, textarea');
     let isValid = true;
     
     inputs.forEach(input => {
-      if (!input.value.trim() || (input.type === 'checkbox' && !input.checked)) {
-        isValid = false;
-        input.classList.add('is-invalid');
-      } else {
-        input.classList.remove('is-invalid');
+      if (input.hasAttribute('required') || (input.value && input.value.trim() !== '')) {
+        if (!input.checkValidity()) {
+          isValid = false;
+          input.classList.add('is-invalid');
+        } else {
+          input.classList.remove('is-invalid');
+        }
       }
     });
     
     if (!isValid) {
-      // Create or show a toast/alert or simply let the browser show validation on the first invalid field
-      // Trigger native HTML5 validation message
       form.reportValidity();
     }
     return isValid;
@@ -748,6 +748,22 @@ document.addEventListener('DOMContentLoaded', function() {
   form.addEventListener('submit', function(e) {
     if(!form.checkValidity()) {
       e.preventDefault();
+      // Navigate to the first step containing an invalid field
+      const firstInvalid = form.querySelector(':invalid');
+      if (firstInvalid) {
+        const stepEl = firstInvalid.closest('.form-step');
+        if (stepEl) {
+          const stepIndex = Array.from(steps).indexOf(stepEl);
+          if (stepIndex !== -1) {
+            currentStep = stepIndex;
+            updateUI();
+            setTimeout(() => {
+              firstInvalid.focus();
+              form.reportValidity();
+            }, 50);
+          }
+        }
+      }
       return;
     }
     btnSubmit.classList.add('loading');
@@ -885,6 +901,17 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
   
+  // Auto-prefix URLs with https:// if protocol is missing
+  const urlInputs = document.querySelectorAll('input[type="url"]');
+  urlInputs.forEach(input => {
+    input.addEventListener('blur', function() {
+      let val = this.value.trim();
+      if (val && !/^https?:\/\//i.test(val)) {
+        this.value = 'https://' + val;
+      }
+    });
+  });
+
   // Initial check on load
   handleMonthInputs();
 
