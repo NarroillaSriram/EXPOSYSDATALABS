@@ -7,7 +7,7 @@ from models import db
 
 class SecureAdminIndexView(AdminIndexView):
     def __init__(self, **kwargs):
-        super(SecureAdminIndexView, self).__init__(endpoint='flask_admin_index', url='/admin_db', **kwargs)
+        super(SecureAdminIndexView, self).__init__(endpoint='flask_admin', url='/admin_db', **kwargs)
 
     def is_accessible(self):
         return current_user.is_authenticated and isinstance(current_user._get_current_object(), AdminModel)
@@ -24,7 +24,8 @@ class AdminModelView(ModelView):
 
 def init_admin(app):
     # url='/admin_db' to avoid conflict with existing '/admin' routes
-    admin = Admin(app, name='Exposys Database Viewer', template_mode='bootstrap3', url='/admin_db', endpoint='flask_admin_db', index_view=SecureAdminIndexView())
+    admin = Admin(app, name='Exposys Database Viewer', template_mode='bootstrap3', url='/admin_db', endpoint='flask_admin', index_view=SecureAdminIndexView())
+
 
     
     # Add views for all major tables
