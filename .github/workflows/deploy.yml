@@ -1,0 +1,64 @@
+name: Deploy to AWS EC2
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Create Deployment Package
+      run: |
+        zip -r deploy.zip . -x "*.git*" "venv*" "node_modules*" "aws_deployment/venv*" ".env"
+
+    - name: Copy Package to Server
+      uses: appleboy/scp-action@v0.1.4
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.SSH_KEY }}
+        source: "deploy.zip"
+        target: "/home/ubuntu"
+        overwrite: true
+
+    - name: Execute Server Updates
+      uses: appleboy/ssh-action@v0.1.10
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.SSH_KEY }}
+        script: |
+          # 1. Extract new code
+          sudo unzip -o /home/ubuntu/deploy.zip -d /var/www/exposys/
+          rm /home/ubuntu/deploy.zip
+          
+          # 2. Fix permissions
+          sudo chown -R www-data:www-data /var/www/exposys
+          sudo chmod -R 775 /var/www/exposys/uploads
+          sudo chmod g+w /var/www/exposys
+          
+          cd /var/www/exposys/
+          
+          # 3. Update Python Dependencies & Restart
+          sudo -u www-data bash -c 'source venv/bin/activate && pip install -r requirements.txt'
+          sudo systemctl restart exposys
+          
+          # 4. Update Node Dependencies & Restart
+          cd certificate_system/backend
+          sudo -u www-data npm install
+          pm2 restart exposys-cert-api
+          pm2 save
+          
+          # 5. Restart Nginx Cache
+          sudo systemctl restart nginx
+          
+          echo "Deployment Complete!"

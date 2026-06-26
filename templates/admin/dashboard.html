@@ -389,7 +389,9 @@
                 <span class="analytics-badge">{{ count }}</span>
               </div>
               <div class="progress-premium">
-                <div class="progress-bar-premium" style="width: {{ [(count / total_students * 100)|int, 100]|min if total_students > 0 else 0 }}%;"></div>
+                {% set w_pct = [(count / total_students * 100)|int, 100]|min if total_students > 0 else 0 %}
+                {% set prog_style = 'style="width: ' ~ w_pct ~ '%;"' %}
+                <div class="progress-bar-premium" {{ prog_style|safe }}></div>
               </div>
             </div>
             {% endfor %}
@@ -510,7 +512,11 @@
                       <i class="fas fa-download me-1"></i>Download
                     </a>
                     {% if s.status != 'approved' %}
-                    <button type="button" class="btn btn-sm btn-success" style="font-size:0.75rem; padding:4px 8px; font-weight:600;" onclick="openCertificateModal({{ s.student.id }}, '{{ s.student.name | e }}', '{{ s.domain_name | e }}', '2')">
+                    <button type="button" class="btn btn-sm btn-success" style="font-size:0.75rem; padding:4px 8px; font-weight:600;"
+                            data-student-id="{{ s.student.id }}"
+                            data-student-name="{{ s.student.name | e }}"
+                            data-domain="{{ s.domain_name | e }}"
+                            onclick="openCertificateModal(this.dataset.studentId, this.dataset.studentName, this.dataset.domain, '2')">
                       <i class="fas fa-award me-1"></i>Issue
                     </button>
                     {% endif %}
@@ -540,10 +546,14 @@
       ('fa-file-csv', 'Export Data',     'Preview & download student CSV',  url_for('admin.export_students'),  '#f59e0b', 'rgba(245,158,11,0.08)'),
       ('fa-shield-check', 'Verify Certificate', 'Check certificate authenticity', url_for('main.verify_search'), '#06b6d4', 'rgba(6,182,212,0.08)'),
     ] %}
-    <div class="col-lg-3 col-md-6" style="animation: cardSlideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both; animation-delay: {{ 0.3 + loop.index0 * 0.05 }}s;">
-      <a href="{{ dest }}" class="action-card-premium" style="border-color: {{ bg }};">
+    {% set anim_delay = 0.3 + loop.index0 * 0.05 %}
+    {% set col_style = 'style="animation: cardSlideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both; animation-delay: ' ~ anim_delay ~ 's;"' %}
+    <div class="col-lg-3 col-md-6" {{ col_style|safe }}>
+      {% set a_style = 'style="border-color: ' ~ bg ~ ';"' %}
+      <a href="{{ dest }}" class="action-card-premium" {{ a_style|safe }}>
         <!-- Icon Box -->
-        <div class="action-icon-box" style="background: {{ bg }}; color: {{ color }};">
+        {% set icon_style = 'style="background: ' ~ bg ~ '; color: ' ~ color ~ ';"' %}
+        <div class="action-icon-box" {{ icon_style|safe }}>
           <i class="fas {{ icon }}"></i>
         </div>
         <!-- Text details -->

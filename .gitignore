@@ -7,3 +7,8 @@ uploads/
 *.db
 .DS_Store
 instance/
+
+# AWS Deployment Artifacts
+*.pem
+*.zip
+deploy.ps1

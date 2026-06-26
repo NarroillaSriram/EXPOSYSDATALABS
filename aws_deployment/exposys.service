@@ -1,0 +1,17 @@
+[Unit]
+Description=Gunicorn instance to serve Exposys Flask App
+After=network.target
+
+[Service]
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/exposys
+Environment="PATH=/var/www/exposys/venv/bin"
+# Using 3 workers, binding to a local unix socket
+ExecStart=/var/www/exposys/venv/bin/gunicorn --workers 3 --bind unix:exposys.sock -m 007 app:app
+# Restart policy
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

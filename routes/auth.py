@@ -82,8 +82,11 @@ def login():
             return redirect(url_for('admin.dashboard'))
     form = LoginForm()
     if form.validate_on_submit():
-        student = Student.query.filter_by(email=form.email.data).first()
-        if student and student.check_password(form.password.data):
+        email = form.email.data.strip() if form.email.data else ''
+        password = form.password.data.strip() if form.password.data else ''
+        print(f"Login attempt: email='{email}', password='{password}'", flush=True)
+        student = Student.query.filter(Student.email.ilike(email)).first()
+        if student and student.check_password(password):
             login_user(student, remember=form.remember.data)
             flash(f'Welcome back, {student.name}!', 'success')
             
