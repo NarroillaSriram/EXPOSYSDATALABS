@@ -34,3 +34,5 @@ WTForms==3.0.1
 qrcode
 reportlab
 
+
+Flask-Admin==1.6.1

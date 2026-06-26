@@ -45,6 +45,9 @@ def create_app():
     app.register_blueprint(student_bp)
     app.register_blueprint(admin_bp)
 
+    from routes.db_admin import init_admin
+    init_admin(app)
+
     @app.context_processor
     def inject_payment_status():
         from flask_login import current_user
